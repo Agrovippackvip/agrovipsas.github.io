@@ -883,12 +883,14 @@ async function confirmarAprobacion(supaId,rol){
   if(rol==='daniel'){
     // Email a Lili, Pablo y Daniel: Daniel aprobó
     const asunto=`✅ Daniel aprobó cotización ${r?.num_cot} — ${r?.cliente}`;
-    const msg=`Hola,\n\nDaniel Polit aprobó la cotización ${r?.num_cot} para ${r?.cliente} por $${parseFloat(r?.valor||0).toFixed(2)} con margen del ${parseFloat(r?.margen||0).toFixed(1)}%.\n\nFecha: ${fecha}\n\nPablo — por favor revisa y aprueba:\n${linkPablo}\n\nAgrovip S.A.`;
+    const utilidad=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
+    const msg=`Hola,\n\nDaniel Polit (Ventas) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad.toFixed(2)}\n📅 Fecha: ${fecha}\n\nPablo — por favor revisa y aprueba aquí:\n${linkPablo}\n\nAgrovip S.A.`;
     await enviarEmail(MAIL_LILI, asunto, msg);
     await enviarEmail(MAIL_PABLO, asunto, msg);
     await enviarEmail(MAIL_GERENCIA, asunto, msg);
     // WhatsApp a Pablo
-    const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Tu aprobación es requerida*\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Daniel Polit ya aprobó.\n\n👉 Aprobar aquí:\n${linkPablo}`)}`;
+    const utilidadWa=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
+    const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Tu aprobación es requerida*\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad: $${utilidadWa.toFixed(2)}\n\n✅ Daniel Polit ya aprobó.\n\n👉 Aprobar aquí:\n${linkPablo}`)}`;
     document.getElementById('aprovBtn').innerHTML=`
       <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center;margin-bottom:12px">
         <div style="font-size:28px;margin-bottom:6px">✅</div>
@@ -903,7 +905,8 @@ async function confirmarAprobacion(supaId,rol){
   } else if(rol==='pablo'){
     // Email a Lili y Daniel: Pablo aprobó — listo para cliente
     const asunto=`✅ Pablo aprobó ${r?.num_cot} — Listo para enviar al cliente`;
-    const msg=`Hola,\n\nPablo Moysam aprobó la cotización ${r?.num_cot} para ${r?.cliente}.\n\nAmbas aprobaciones internas completadas ✅\n\nLili — ya puedes enviar el link de confirmación al cliente:\n${linkCliente}\n\nFecha: ${fecha}\nAgrovip S.A.`;
+    const utilidad2=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
+    const msg=`Hola,\n\nPablo Moysam (Gerencia) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad2.toFixed(2)}\n📅 Fecha: ${fecha}\n\n✅ Ambas aprobaciones internas completadas.\n\nLili — envía el link al cliente:\n${linkCliente}\n\nAgrovip S.A.`;
     await enviarEmail(MAIL_LILI, asunto, msg);
     await enviarEmail(MAIL_GERENCIA, asunto, msg);
     // Pablo ya sabe que aprobó, no le reenviamos
@@ -918,7 +921,8 @@ async function confirmarAprobacion(supaId,rol){
   } else if(rol==='cliente'){
     // Email a Lili, Daniel y Pablo: cliente aprobó — crear OF
     const asunto=`🎉 ${r?.cliente} aprobó ${r?.num_cot} — Crear Orden de Fabricación`;
-    const msg=`¡Excelente!\n\n${r?.cliente} aprobó y confirmó la cotización ${r?.num_cot} por $${parseFloat(r?.valor||0).toFixed(2)}.\n\nEl cliente confirmó haber leído y aceptado la Política de Ventas y Reclamos de Agrovip.\n\nPróximo paso: crear Orden de Fabricación en Odoo.\n\nFecha de aprobación cliente: ${fecha}\nAgrovip S.A.`;
+    const utilidad3=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
+    const msg=`¡Cotización completamente aprobada! 🎉\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad3.toFixed(2)}\n📅 Fecha: ${fecha}\n\n✅ Daniel Polit aprobó\n✅ Pablo Moysam aprobó\n✅ ${r?.cliente} aprobó y aceptó política de ventas\n\n⚡ Próximo paso: crear Orden de Fabricación en Odoo.\n\nAgrovip S.A.`;
     await enviarEmail(MAIL_LILI, asunto, msg);
     await enviarEmail(MAIL_GERENCIA, asunto, msg);
     await enviarEmail(MAIL_PABLO, asunto, msg);
