@@ -1120,12 +1120,58 @@ function renderReporte(){
   const totalUtil=cots.reduce((s,c)=>s+(c.utilidad||0),0);
   const margenProm=cots.length?cots.reduce((s,c)=>s+(c.margenReal||0),0)/cots.length:0;
   const conv=cots.length?cots.filter(c=>c.estado==='Facturada').length/cots.length*100:0;
+
+  // Pipeline counts
+  const nBorrador=cots.filter(c=>c.estado==='Borrador').length;
+  const nEnviada=cots.filter(c=>c.estado==='Enviada').length;
+  const nAprobada=cots.filter(c=>c.estado==='Aprobada').length;
+  const nFacturada=cots.filter(c=>c.estado==='Facturada').length;
+  const valorEnviado=cots.filter(c=>c.estado==='Enviada').reduce((s,c)=>s+(c.valorCotizado||0),0);
+  const valorAprobado=cots.filter(c=>c.estado==='Aprobada'||c.estado==='Facturada').reduce((s,c)=>s+(c.valorCotizado||0),0);
+  const pipelineTotal=cots.length||1;
+
   document.getElementById('rptKpis').innerHTML=`
-    <div class="rpt-card"><div class="lbl">Operaciones</div><div class="val">${cots.length}</div></div>
+    <div class="rpt-card"><div class="lbl">Total cotizaciones</div><div class="val">${cots.length}</div><div style="font-size:11px;color:var(--gris)">en el período</div></div>
     <div class="rpt-card"><div class="lbl">Valor cotizado</div><div class="val">${fk(totalCot)}</div></div>
     <div class="rpt-card"><div class="lbl">Valor facturado</div><div class="val">${fk(totalFac)}</div><div style="font-size:11px;color:var(--gris)">${conv.toFixed(0)}% conversión</div></div>
     <div class="rpt-card"><div class="lbl">Utilidad bruta</div><div class="val">${fk(totalUtil)}</div></div>
     <div class="rpt-card"><div class="lbl">Margen promedio</div><div class="val">${margenProm.toFixed(1)}%</div><div class="chart-bar"><div class="chart-bar-fill" style="width:${Math.min(margenProm/20*100,100)}%"></div></div></div>
+  `;
+
+  // PIPELINE KPIs
+  const pipelineEl = document.getElementById('rptKpis');
+  pipelineEl.innerHTML += `
+    <div style="grid-column:1/-1;margin-top:4px">
+      <div style="font-size:10px;font-weight:600;color:var(--gris);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)">PIPELINE DE COTIZACIONES</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid #94A3B8">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📝 Borradores</div>
+          <div style="font-size:28px;font-weight:700;color:#475569">${nBorrador}</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${((nBorrador/pipelineTotal)*100).toFixed(0)}% del total</div>
+        </div>
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid #3B82F6">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📤 Enviadas a cliente</div>
+          <div style="font-size:28px;font-weight:700;color:#1E40AF">${nEnviada}</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${fk(valorEnviado)} en juego</div>
+        </div>
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid #1A6B3C">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">✅ Aprobadas</div>
+          <div style="font-size:28px;font-weight:700;color:#1A6B3C">${nAprobada}</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${fk(valorAprobado)} aprobado</div>
+        </div>
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid #6B21A8">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">🧾 Facturadas</div>
+          <div style="font-size:28px;font-weight:700;color:#6B21A8">${nFacturada}</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${fk(totalFac)} cobrado</div>
+        </div>
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid var(--am)">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">🎯 Tasa de cierre</div>
+          <div style="font-size:28px;font-weight:700;color:${conv>=50?'#1A6B3C':conv>=25?'#D4A017':'#C0392B'}">${conv.toFixed(0)}%</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${nFacturada} de ${cots.length} cerradas</div>
+          <div class="chart-bar" style="margin-top:6px"><div class="chart-bar-fill" style="width:${Math.min(conv,100)}%;background:${conv>=50?'#1A6B3C':conv>=25?'#D4A017':'#C0392B'}"></div></div>
+        </div>
+      </div>
+    </div>
   `;
   const byCli={};cots.forEach(c=>{if(!byCli[c.cliente])byCli[c.cliente]={util:0,margen:[],ap:0,total:0};byCli[c.cliente].util+=c.utilidad||0;byCli[c.cliente].margen.push(c.margenReal||0);byCli[c.cliente].total++;if(c.estado==='Aprobada'||c.estado==='Facturada')byCli[c.cliente].ap++;});
   const maxU=Math.max(...Object.values(byCli).map(v=>v.util),1);
