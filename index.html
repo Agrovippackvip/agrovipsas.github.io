@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agrovip · Sistema Interno</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root{--g:#1A6B3C;--g2:#7A9A2E;--am:#D4A017;--rd:#C0392B;--cr:#F5F0E8;--cr2:#EAE3D2;--gris:#6B6B5A;--ink:#1C1C1C;--bd:#E0D8C8}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -839,19 +840,96 @@ async function procesarAprobacion(supaId,rol,token){
   }
 }
 
+// EMAILJS
+const EJS_SVC='service_lptgrd5';
+const EJS_TPL='template_2z6dond';
+const EJS_KEY='ZvrnAlzPIyQhSUzWj';
+const MAIL_LILI='lilibeth@agrovipsa.com';
+const MAIL_PABLO='gerencia@packvipsas.com';
+const MAIL_GERENCIA='gerencia@agrovipsa.com';
+
+
+async function enviarEmail(para, asunto, mensaje){
+  try{
+    await fetch('https://api.emailjs.com/api/v1.0/email/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        service_id:EJS_SVC,
+        template_id:EJS_TPL,
+        user_id:EJS_KEY,
+        template_params:{to_email:para, asunto, mensaje}
+      })
+    });
+  }catch(e){console.log('Email error:',e);}
+}
+
 async function confirmarAprobacion(supaId,rol){
   const campo={'daniel':'aprobado_daniel','pablo':'aprobado_pablo','cliente':'aprobado_cliente'}[rol];
   const campofecha={'daniel':'fecha_daniel','pablo':'fecha_pablo','cliente':'fecha_cliente'}[rol];
   const update={[campo]:true,[campofecha]:new Date().toISOString()};
   await supaFetch('PATCH',`aprobaciones?id=eq.${supaId}`,update);
-  const nombre={'daniel':'Daniel Polit','pablo':'Pablo Moysam','cliente':'Cliente'}[rol];
-  document.getElementById('aprovBtn').innerHTML=`
-    <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center">
-      <div style="font-size:32px;margin-bottom:8px">✅</div>
-      <div style="font-size:16px;font-weight:700;color:#065F46">¡Aprobado exitosamente!</div>
-      <div style="font-size:13px;color:#065F46;margin-top:6px">${nombre} · ${new Date().toLocaleDateString('es-EC')}</div>
-      <div style="font-size:12px;color:#6B6B5A;margin-top:8px">Agrovip ha sido notificado. Gracias.</div>
-    </div>`;
+
+  // Obtener datos completos
+  const data=await supaFetch('GET',`aprobaciones?id=eq.${supaId}&select=*`);
+  const r=data?.[0];
+  const nombre={'daniel':'Daniel Polit','pablo':'Pablo Moysam','cliente':r?.cliente||'Cliente'}[rol];
+  const fecha=new Date().toLocaleDateString('es-EC');
+  const linkPablo=`${BASE_URL}?aprobar=${supaId}&rol=pablo&token=${r?.token_pablo}`;
+  const linkCliente=`${BASE_URL}?aprobar=${supaId}&rol=cliente&token=${r?.token_cliente}`;
+  const waNumPablo='593996404584';
+
+  // CADENA SECUENCIAL
+  if(rol==='daniel'){
+    // Email a Lili, Pablo y Daniel: Daniel aprobó
+    const asunto=`✅ Daniel aprobó cotización ${r?.num_cot} — ${r?.cliente}`;
+    const msg=`Hola,\n\nDaniel Polit aprobó la cotización ${r?.num_cot} para ${r?.cliente} por $${parseFloat(r?.valor||0).toFixed(2)} con margen del ${parseFloat(r?.margen||0).toFixed(1)}%.\n\nFecha: ${fecha}\n\nPablo — por favor revisa y aprueba:\n${linkPablo}\n\nAgrovip S.A.`;
+    await enviarEmail(MAIL_LILI, asunto, msg);
+    await enviarEmail(MAIL_PABLO, asunto, msg);
+    await enviarEmail(MAIL_GERENCIA, asunto, msg);
+    // WhatsApp a Pablo
+    const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Tu aprobación es requerida*\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Daniel Polit ya aprobó.\n\n👉 Aprobar aquí:\n${linkPablo}`)}`;
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center;margin-bottom:12px">
+        <div style="font-size:28px;margin-bottom:6px">✅</div>
+        <div style="font-size:15px;font-weight:700;color:#065F46">¡Aprobado! Gracias Daniel.</div>
+        <div style="font-size:12px;color:#065F46;margin-top:4px">Se notificó a Lili y Pablo por email.</div>
+      </div>
+      <a href="${waPablo}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:white;padding:12px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Enviar WhatsApp a Pablo Moysam
+      </a>`;
+
+  } else if(rol==='pablo'){
+    // Email a Lili y Daniel: Pablo aprobó — listo para cliente
+    const asunto=`✅ Pablo aprobó ${r?.num_cot} — Listo para enviar al cliente`;
+    const msg=`Hola,\n\nPablo Moysam aprobó la cotización ${r?.num_cot} para ${r?.cliente}.\n\nAmbas aprobaciones internas completadas ✅\n\nLili — ya puedes enviar el link de confirmación al cliente:\n${linkCliente}\n\nFecha: ${fecha}\nAgrovip S.A.`;
+    await enviarEmail(MAIL_LILI, asunto, msg);
+    await enviarEmail(MAIL_GERENCIA, asunto, msg);
+    // Pablo ya sabe que aprobó, no le reenviamos
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center;margin-bottom:12px">
+        <div style="font-size:28px;margin-bottom:6px">✅</div>
+        <div style="font-size:15px;font-weight:700;color:#065F46">¡Aprobado! Gracias Pablo.</div>
+        <div style="font-size:12px;color:#065F46;margin-top:4px">Se notificó a Lili y Daniel por email.</div>
+        <div style="font-size:12px;color:#065F46;margin-top:4px">Lili recibirá el link para enviar al cliente.</div>
+      </div>`;
+
+  } else if(rol==='cliente'){
+    // Email a Lili, Daniel y Pablo: cliente aprobó — crear OF
+    const asunto=`🎉 ${r?.cliente} aprobó ${r?.num_cot} — Crear Orden de Fabricación`;
+    const msg=`¡Excelente!\n\n${r?.cliente} aprobó y confirmó la cotización ${r?.num_cot} por $${parseFloat(r?.valor||0).toFixed(2)}.\n\nEl cliente confirmó haber leído y aceptado la Política de Ventas y Reclamos de Agrovip.\n\nPróximo paso: crear Orden de Fabricación en Odoo.\n\nFecha de aprobación cliente: ${fecha}\nAgrovip S.A.`;
+    await enviarEmail(MAIL_LILI, asunto, msg);
+    await enviarEmail(MAIL_GERENCIA, asunto, msg);
+    await enviarEmail(MAIL_PABLO, asunto, msg);
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">🎉</div>
+        <div style="font-size:16px;font-weight:700;color:#065F46">¡Cotización completamente aprobada!</div>
+        <div style="font-size:13px;color:#065F46;margin-top:6px">${r?.cliente} · ${fecha}</div>
+        <div style="font-size:12px;color:#6B6B5A;margin-top:8px">Agrovip ha sido notificado. Se creará la Orden de Fabricación en Odoo.</div>
+      </div>`;
+  }
 }
 
 // COTIZACIONES
