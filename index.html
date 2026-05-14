@@ -692,20 +692,20 @@ async function enviarAprobacion(){
   document.getElementById('aprovPanel').style.display='block';
   document.getElementById('ap_cli_nombre').textContent=c.cliente;
 
-  // Abrir WhatsApp para Daniel
-  const waNumDaniel='+593990000001'; // reemplazar con número real de Daniel
-  const waNumPablo='+593990000002';  // reemplazar con número real de Pablo
+  const waNumDaniel='593998945387';
+  const waNumPablo='593996404584';
 
-  // Copiar links al portapapeles
+  // Links para copiar
   const todosLosLinks=`*LINKS DE APROBACIÓN — ${c.numCot}*\n\n👤 Daniel Polit:\n${linkDaniel}\n\n👤 Pablo Moysam:\n${linkPablo}\n\n🏢 Cliente ${c.cliente}:\n${linkCliente}`;
   navigator.clipboard.writeText(todosLosLinks).catch(()=>{});
 
-  // Abrir WhatsApp con mensaje para Agrovip interno
-  const waMsg=encodeURIComponent(msgInterno);
-  const waUrl=`https://wa.me/${WA_AGROVIP.replace(/\+/,'')}?text=${waMsg}`;
+  // Mensajes WhatsApp
+  const waDaniel=`https://wa.me/${waNumDaniel}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkDaniel}`)}`;
+  const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkPablo}`)}`;
 
-  alert(`✅ Aprobaciones creadas y links copiados al portapapeles.\n\nSe abrirá WhatsApp para enviar al equipo interno.\n\nLinks también copiados para enviar manualmente a Pablo y al cliente.`);
-  window.open(waUrl,'_blank');
+  alert(`✅ Cotización ${c.numCot} enviada para aprobación.\n\nSe abrirán WhatsApp para Daniel y Pablo.\nEl link del cliente fue copiado al portapapeles — pégalo en tu chat con ${c.cliente}.`);
+  window.open(waDaniel,'_blank');
+  setTimeout(()=>window.open(waPablo,'_blank'),1500);
 
   // Polling para actualizar estado
   iniciarPolling(supaId);
@@ -757,13 +757,68 @@ async function procesarAprobacion(supaId,rol,token){
   const yaAprobado={'daniel':r.aprobado_daniel,'pablo':r.aprobado_pablo,'cliente':r.aprobado_cliente}[rol];
   const nombre={'daniel':'Daniel Polit','pablo':'Pablo Moysam','cliente':r.cliente}[rol];
 
-  document.getElementById('aprovMsg').innerHTML=`<b>${nombre}</b><br>Cotización <b>${r.num_cot}</b><br>Cliente: ${r.cliente}<br>Valor: $${parseFloat(r.valor).toFixed(2)}<br>Margen: ${parseFloat(r.margen).toFixed(1)}%`;
+  // Detalle cotización
+  document.getElementById('aprovMsg').innerHTML=`
+    <div style="text-align:left;background:#F5F0E8;border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px">
+      <div style="font-weight:700;color:#1A6B3C;margin-bottom:8px">📋 ${r.num_cot}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div><span style="color:#6B6B5A;font-size:11px">CLIENTE</span><br><b>${r.cliente}</b></div>
+        <div><span style="color:#6B6B5A;font-size:11px">VALOR</span><br><b>$${parseFloat(r.valor).toFixed(2)}</b></div>
+      </div>
+    </div>`;
 
   if(yaAprobado){
-    document.getElementById('aprovBtn').innerHTML=`<div style="background:#D1FAE5;color:#065F46;padding:12px;border-radius:8px;font-weight:600">✅ Ya aprobado anteriormente</div>`;
+    document.getElementById('aprovBtn').innerHTML=`<div style="background:#D1FAE5;color:#065F46;padding:14px;border-radius:8px;font-weight:600;text-align:center">✅ Ya aprobado anteriormente<br><span style="font-size:12px;font-weight:400">Gracias por su confirmación.</span></div>`;
     return;
   }
-  document.getElementById('aprovBtn').innerHTML=`<button onclick="confirmarAprobacion('${supaId}','${rol}')" style="width:100%;padding:14px;background:#1A6B3C;color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer">✅ APROBAR COTIZACIÓN</button>`;
+
+  // Pantalla diferente para cliente vs interno
+  if(rol==='cliente'){
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="text-align:left">
+        <div style="font-size:13px;font-weight:700;color:#1A6B3C;margin-bottom:10px">📄 Política de Ventas y Reclamos</div>
+        <div style="font-size:12px;color:#333;background:#fff;border:1px solid #E0D8C8;border-radius:8px;padding:14px;max-height:200px;overflow-y:auto;margin-bottom:14px;line-height:1.6">
+          <b>1. Precios:</b> Los precios acordados aplican para la operación en curso. No hay ajustes retroactivos.<br><br>
+          <b>2. Entrega:</b> El Incoterm aplicable (FOB/CIF) se define antes del despacho. La responsabilidad se transfiere según lo acordado.<br><br>
+          <b>3. Reclamos de calidad:</b> Deben notificarse dentro de los <b>3 días calendario</b> desde la llegada de la carga, con evidencia fotográfica o de video (fecha y hora visible).<br><br>
+          <b>4. Documentación de reclamos:</b> La documentación completa (factura, guía, fotos, informe de calidad) debe entregarse dentro de los <b>15 días calendario</b> desde la llegada.<br><br>
+          <b>5. Pago:</b> Según condiciones pactadas. Agrovip se reserva el derecho de revisar condiciones de crédito ante atrasos.<br><br>
+          <i>Documento completo disponible en agrovipsas.com · Versión 4.0 · Mayo 2026</i>
+        </div>
+        <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px;cursor:pointer;background:#F0F9F4;border-radius:7px;padding:10px">
+          <input type="checkbox" id="chk_politica" style="width:18px;height:18px;margin-top:1px;accent-color:#1A6B3C;flex-shrink:0">
+          <span>He leído y acepto la <b>Política de Ventas y Gestión de Reclamos</b> de Agrovip S.A.</span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;font-size:13px;cursor:pointer;background:#F0F9F4;border-radius:7px;padding:10px">
+          <input type="checkbox" id="chk_cotizacion" style="width:18px;height:18px;margin-top:1px;accent-color:#1A6B3C;flex-shrink:0">
+          <span>Apruebo la cotización <b>${r.num_cot}</b> por valor de <b>$${parseFloat(r.valor).toFixed(2)}</b> y confirmo el pedido.</span>
+        </label>
+        <button onclick="confirmarAprobacion('${supaId}','${rol}')" style="width:100%;padding:14px;background:#1A6B3C;color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;opacity:.4" id="btnAprobarFinal" disabled>✅ CONFIRMAR Y APROBAR</button>
+        <div style="font-size:11px;color:#6B6B5A;text-align:center;margin-top:8px">Debes marcar ambas casillas para continuar</div>
+      </div>`;
+    // Activar botón solo si ambos checks marcados
+    setTimeout(()=>{
+      const c1=document.getElementById('chk_politica'),c2=document.getElementById('chk_cotizacion'),b=document.getElementById('btnAprobarFinal');
+      if(c1&&c2&&b){
+        const check=()=>{b.disabled=!(c1.checked&&c2.checked);b.style.opacity=b.disabled?'.4':'1';};
+        c1.addEventListener('change',check);c2.addEventListener('change',check);
+      }
+    },100);
+  } else {
+    // Daniel y Pablo — pantalla simple
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="text-align:left">
+        <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;font-size:13px;cursor:pointer;background:#F0F9F4;border-radius:7px;padding:10px">
+          <input type="checkbox" id="chk_interno" style="width:18px;height:18px;margin-top:1px;accent-color:#1A6B3C;flex-shrink:0">
+          <span>Revisé los márgenes y costos. Apruebo la cotización <b>${r.num_cot}</b> para <b>${r.cliente}</b> por <b>$${parseFloat(r.valor).toFixed(2)}</b>.</span>
+        </label>
+        <button onclick="confirmarAprobacion('${supaId}','${rol}')" style="width:100%;padding:14px;background:#1A6B3C;color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;opacity:.4" id="btnAprobarFinal" disabled>✅ APROBAR</button>
+      </div>`;
+    setTimeout(()=>{
+      const c=document.getElementById('chk_interno'),b=document.getElementById('btnAprobarFinal');
+      if(c&&b){c.addEventListener('change',()=>{b.disabled=!c.checked;b.style.opacity=b.disabled?'.4':'1';});}
+    },100);
+  }
 }
 
 async function confirmarAprobacion(supaId,rol){
@@ -771,7 +826,14 @@ async function confirmarAprobacion(supaId,rol){
   const campofecha={'daniel':'fecha_daniel','pablo':'fecha_pablo','cliente':'fecha_cliente'}[rol];
   const update={[campo]:true,[campofecha]:new Date().toISOString()};
   await supaFetch('PATCH',`aprobaciones?id=eq.${supaId}`,update);
-  document.getElementById('aprovBtn').innerHTML=`<div style="background:#D1FAE5;color:#065F46;padding:16px;border-radius:8px;font-size:16px;font-weight:700">✅ ¡Aprobado exitosamente!<br><span style="font-size:13px;font-weight:400">Gracias. Agrovip ha sido notificado.</span></div>`;
+  const nombre={'daniel':'Daniel Polit','pablo':'Pablo Moysam','cliente':'Cliente'}[rol];
+  document.getElementById('aprovBtn').innerHTML=`
+    <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">✅</div>
+      <div style="font-size:16px;font-weight:700;color:#065F46">¡Aprobado exitosamente!</div>
+      <div style="font-size:13px;color:#065F46;margin-top:6px">${nombre} · ${new Date().toLocaleDateString('es-EC')}</div>
+      <div style="font-size:12px;color:#6B6B5A;margin-top:8px">Agrovip ha sido notificado. Gracias.</div>
+    </div>`;
 }
 
 // COTIZACIONES
