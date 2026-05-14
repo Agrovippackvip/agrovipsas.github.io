@@ -440,10 +440,34 @@ input,select,textarea,button{font-family:inherit}
   <div class="modal">
     <div class="modal-title">Registrar facturación</div>
     <div class="fld"><label>N° Factura Agrovip</label><input type="text" id="mf_factura" placeholder="001-001-000000XXX"></div>
-    <div class="fld"><label>Valor facturado real (USD)</label><input type="number" id="mf_valor" step="0.01"></div>
-    <div class="fld"><label>Fecha</label><input type="date" id="mf_fecha"></div>
+    <div class="fr2">
+      <div class="fld"><label>Valor facturado real (USD)</label><input type="number" id="mf_valor" step="0.01" oninput="calcMfPorCaja()"></div>
+      <div class="fld"><label>Fecha</label><input type="date" id="mf_fecha"></div>
+    </div>
+    <div class="fr2">
+      <div class="fld"><label>Cajas facturadas</label><input type="number" id="mf_cajas" step="1" oninput="calcMfPorCaja()"></div>
+      <div class="fld"><label>Valor por caja (auto)</label><input type="text" id="mf_porcaja" readonly style="background:var(--cr);color:var(--g);font-weight:600"></div>
+    </div>
+    <div style="background:var(--cr);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:600;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Nota de crédito (si aplica)</div>
+      <div class="fld"><label>Tipo de N/C</label>
+        <select id="mf_nc_tipo">
+          <option value="">— Sin nota de crédito —</option>
+          <option value="Calidad">Calidad — problema con la fruta</option>
+          <option value="Comercial">Comercial — ajuste de precio</option>
+          <option value="Demoras">Demoras — retraso en entrega</option>
+          <option value="Calidad+Comercial">Calidad + Comercial</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="fr2">
+        <div class="fld"><label>Monto N/C (USD)</label><input type="number" id="mf_nc_monto" step="0.01" placeholder="0.00" oninput="calcMfPorCaja()"></div>
+        <div class="fld"><label>Detalle N/C</label><input type="text" id="mf_nc_detalle" placeholder="Observación..."></div>
+      </div>
+      <div id="mf_nc_resumen" style="font-size:12px;color:var(--rd);font-weight:600;display:none"></div>
+    </div>
     <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="btn-p" style="margin-top:0" onclick="confirmarFactura()">Guardar</button>
+      <button class="btn-p" style="margin-top:0" onclick="confirmarFactura()">Guardar factura</button>
       <button class="btn-sm" onclick="cerrarModal('modalFactura')">Cancelar</button>
     </div>
   </div>
@@ -970,7 +994,13 @@ function cotCard(c){
       <div class="cot-m"><div class="et">Valor cobrado</div><div class="nm">${f2(c.valorCobrado)}</div></div>
       <div class="cot-m"><div class="et">Costo CIF/caja</div><div class="nm">${f2(c.costoTotalCaja)}</div></div>
       <div class="cot-m"><div class="et">Utilidad bruta</div><div class="nm hl">${f2(c.utilidad)}</div></div>
-      ${c.estado==='Facturada'&&c.valorFacturadoReal?`<div class="cot-m"><div class="et">Facturado real</div><div class="nm hl">${f2(c.valorFacturadoReal)}</div></div>`:''}
+      ${c.estado==='Facturada'&&c.valorFacturadoReal?`
+        <div class="cot-m"><div class="et">Facturado real</div><div class="nm hl">${f2(c.valorFacturadoReal)}</div></div>
+        <div class="cot-m"><div class="et">Cajas facturadas</div><div class="nm">${(c.cajasFacturadas||c.cajasTotal||0).toLocaleString()}</div></div>
+        <div class="cot-m"><div class="et">Valor/caja real</div><div class="nm hl">${c.valorPorCajaFact?'$'+c.valorPorCajaFact.toFixed(2):'—'}</div></div>
+        ${c.ncFacturaMonto>0?`<div class="cot-m" style="border-left:3px solid var(--am)"><div class="et">N/C ${c.ncFacturaTipo||''}</div><div class="nm" style="color:var(--rd)">-${f2(c.ncFacturaMonto)}</div>${c.ncFacturaDetalle?`<div style="font-size:10px;color:var(--gris)">${c.ncFacturaDetalle}</div>`:''}</div>`:''}
+        <div class="cot-m"><div class="et">N° Factura</div><div class="nm" style="font-size:12px">${c.numFactura||'—'}</div></div>
+      `:''}
     </div>
     ${c.notas?`<div style="font-size:12px;color:var(--gris);margin-bottom:10px;padding:8px 10px;background:var(--cr);border-radius:7px">${c.notas}</div>`:''}
     <div class="cot-actions">
@@ -1025,13 +1055,58 @@ function updateStats(){
 let facturaTargetId=null;
 function abrirModalFactura(id){
   facturaTargetId=id;
+  const c=lc.cots().find(x=>x.id===id);
   document.getElementById('mf_fecha').value=new Date().toISOString().split('T')[0];
-  document.getElementById('mf_factura').value='';document.getElementById('mf_valor').value='';
+  document.getElementById('mf_factura').value='';
+  document.getElementById('mf_valor').value=c?.valorCobrado?.toFixed(2)||'';
+  document.getElementById('mf_cajas').value=c?.cajasTotal||'';
+  document.getElementById('mf_nc_tipo').value='';
+  document.getElementById('mf_nc_monto').value='';
+  document.getElementById('mf_nc_detalle').value='';
+  document.getElementById('mf_nc_resumen').style.display='none';
+  calcMfPorCaja();
   document.getElementById('modalFactura').classList.add('show');
 }
+
+function calcMfPorCaja(){
+  const valor=parseFloat(document.getElementById('mf_valor').value)||0;
+  const cajas=parseFloat(document.getElementById('mf_cajas').value)||0;
+  const nc=parseFloat(document.getElementById('mf_nc_monto').value)||0;
+  const valorNeto=valor-nc;
+  if(cajas>0){
+    document.getElementById('mf_porcaja').value='$'+(valorNeto/cajas).toFixed(2)+'/caja';
+  } else {
+    document.getElementById('mf_porcaja').value='—';
+  }
+  const resumen=document.getElementById('mf_nc_resumen');
+  if(nc>0){
+    resumen.style.display='block';
+    resumen.textContent=`Valor neto después de N/C: $${valorNeto.toFixed(2)}`;
+  } else {
+    resumen.style.display='none';
+  }
+}
+
 function confirmarFactura(){
   const cots=lc.cots();const i=cots.findIndex(c=>c.id===facturaTargetId);
-  if(i>=0){cots[i].numFactura=document.getElementById('mf_factura').value.trim();cots[i].valorFacturadoReal=parseFloat(document.getElementById('mf_valor').value)||cots[i].valorCobrado;cots[i].fechaFactura=document.getElementById('mf_fecha').value;cots[i].estado='Facturada';lc.saveCots(cots);}
+  if(i>=0){
+    const valor=parseFloat(document.getElementById('mf_valor').value)||cots[i].valorCobrado;
+    const cajas=parseFloat(document.getElementById('mf_cajas').value)||cots[i].cajasTotal;
+    const ncMonto=parseFloat(document.getElementById('mf_nc_monto').value)||0;
+    const ncTipo=document.getElementById('mf_nc_tipo').value;
+    const ncDetalle=document.getElementById('mf_nc_detalle').value.trim();
+    cots[i].numFactura=document.getElementById('mf_factura').value.trim();
+    cots[i].valorFacturadoReal=valor;
+    cots[i].cajasFacturadas=cajas;
+    cots[i].valorPorCajaFact=cajas>0?((valor-ncMonto)/cajas):0;
+    cots[i].ncFacturaTipo=ncTipo;
+    cots[i].ncFacturaMonto=ncMonto;
+    cots[i].ncFacturaDetalle=ncDetalle;
+    cots[i].valorNetoFact=valor-ncMonto;
+    cots[i].fechaFactura=document.getElementById('mf_fecha').value;
+    cots[i].estado='Facturada';
+    lc.saveCots(cots);
+  }
   cerrarModal('modalFactura');renderCots();
 }
 
