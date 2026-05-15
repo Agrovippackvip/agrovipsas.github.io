@@ -1381,14 +1381,33 @@ function calcP(){
   calcFechaPago();
 }
 
-function gP(){
+async function gP(){
   const n=document.getElementById('pp').value||document.getElementById('ppn').value;
   const pr=parseFloat(document.getElementById('ppr').value)||0;
   const kg=parseFloat(document.getElementById('pkg').value)||0;
   if(!n||!pr||!kg){alert('Completa productor, precio y kilos.');return;}
   const fp=calcFechaPago();
-  const p={id:'p'+Date.now(),semana:parseInt(document.getElementById('psem').value)||0,productor:n,tipo:document.getElementById('pt').value,precio:pr,kilos:kg,gavetas:parseFloat(document.getElementById('pgav').value)||0,dia:document.getElementById('pdia').value,tipoventa:document.getElementById('ptipoventa').value,transporte:document.getElementById('ptr').value,notas:document.getElementById('pnot').value.trim(),maxP:parseFloat(document.getElementById('pmaxp').value)||10,maxR:parseFloat(document.getElementById('pmaxr').value)||15,minGav:parseFloat(document.getElementById('pmgav').value)||9,valor:pr*kg,estado:'Pendiente',fecha:new Date().toLocaleDateString('es-EC'),fechaPago:fp.fechaPago,fechaPagoDesc:fp.desc};
-  const peds=lc.peds();peds.unshift(p);lc.sP(peds);
+  const p={
+    id:'p'+Date.now(),
+    semana:parseInt(document.getElementById('psem').value)||0,
+    productor:n,
+    tipo:document.getElementById('pt').value,
+    precio:pr,kilos:kg,
+    gavetas:parseFloat(document.getElementById('pgav').value)||0,
+    dia:document.getElementById('pdia').value,
+    tipoventa:document.getElementById('ptipoventa').value,
+    transporte:document.getElementById('ptr').value,
+    notas:document.getElementById('pnot').value.trim(),
+    maxp:parseFloat(document.getElementById('pmaxp').value)||10,
+    maxr:parseFloat(document.getElementById('pmaxr').value)||15,
+    mingav:parseFloat(document.getElementById('pmgav').value)||9,
+    valor:pr*kg,estado:'Pendiente',
+    fecha:new Date().toLocaleDateString('es-EC'),
+    fecha_pago:fp.fechaPago,
+    fecha_pago_desc:fp.desc,
+    creado_por:USUARIO_ACTUAL?.nombre||'—'
+  };
+  await lc.sP(p);
   alert(`✓ Pedido guardado — ${n} · ${kg}kg · $${pr.toFixed(3)}/kg\nFecha pago: ${fp.fechaPago}`);
 }
 
