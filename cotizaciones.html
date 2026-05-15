@@ -679,10 +679,10 @@ async function calcular(){
   const sem=document.getElementById('semBlock');
   document.getElementById('semVal').textContent=fp(margenReal);
   sem.className='sem';
-  let estado,desc,bc;
-  if(margenReal>=margenObj){estado='sem-v';desc='✓ Dentro del objetivo — aprobado';bc='bg';}
-  else if(margenReal>=margenObj-4){estado='sem-a';desc='⚠ Ajustado — negociar precio';bc='ba';}
-  else{estado='sem-r';desc='✗ Por debajo del objetivo';bc='br';}
+  let estado,desc;
+  if(margenReal>=margenObj){estado='sem-v';desc='✓ Dentro del objetivo — aprobado';}
+  else if(margenReal>=margenObj-4){estado='sem-a';desc='⚠ Ajustado — negociar precio';}
+  else{estado='sem-r';desc='✗ Por debajo del objetivo';}
   sem.classList.add(estado);document.getElementById('semDesc').textContent=desc;
   document.getElementById('secRes').style.display='';
 
