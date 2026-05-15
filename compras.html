@@ -359,8 +359,8 @@ input,select,textarea,button{font-family:inherit}
           <b>Fotos que debes adjuntar:</b><br>
           <span id="fotosGuia">Selecciona los problemas arriba para ver qué fotos necesitas.</span>
         </div>
-        <button class="bmail" onclick="generarMailReporte()">📧 Abrir email con reporte pre-llenado</button>
-        <div style="margin-top:8px;font-size:11px;color:var(--gris);text-align:center">El correo irá a: Lili, Daniel y Pablo (informativo)</div>
+        <button class="bmail" onclick="generarMailReporte()">📧 Enviar reporte por email a Lili, Daniel y Pablo</button>
+        <div style="margin-top:8px;font-size:11px;color:var(--gris);text-align:center">El email incluye diseño Agrovip con tabla de datos y guía de fotos</div>
       </div>
     </div>
 
@@ -1614,6 +1614,75 @@ async function generarMailReporte(){
   const prodMan=document.getElementById('rprodman').value;
   const allPeds=await lc.peds();
   const ped=allPeds.find(p=>p.id===pedId);
+  const productor=ped?ped.productor:prodMan||'—';
+  const semana=ped?`S${ped.semana}`:'';
+  const kg=document.getElementById('rkg').value;
+  const dest=document.getElementById('rdest').value;
+  const desc=document.getElementById('rdesc').value;
+  const hora=document.getElementById('rhora').value;
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>b.dataset.prob);
+  if(!problemas.length){alert('Selecciona al menos un tipo de problema.');return;}
+  const fotos=problemas.map(p=>`• ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('<br>');
+  const fecha=new Date().toLocaleDateString('es-EC',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const asunto=`⚠️ Reporte de rechazo — ${productor} ${semana} — ${new Date().toLocaleDateString('es-EC')}`;
+
+  const mensaje=`
+<table style="width:100%;border-collapse:collapse;font-size:14px">
+  <tr><td style="padding:8px 12px;background:#fff;border-bottom:1px solid #E0D8C8;color:#6B6B5A;width:40%"><b>Reportado por</b></td><td style="padding:8px 12px;background:#fff;border-bottom:1px solid #E0D8C8">${nombre}</td></tr>
+  <tr><td style="padding:8px 12px;background:#F5F0E8;border-bottom:1px solid #E0D8C8;color:#6B6B5A"><b>Fecha</b></td><td style="padding:8px 12px;background:#F5F0E8;border-bottom:1px solid #E0D8C8">${fecha}${hora?' · '+hora:''}</td></tr>
+  <tr><td style="padding:8px 12px;background:#fff;border-bottom:1px solid #E0D8C8;color:#6B6B5A"><b>Productor</b></td><td style="padding:8px 12px;background:#fff;border-bottom:1px solid #E0D8C8">${productor} ${semana}</td></tr>
+  <tr><td style="padding:8px 12px;background:#F5F0E8;border-bottom:1px solid #E0D8C8;color:#6B6B5A"><b>Kilos afectados</b></td><td style="padding:8px 12px;background:#F5F0E8;border-bottom:1px solid #E0D8C8">${kg||'—'} kg</td></tr>
+  <tr><td style="padding:8px 12px;background:#fff;border-bottom:1px solid #E0D8C8;color:#6B6B5A"><b>Destino</b></td><td style="padding:8px 12px;background:#fff;border-bottom:1px solid #E0D8C8">${dest}</td></tr>
+</table>
+
+<div style="margin-top:16px;padding:14px;background:#FEE2E2;border-radius:8px;border-left:4px solid #C0392B">
+  <b style="color:#991B1B">Problemas detectados:</b><br><br>
+  <span style="color:#1C1C1C">${problemas.map(p=>'🔴 '+p).join('<br>')}</span>
+</div>
+
+<div style="margin-top:14px;padding:14px;background:#fff;border-radius:8px;border:1px solid #E0D8C8">
+  <b style="color:#1A6B3C">Descripción detallada:</b><br><br>
+  <span style="color:#333">${desc||'Sin descripción adicional.'}</span>
+</div>
+
+<div style="margin-top:14px;padding:14px;background:#FEF3C7;border-radius:8px;border-left:4px solid #D4A017">
+  <b style="color:#92400E">📷 Fotos a adjuntar en este email:</b><br><br>
+  <span style="color:#92400E">${fotos}</span>
+</div>
+
+<p style="margin-top:16px;font-size:12px;color:#6B6B5A;border-top:1px solid #E0D8C8;padding-top:12px">
+  Este reporte fue generado automáticamente por el sistema de Agrovip S.A.<br>
+  Por favor adjuntar las fotos indicadas y responder con cualquier acción tomada.
+</p>`;
+
+  // Enviar a Lili y Daniel
+  const btnEl=document.querySelector('[onclick="generarMailReporte()"]');
+  if(btnEl){btnEl.textContent='⏳ Enviando...';btnEl.disabled=true;}
+  try{
+    await fetch('https://api.emailjs.com/api/v1.0/email/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({service_id:'service_lptgrd5',template_id:'template_i4iu7bd',user_id:'ZvrnAlzPIyQhSUzWj',
+        template_params:{to_email:MAIL_LILI,asunto,mensaje}})
+    });
+    await fetch('https://api.emailjs.com/api/v1.0/email/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({service_id:'service_lptgrd5',template_id:'template_i4iu7bd',user_id:'ZvrnAlzPIyQhSUzWj',
+        template_params:{to_email:MAIL_DANIEL,asunto,mensaje}})
+    });
+    await fetch('https://api.emailjs.com/api/v1.0/email/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({service_id:'service_lptgrd5',template_id:'template_i4iu7bd',user_id:'ZvrnAlzPIyQhSUzWj',
+        template_params:{to_email:MAIL_PABLO,asunto,mensaje}})
+    });
+    alert(`✅ Reporte enviado a Lili, Daniel y Pablo.\n\n📷 Recuerda: adjunta las fotos respondiendo este email.`);
+  }catch(e){
+    alert('Error al enviar. Verifica la conexión.');
+  }
+  if(btnEl){btnEl.textContent='📧 Abrir email con reporte pre-llenado';btnEl.disabled=false;}
+}
   const productor=ped?ped.productor:prodMan||'—';
   const semana=ped?`S${ped.semana}`:'';
   const kg=document.getElementById('rkg').value;
