@@ -284,6 +284,27 @@ input,select,textarea,button{font-family:inherit}
             </div>
           </div>
           <div class="fld"><label>Observaciones generales</label><textarea id="recobs" placeholder="Calidad, color, estado de gavetas..."></textarea></div>
+
+          <!-- CALIBRES -->
+          <div class="fld">
+            <label>Distribución por calibre (cajas por calibre)</label>
+            <div style="background:var(--cr);border-radius:8px;padding:12px;margin-top:4px">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px" id="calibreFields">
+                ${[6,7,8,9,10,11,12,13,14].map(c=>`
+                <div style="text-align:center">
+                  <div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL ${c}</div>
+                  <input type="number" id="cal_${c}" min="0" step="1" placeholder="0" 
+                    oninput="calcCalibreTotales()"
+                    style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center">
+                </div>`).join('')}
+              </div>
+              <div style="margin-top:10px;padding:8px 10px;background:white;border-radius:6px;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                <span>Total cajas: <b id="cal_total_cajas" style="color:var(--g)">0</b></span>
+                <span>Peso total: <b id="cal_total_peso" style="color:var(--g)">0 kg</b></span>
+                <span id="cal_diff_alert" style="color:var(--rd);font-weight:600;display:none"></span>
+              </div>
+            </div>
+          </div>
           <div style="display:flex;gap:8px;margin-top:8px">
             <button class="bp" style="margin-top:0;flex:1" onclick="gRec()">💾 Registrar</button>
             <button class="bwa" style="flex:1" onclick="waRec()">📱 Notificar productor</button>
@@ -333,6 +354,10 @@ input,select,textarea,button{font-family:inherit}
             <button class="prob-chip" data-prob="Hongos / moho" onclick="toggleChip(this)">🍄 Moho</button>
             <button class="prob-chip" data-prob="Daño estético (apto para valor agregado)" onclick="toggleChip(this)">✨ Estético/VA</button>
             <button class="prob-chip" data-prob="Otro problema" onclick="toggleChip(this)">❓ Otro</button>
+          </div>
+          <div id="probPctPanel" style="display:none;margin-top:12px;background:var(--cr);border-radius:8px;padding:12px">
+            <div style="font-size:11px;font-weight:600;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">% aproximado por problema</div>
+            <div id="probPctFields"></div>
           </div>
         </div>
         <div class="fr2">
@@ -1600,6 +1625,28 @@ const fotosGuia={
 function toggleChip(btn){
   btn.classList.toggle('sel');
   actualizarFotosGuia();
+  actualizarPctFields();
+}
+
+function actualizarPctFields(){
+  const sels=Array.from(document.querySelectorAll('.prob-chip.sel'));
+  const panel=document.getElementById('probPctPanel');
+  const fields=document.getElementById('probPctFields');
+  if(!sels.length){panel.style.display='none';return;}
+  panel.style.display='block';
+  // Mantener valores existentes
+  const existing={};
+  document.querySelectorAll('.prob-pct-input').forEach(i=>{existing[i.dataset.prob]=i.value;});
+  fields.innerHTML=sels.map(b=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px">
+      <span style="flex:1;color:var(--ink)">${b.dataset.prob}</span>
+      <div style="display:flex;align-items:center;gap:4px">
+        <input type="number" class="prob-pct-input" data-prob="${b.dataset.prob}" 
+          value="${existing[b.dataset.prob]||''}" min="0" max="100" step="1" placeholder="0"
+          style="width:70px;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:right">
+        <span style="color:var(--gris)">%</span>
+      </div>
+    </div>`).join('');
 }
 
 function actualizarFotosGuia(){
@@ -1621,7 +1668,7 @@ async function generarMailReporte(){
   const dest=document.getElementById('rdest').value;
   const desc=document.getElementById('rdesc').value;
   const hora=document.getElementById('rhora').value;
-  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>b.dataset.prob);
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:' (% no especificado)');});
   if(!problemas.length){alert('Selecciona al menos un tipo de problema.');return;}
   const fotos=problemas.map(p=>`• ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('<br>');
   const fecha=new Date().toLocaleDateString('es-EC',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})+'  · '+new Date().toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});
@@ -1629,6 +1676,7 @@ async function generarMailReporte(){
   const problemasTexto=problemas.map(p=>'🔴 '+p).join('\n');
   const fotosTexto=problemas.map(p=>`• ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('\n');
 
+  const calibreResumen=getCalibreResumen();
   const params={
     to_email:'placeholder',
     asunto,
@@ -1638,7 +1686,7 @@ async function generarMailReporte(){
     kg:kg||'—',
     destino:dest,
     problemas:problemasTexto,
-    descripcion:desc||'Sin descripción adicional.',
+    descripcion:(desc||'Sin descripción adicional.')+'\n\nDistribución por calibre:\n'+calibreResumen,
     fotos:fotosTexto
   };
 
@@ -1664,7 +1712,42 @@ async function generarMailReporte(){
   if(btnEl){btnEl.textContent='📧 Enviar reporte por email a Lili, Daniel y Pablo';btnEl.disabled=false;}
 }
 
-function waFotos(){
+function calcCalibreTotales(){
+  const calibres=[6,7,8,9,10,11,12,13,14];
+  let totalCajas=0;
+  calibres.forEach(c=>{
+    const v=parseFloat(document.getElementById('cal_'+c)?.value)||0;
+    totalCajas+=v;
+  });
+  const pesoTotal=totalCajas*4.5;
+  document.getElementById('cal_total_cajas').textContent=totalCajas.toLocaleString();
+  document.getElementById('cal_total_peso').textContent=pesoTotal.toFixed(1)+' kg';
+  // Comparar con kilos recibidos
+  const kgRec=parseFloat(document.getElementById('reckg')?.value)||0;
+  const diffAlert=document.getElementById('cal_diff_alert');
+  if(kgRec>0&&totalCajas>0){
+    const diff=pesoTotal-kgRec;
+    if(Math.abs(diff)>50){
+      diffAlert.style.display='';
+      diffAlert.textContent=`⚠ Diferencia de ${Math.abs(diff).toFixed(1)} kg vs kilos recibidos`;
+    } else {
+      diffAlert.style.display='none';
+    }
+  } else {
+    diffAlert.style.display='none';
+  }
+}
+
+function getCalibreResumen(){
+  const calibres=[6,7,8,9,10,11,12,13,14];
+  const resumen=calibres.map(c=>{
+    const v=parseFloat(document.getElementById('cal_'+c)?.value)||0;
+    return v>0?`Cal ${c}: ${v} cajas (${(v*4.5).toFixed(1)} kg)`:'';
+  }).filter(Boolean);
+  return resumen.length?resumen.join(' | '):'No especificado';
+}
+
+
   const nombre=document.getElementById('rnom').value;
   const prodMan=document.getElementById('rprodman').value;
   const pedId=document.getElementById('rprod').value;
@@ -1672,14 +1755,15 @@ function waFotos(){
   const ped=allPedsCache.find(p=>p.id===pedId);
   const productor=ped?ped.productor:prodMan||'—';
   const semana=ped?`S${ped.semana}`:'';
-  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>b.dataset.prob);
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:' (% no especificado)');});
   const kg=document.getElementById('rkg').value;
   const fecha=new Date().toLocaleDateString('es-EC');
   const hora=document.getElementById('rhora').value;
 
   const fotosNecesarias=problemas.map(p=>`📷 ${p}:\n   ${fotosGuia[p]||'Foto del problema'}`).join('\n\n');
 
-  const msg=`*FOTOS REPORTE DE RECHAZO — AGROVIP*\n\n👤 ${nombre}\n📅 ${fecha}${hora?' · '+hora:''}\n🌿 Productor: ${productor} ${semana}\n⚖️ Kilos afectados: ${kg||'—'} kg\n\n*Fotos adjuntas a este mensaje:*\n\n${fotosNecesarias}\n\n_Por favor adjunta las fotos correspondientes a este mensaje._\n\n*Agrovip S.A. · PackVip*`;
+  const calibreResumenWa=getCalibreResumen();
+  const msg=`*FOTOS REPORTE DE RECHAZO — AGROVIP*\n\n👤 ${nombre}\n📅 ${fecha}${hora?' · '+hora:''}\n🌿 Productor: ${productor} ${semana}\n⚖️ Kilos afectados: ${kg||'—'} kg\n📦 Calibres: ${calibreResumenWa}\n\n*Fotos adjuntas a este mensaje:*\n\n${fotosNecesarias}\n\n_Por favor adjunta las fotos correspondientes a este mensaje._\n\n*Agrovip S.A. · PackVip*`;
 
   const waNum='593995938213';
   window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`,'_blank');
