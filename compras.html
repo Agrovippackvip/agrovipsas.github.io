@@ -360,7 +360,8 @@ input,select,textarea,button{font-family:inherit}
           <span id="fotosGuia">Selecciona los problemas arriba para ver qué fotos necesitas.</span>
         </div>
         <button class="bmail" onclick="generarMailReporte()">📧 Enviar reporte por email a Lili, Daniel y Pablo</button>
-        <div style="margin-top:8px;font-size:11px;color:var(--gris);text-align:center">El email incluye diseño Agrovip con tabla de datos y guía de fotos</div>
+        <button class="bwa" style="margin-top:8px;width:100%;justify-content:center" onclick="waFotos()">📱 Enviar fotos por WhatsApp</button>
+        <div style="margin-top:8px;font-size:11px;color:var(--gris);text-align:center">Email = reporte formal · WhatsApp = fotos de evidencia</div>
       </div>
     </div>
 
@@ -1663,7 +1664,28 @@ async function generarMailReporte(){
   if(btnEl){btnEl.textContent='📧 Enviar reporte por email a Lili, Daniel y Pablo';btnEl.disabled=false;}
 }
 
-// PRODUCTORES
+function waFotos(){
+  const nombre=document.getElementById('rnom').value;
+  const prodMan=document.getElementById('rprodman').value;
+  const pedId=document.getElementById('rprod').value;
+  const allPedsCache=_peds||[];
+  const ped=allPedsCache.find(p=>p.id===pedId);
+  const productor=ped?ped.productor:prodMan||'—';
+  const semana=ped?`S${ped.semana}`:'';
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>b.dataset.prob);
+  const kg=document.getElementById('rkg').value;
+  const fecha=new Date().toLocaleDateString('es-EC');
+  const hora=document.getElementById('rhora').value;
+
+  const fotosNecesarias=problemas.map(p=>`📷 ${p}:\n   ${fotosGuia[p]||'Foto del problema'}`).join('\n\n');
+
+  const msg=`*FOTOS REPORTE DE RECHAZO — AGROVIP*\n\n👤 ${nombre}\n📅 ${fecha}${hora?' · '+hora:''}\n🌿 Productor: ${productor} ${semana}\n⚖️ Kilos afectados: ${kg||'—'} kg\n\n*Fotos adjuntas a este mensaje:*\n\n${fotosNecesarias}\n\n_Por favor adjunta las fotos correspondientes a este mensaje._\n\n*Agrovip S.A. · PackVip*`;
+
+  const waNum='593995938213';
+  window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+
 function rProd(){
   const f=document.getElementById('ftp').value;
   const b=document.getElementById('bprod').value.toLowerCase();
