@@ -474,26 +474,37 @@ input,select,textarea,button{font-family:inherit}
 </div>
 
 <script>
-const PASS='Agrovip2026';
 const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0';
 const BASE_URL='https://app.agrovipsas.com';
 const WA_AGROVIP='+593995938213';
+let USUARIO_ACTUAL=null;
 
 // AUTH
-function login(){
-  if(document.getElementById('loginPass').value===PASS){
-    document.getElementById('loginWrap').style.display='none';
-    document.getElementById('appWrap').style.display='block';
-    init();
-  } else {
+async function login(){
+  const pw=document.getElementById('loginPass').value.trim();
+  if(!pw){document.getElementById('loginErr').style.display='block';return;}
+  const data=await supaFetch('GET',`usuarios?clave=eq.${encodeURIComponent(pw)}&select=*`);
+  if(!data||!data.length){
     document.getElementById('loginErr').style.display='block';
+    document.getElementById('loginErr').textContent='Contraseña incorrecta';
+    return;
   }
+  USUARIO_ACTUAL=data[0];
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('appWrap').style.display='block';
+  // Mostrar nombre en header
+  const hdrDate=document.getElementById('hdrDate');
+  const now=new Date();
+  hdrDate.innerHTML=now.toLocaleDateString('es-EC',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase()+'<br><span style="font-size:10px;opacity:.8">'+USUARIO_ACTUAL.nombre+'</span>';
+  init();
 }
 function logout(){
   document.getElementById('loginWrap').style.display='flex';
   document.getElementById('appWrap').style.display='none';
   document.getElementById('loginPass').value='';
+  USUARIO_ACTUAL=null;
+  _cots=null;_clis=null;
 }
 function init(){
   const now=new Date();
@@ -698,7 +709,7 @@ function calcular(){
     valorCotizado:valorFacturado,valorCobrado,costoTotal,margenReal,precioMin,costoTotalCaja,
     pvProm,pFrutaProm,kgTotal,cajasTotal,utilidad,ncMonto,ncMotivo,notas,proveedores,
     valorFacturadoReal:null,numFactura:null,fechaFactura:null,bc,margenObj,
-    semana:getSemana(),mes:getMes(),supaId:null};
+    semana:getSemana(),mes:getMes(),supaId:null,creado_por:USUARIO_ACTUAL?.nombre||'—'};
   const cots=lc.cots();cots.unshift(cot);lc.saveCots(cots);
   ultimoCalculo=cot;cotCount++;
   const nb=document.getElementById('cotBadgeNav');nb.style.display='';nb.textContent=cots.length;
@@ -1005,7 +1016,7 @@ function cotCard(c){
     <div class="cot-head">
       <div>
         <div class="cot-title">${c.cliente} <span style="color:var(--gris);font-weight:400;font-size:12px">· ${c.numCot}</span></div>
-        <div class="cot-sub">${c.fecha} · ${c.tipo} · ${(c.cajasTotal||0).toLocaleString()} cajas</div>
+        <div class="cot-sub">${c.fecha} · ${c.tipo} · ${(c.cajasTotal||0).toLocaleString()} cajas · <span style="color:var(--g)">por ${c.creado_por||'—'}</span></div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <span class="badge ${ecls}">${c.estado}</span>
