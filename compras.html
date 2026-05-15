@@ -1683,21 +1683,6 @@ async function generarMailReporte(){
   }
   if(btnEl){btnEl.textContent='📧 Abrir email con reporte pre-llenado';btnEl.disabled=false;}
 }
-  const productor=ped?ped.productor:prodMan||'—';
-  const semana=ped?`S${ped.semana}`:'';
-  const kg=document.getElementById('rkg').value;
-  const dest=document.getElementById('rdest').value;
-  const desc=document.getElementById('rdesc').value;
-  const hora=document.getElementById('rhora').value;
-  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>b.dataset.prob);
-  if(!problemas.length){alert('Selecciona al menos un tipo de problema.');return;}
-  const fotos=problemas.map(p=>`📷 ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('\n');
-  const asunto=`⚠️ Reporte de rechazo — ${productor} ${semana} — ${new Date().toLocaleDateString('es-EC')}`;
-  const cuerpo=`REPORTE DE RECHAZO — AGROVIP S.A.\n\nReportado por: ${nombre}\nFecha: ${new Date().toLocaleDateString('es-EC')}${hora?' · Hora: '+hora:''}\nProductor: ${productor} ${semana}\nKilos afectados: ${kg||'—'} kg\nDestino: ${dest}\n\nPROBLEMAS DETECTADOS:\n${problemas.map(p=>'• '+p).join('\n')}\n\nDESCRIPCIÓN:\n${desc||'Sin descripción adicional.'}\n\n=====================================\nADJUNTAR FOTOS:\n${fotos}\n=====================================\n\nPor favor adjunta las fotos indicadas y envía este correo.\n\nAgrovip S.A. · PackVip`;
-  const dest_mail=`${MAIL_LILI},${MAIL_DANIEL}`;
-  const cc_mail=MAIL_PABLO;
-  window.location.href=`mailto:${dest_mail}?cc=${cc_mail}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-}
 
 // PRODUCTORES
 function rProd(){
