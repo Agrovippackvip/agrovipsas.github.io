@@ -199,12 +199,20 @@ input,select,textarea,button{font-family:inherit}
         <div class="card">
           <div class="card-t">Precio de venta</div>
           <div class="fr2">
-            <div class="fld"><label>Precio PB ($/caja)</label><input type="number" id="pvPB" step="0.01" placeholder="0.00"></div>
+            <div class="fld"><label>Precio PB — Pulpa Blanca ($/caja)</label><input type="number" id="pvPB" step="0.01" placeholder="0.00"></div>
             <div class="fld"><label>Cajas PB</label><input type="number" id="cajasPB" step="1"></div>
           </div>
           <div class="fr2">
-            <div class="fld"><label>Precio PR ($/caja)</label><input type="number" id="pvPR" step="0.01" placeholder="0.00"></div>
+            <div class="fld"><label>Precio PR — Pulpa Roja ($/caja)</label><input type="number" id="pvPR" step="0.01" placeholder="0.00"></div>
             <div class="fld"><label>Cajas PR</label><input type="number" id="cajasPR" step="1"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Precio GY — Golden Yellow ($/caja)</label><input type="number" id="pvGY" step="0.01" placeholder="0.00"></div>
+            <div class="fld"><label>Cajas GY</label><input type="number" id="cajasGY" step="1"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Precio AM — Amarilla ($/caja)</label><input type="number" id="pvAM" step="0.01" placeholder="0.00"></div>
+            <div class="fld"><label>Cajas AM</label><input type="number" id="cajasAM" step="1"></div>
           </div>
           <div class="fr2">
             <div class="fld"><label>Nota de crédito (USD)</label><input type="number" id="ncMonto" value="0"></div>
@@ -626,6 +634,10 @@ async function calcular(){
   const cajasPB=cajasPBin>0?cajasPBin:(pvPB>0?cajasTotal:0);
   const pvPR=parseFloat(document.getElementById('pvPR').value)||0;
   const cajasPR=parseFloat(document.getElementById('cajasPR').value)||0;
+  const pvGY=parseFloat(document.getElementById('pvGY').value)||0;
+  const cajasGY=parseFloat(document.getElementById('cajasGY').value)||0;
+  const pvAM=parseFloat(document.getElementById('pvAM').value)||0;
+  const cajasAM=parseFloat(document.getElementById('cajasAM').value)||0;
   const ncMonto=parseFloat(document.getElementById('ncMonto').value)||0;
   const ncMotivo=document.getElementById('ncMotivo').value.trim();
   const notas=document.getElementById('cotNotas').value.trim();
@@ -648,13 +660,13 @@ async function calcular(){
   const fleteTotal=ea?fleteAer:(el?0:fleteMar+aduana);
   const costoFrutaCaja=kgTotal>0?costFruta/cajasTotal:pFrutaProm*kgCaja;
   const costoFleteCaja=fleteTotal/cajasTotal;
-  const cajasCon=(cajasPB+cajasPR)||cajasTotal;
-  const empProm=cajasCon>0?(empPB*cajasPB+empPR*cajasPR)/cajasCon:empPB;
+  const cajasCon=(cajasPB+cajasPR+cajasGY+cajasAM)||cajasTotal;
+  const empProm=cajasCon>0?(empPB*cajasPB+empPR*cajasPR+empPB*cajasGY+empPB*cajasAM)/cajasCon:empPB;
   const costoOtrosCaja=((fito+iica)+termos+sachets+otros+transp+comBancos)/cajasTotal;
   const costoAdmCaja=gastosAdm/cajasTotal;
   const costoTotalCaja=costoFrutaCaja+costoFleteCaja+empProm+ctnCosto+costoOtrosCaja+costoAdmCaja;
   const costoTotal=costoTotalCaja*cajasTotal;
-  const valorFacturado=pvPB*cajasPB+pvPR*cajasPR;
+  const valorFacturado=pvPB*cajasPB+pvPR*cajasPR+pvGY*cajasGY+pvAM*cajasAM;
   const valorCobrado=valorFacturado-ncMonto;
   const pvProm=cajasTotal>0?valorCobrado/cajasTotal:0;
   const utilidad=valorCobrado-costoTotal;
