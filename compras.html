@@ -1608,11 +1608,12 @@ function actualizarFotosGuia(){
   document.getElementById('fotosGuia').textContent=guia;
 }
 
-function generarMailReporte(){
+async function generarMailReporte(){
   const nombre=document.getElementById('rnom').value;
   const pedId=document.getElementById('rprod').value;
   const prodMan=document.getElementById('rprodman').value;
-  const ped=lc.peds().find(p=>p.id===pedId);
+  const allPeds=await lc.peds();
+  const ped=allPeds.find(p=>p.id===pedId);
   const productor=ped?ped.productor:prodMan||'—';
   const semana=ped?`S${ped.semana}`:'';
   const kg=document.getElementById('rkg').value;
