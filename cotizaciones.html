@@ -1348,9 +1348,18 @@ async function enviarIA(){
   btn.disabled=false;btn.innerHTML='Enviar';msgs.scrollTop=msgs.scrollHeight;
 }
 
-// Init check aprobacion sin login
+// Init check aprobacion sin login — corre inmediatamente
 const _p=new URLSearchParams(window.location.search);
-if(_p.get('aprobar')){procesarAprobacion(_p.get('aprobar'),_p.get('rol'),_p.get('token'));}
+if(_p.get('aprobar')){
+  // Ocultar login y app inmediatamente
+  document.addEventListener('DOMContentLoaded',()=>{
+    const lw=document.getElementById('loginWrap');
+    const aw=document.getElementById('appWrap');
+    if(lw)lw.style.display='none';
+    if(aw)aw.style.display='none';
+    procesarAprobacion(_p.get('aprobar'),_p.get('rol'),_p.get('token'));
+  });
+}
 </script>
 </body>
 </html>
