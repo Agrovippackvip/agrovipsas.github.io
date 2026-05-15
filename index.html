@@ -505,11 +505,34 @@ function init(){
 }
 
 // STORAGE
+let _cots=null, _clis=null;
 const lc={
-  cots:()=>JSON.parse(localStorage.getItem('av_cots')||'[]'),
-  saveCots:d=>localStorage.setItem('av_cots',JSON.stringify(d)),
-  clis:()=>JSON.parse(localStorage.getItem('av_clis')||'[]'),
-  saveClis:d=>localStorage.setItem('av_clis',JSON.stringify(d)),
+  cots: async ()=>{
+    if(_cots===null){const d=await supaFetch('GET','cotizaciones?select=*&order=created_at.desc');_cots=d||[];}
+    return _cots;
+  },
+  saveCots: async (cot)=>{
+    await supaFetch('POST','cotizaciones',cot);_cots=null;
+  },
+  updateCot: async (id,data)=>{
+    await supaFetch('PATCH',`cotizaciones?id=eq.${id}`,data);_cots=null;
+  },
+  delCot: async (id)=>{
+    await supaFetch('DELETE',`cotizaciones?id=eq.${id}`);_cots=null;
+  },
+  clis: async ()=>{
+    if(_clis===null){const d=await supaFetch('GET','clientes?select=*&order=created_at.desc');_clis=d||[];}
+    return _clis;
+  },
+  saveClis: async (cli)=>{
+    await supaFetch('POST','clientes',cli);_clis=null;
+  },
+  updateCli: async (id,data)=>{
+    await supaFetch('PATCH',`clientes?id=eq.${id}`,data);_clis=null;
+  },
+  delCli: async (id)=>{
+    await supaFetch('DELETE',`clientes?id=eq.${id}`);_clis=null;
+  },
 };
 
 // UTILS

@@ -116,7 +116,7 @@ input,select,textarea,button{font-family:inherit}
             <div class="ct">🌿 Datos del pedido</div>
             <div class="fld"><label>Productor (histórico)</label><select id="pp" onchange="chProd()"><option value="">— Seleccionar —</option></select></div>
             <div class="fld"><label>O nuevo productor</label><input type="text" id="ppn" placeholder="Nombre del productor"></div>
-            <div class="fld"><label>Tipo de fruta</label><select id="pt"><option>Roja Pulpa Blanca</option><option>Roja Pulpa Roja</option><option>Amarilla</option></select></div>
+            <div class="fld"><label>Tipo de fruta</label><select id="pt"><option value="Pitahaya Roja Pulpa Blanca">Pitahaya Roja Pulpa Blanca</option><option value="Pitahaya Roja Pulpa Roja">Pitahaya Roja Pulpa Roja</option><option value="Pitahaya Golden Yellow">Pitahaya Golden Yellow</option><option value="Pitahaya Amarilla">Pitahaya Amarilla</option></select></div>
             <div class="fr2">
               <div class="fld"><label>Semana #</label><input type="number" id="psem" placeholder="Ej: 20"></div>
               <div class="fld"><label>Precio pactado ($/kg)</label><input type="number" id="ppr" step="0.05" placeholder="0.00" oninput="calcP()"></div>
@@ -403,8 +403,9 @@ input,select,textarea,button{font-family:inherit}
 </div>
 
 <script>
-const PASS_ADMIN='Agrovip2026';
-const PASS_PLANTA='PackVip2026';
+const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0';
+let USUARIO_ACTUAL = null;
 const HIST={
   "productores": [
     {
@@ -1190,20 +1191,66 @@ const fk=n=>{try{return'$'+Math.round(parseFloat(n)).toLocaleString();}catch{ret
 
 let ROLE='admin'; // admin | planta
 
-const lc={
-  peds:()=>JSON.parse(localStorage.getItem('av_peds')||'[]'),
-  sP:d=>localStorage.setItem('av_peds',JSON.stringify(d)),
-  recs:()=>JSON.parse(localStorage.getItem('av_recs')||'[]'),
-  sR:d=>localStorage.setItem('av_recs',JSON.stringify(d)),
+// Cache local para sesión
+let _peds = null;
+let _recs = null;
+
+const lc = {
+  peds: async () => {
+    if(_peds === null){
+      const data = await supaFetch('GET', 'pedidos_compra?select=*&order=created_at.desc');
+      _peds = data || [];
+    }
+    return _peds;
+  },
+  sP: async (pedido) => {
+    // Upsert single pedido
+    const r = await supaFetch('POST', 'pedidos_compra', pedido);
+    _peds = null; // invalidate cache
+    return r;
+  },
+  delP: async (id) => {
+    await supaFetch('DELETE', `pedidos_compra?id=eq.${id}`);
+    _peds = null;
+  },
+  recs: async () => {
+    if(_recs === null){
+      const data = await supaFetch('GET', 'recepciones?select=*&order=created_at.desc');
+      _recs = data || [];
+    }
+    return _recs;
+  },
+  sR: async (rec) => {
+    await supaFetch('POST', 'recepciones', rec);
+    _recs = null;
+  },
 };
 
-function login(){
-  const pw=document.getElementById('lp').value;
-  if(pw===PASS_ADMIN){ROLE='admin';}
-  else if(pw===PASS_PLANTA){ROLE='planta';}
-  else{document.getElementById('le').style.display='block';return;}
+async function supaFetch(method, path, body){
+  const r = await fetch(SUPA_URL+'/rest/v1/'+path, {
+    method,
+    headers:{
+      'Content-Type':'application/json',
+      'apikey':SUPA_KEY,
+      'Authorization':'Bearer '+SUPA_KEY,
+      'Prefer': method==='POST'?'return=representation':''
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if(!r.ok){console.error('Supa error:', await r.text()); return null;}
+  return r.status===204 ? true : r.json();
+}
+
+async function login(){
+  const pw = document.getElementById('lp').value.trim();
+  if(!pw){document.getElementById('le').style.display='block';return;}
+  const data = await supaFetch('GET', `usuarios?clave=eq.${encodeURIComponent(pw)}&select=*`);
+  if(!data || !data.length){document.getElementById('le').style.display='block';document.getElementById('le').textContent='Contraseña incorrecta';return;}
+  USUARIO_ACTUAL = data[0];
+  ROLE = USUARIO_ACTUAL.rol === 'produccion' ? 'planta' : 'admin';
   document.getElementById('lw').style.display='none';
   document.getElementById('aw').style.display='block';
+  document.getElementById('roleLabel').textContent = USUARIO_ACTUAL.nombre + ' · ' + USUARIO_ACTUAL.rol;
   configurarRol();
   init();
 }
@@ -1244,14 +1291,15 @@ function init(){
   rH();rProd();rSem();
 }
 
-function poblarSelectsProduccion(){
+async function poblarSelectsProduccion(){
   const sel=document.getElementById('rprod');
   if(!sel)return;
-  const peds=lc.peds();
+  const peds=await lc.peds();
   sel.innerHTML='<option value="">— Seleccionar pedido —</option>'+peds.map(p=>`<option value="${p.id}">${p.productor} · S${p.semana} · ${p.kilos}kg</option>`).join('');
   const selRec=document.getElementById('recp');
   if(selRec)selRec.innerHTML='<option value="">— Seleccionar pedido pendiente —</option>'+peds.filter(p=>p.estado!=='Recibido').map(p=>`<option value="${p.id}">${p.productor} · S${p.semana} · ${p.kilos}kg</option>`).join('');
 }
+
 
 function gt(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('show'));
@@ -1357,13 +1405,14 @@ function waP(){
   const fp=calcFechaPago();
   const msg=`*CONFIRMACIÓN DE PEDIDO — AGROVIP S.A.*\n\n📅 Semana ${sem} · Entrega: ${dia}\n\n👤 Estimado ${n},\n\nConfirmamos el pedido de fruta:\n\n🌿 Tipo: ${document.getElementById('pt').value}\n⚖️ Kilos negociados: *${kg.toFixed(1)} kg*\n💰 Precio pactado: *$${pr.toFixed(3)}/kg*\n💵 Valor estimado: *${fk(pr*kg)}*\n\n📅 *Fecha tentativa de pago: ${fp.fechaPago}*\n(${fp.desc})\n\n📋 *Condiciones de calidad:*\n• Fruta pequeña (280-350g): máximo ${mxp}%\n• Rechazo máximo: ${mxr}%\n\n⚠️ *Multas por incumplimiento:*\n• Faltante → prorrateo costo de transporte\n• Rechazo mayor al límite → descuento en liquidación\n• Fruta pequeña fuera del límite → valor agregado o donación\n${not?'\n📝 Notas: '+not:''}\n\nConfirmar recepción de este mensaje.\n\n*Agrovip S.A. · PackVip*`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
-  gP();
+  await gP();
 }
 
 // SEMANA
-function rSem(){
+async function rSem(){
   const s=parseInt(document.getElementById('swn').value)||0;
-  const peds=lc.peds().filter(p=>p.semana===s);
+  const allPeds=await lc.peds();
+  const peds=allPeds.filter(p=>p.semana===s);
   document.getElementById('swp').textContent=peds.length;
   const tk=peds.reduce((a,p)=>a+p.kilos,0);
   const tv=peds.reduce((a,p)=>a+p.valor,0);
@@ -1376,9 +1425,10 @@ function rSem(){
   rFC();
 }
 
-function rFC(){
+async function rFC(){
   const s=parseInt(document.getElementById('swn').value)||0;
-  const peds=lc.peds().filter(p=>p.semana===s);
+  const allPeds=await lc.peds();
+  const peds=allPeds.filter(p=>p.semana===s);
   const tk=peds.reduce((a,p)=>a+p.kilos,0);
   const fc=parseFloat(document.getElementById('swf').value)||0;
   const gap=tk-fc;
@@ -1389,13 +1439,14 @@ function rFC(){
   else document.getElementById('fca').innerHTML='';
 }
 
-function dP(id){if(!confirm('¿Eliminar pedido?'))return;lc.sP(lc.peds().filter(p=>p.id!==id));rSem();}
+async function dP(id){if(!confirm('¿Eliminar pedido?'))return;await lc.delP(id);rSem();}
 
 // TRANSPORTISTA
-function cargarPedidosTransp(){
+async function cargarPedidosTransp(){
   const s=parseInt(document.getElementById('tsem').value)||0;
   const tr=document.getElementById('ttr').value;
-  let peds=lc.peds().filter(p=>p.semana===s);
+  const allPeds=await lc.peds();
+  let peds=allPeds.filter(p=>p.semana===s);
   if(tr!=='Todos')peds=peds.filter(p=>p.transporte===tr||tr==='Todos');
   if(!peds.length){document.getElementById('transpPanel').style.display='none';alert('Sin pedidos para esta semana/transportista.');return;}
   document.getElementById('transpPanel').style.display='block';
@@ -1423,11 +1474,12 @@ function cargarPedidosTransp(){
     </div>`).join('');
 }
 
-function waTransp(){
+async function waTransp(){
   const s=parseInt(document.getElementById('tsem').value)||0;
   const tr=document.getElementById('ttr').value;
-  let peds=lc.peds().filter(p=>p.semana===s);
-  if(tr!=='Todos')peds=peds.filter(p=>p.transporte===tr);
+  const allPeds=await lc.peds();
+  let peds=allPeds.filter(p=>p.semana===s);
+  if(tr!=='Todos')peds=peds.filter(p=>p.transporte===tr||tr==='Todos');
   if(!peds.length)return;
   const diasOrden=['Lunes','Martes','Miércoles','Jueves','Viernes'];
   const porDia={};peds.forEach(p=>{if(!porDia[p.dia])porDia[p.dia]=[];porDia[p.dia].push(p);});
@@ -1436,9 +1488,10 @@ function waTransp(){
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
 }
 
-function mailTransp(){
+async function mailTransp(){
   const s=parseInt(document.getElementById('tsem').value)||0;
-  const peds=lc.peds().filter(p=>p.semana===s);
+  const allPeds=await lc.peds();
+  const peds=allPeds.filter(p=>p.semana===s);
   if(!peds.length)return;
   const diasOrden=['Lunes','Martes','Miércoles','Jueves','Viernes'];
   const porDia={};peds.forEach(p=>{if(!porDia[p.dia])porDia[p.dia]=[];porDia[p.dia].push(p);});
@@ -1448,21 +1501,21 @@ function mailTransp(){
   window.location.href=`mailto:${MAIL_LILI}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
 }
 
-function waConfirmarRetiro(pedId){
-  const p=lc.peds().find(x=>x.id===pedId);if(!p)return;
+async function waConfirmarRetiro(pedId){
+  const allP=await lc.peds();const p=allP.find(x=>x.id===pedId);if(!p)return;
   const msg=`*CONFIRMAR RETIRO — AGROVIP*\n\n📦 Productor: ${p.productor}\nSemana ${p.semana} · ${p.dia}\nKilos estimados: ${p.kilos.toFixed(0)} kg\nGavetas: ${p.gavetas||'—'}\n\nPor favor responder con:\n1. ✅ Hora de retiro\n2. 📦 Gavetas cargadas realmente\n3. ⚠️ Cualquier novedad\n\n*Agrovip S.A.*`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
 }
 
-function waConfirmarLlegada(pedId){
-  const p=lc.peds().find(x=>x.id===pedId);if(!p)return;
+async function waConfirmarLlegada(pedId){
+  const allP=await lc.peds();const p=allP.find(x=>x.id===pedId);if(!p)return;
   const msg=`*CONFIRMAR LLEGADA A PLANTA — AGROVIP*\n\n📦 ${p.productor} · Semana ${p.semana}\nKilos esperados: ${p.kilos.toFixed(0)} kg\n\nEmpacadora: por favor confirmar cuando llegue la carga:\n1. ✅ Hora de llegada\n2. 📦 Gavetas recibidas\n3. ⚖️ Kilos reales (si ya pesaron)\n4. ⚠️ Novedades de calidad\n\n*Agrovip S.A. · PackVip*`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
 }
 
 // RECEPCIÓN
 let PA=null;
-function cPR(){const id=document.getElementById('recp').value;PA=lc.peds().find(p=>p.id===id)||null;if(PA){document.getElementById('recgav').value=PA.gavetas||'';cRec();}}
+async function cPR(){const id=document.getElementById('recp').value;const peds=await lc.peds();PA=peds.find(p=>p.id===id)||null;if(PA){document.getElementById('recgav').value=PA.gavetas||PA.mingav||'';cRec();}}
 function cRec(){
   if(!PA)return;
   const kr=parseFloat(document.getElementById('reckg').value)||0;
