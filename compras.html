@@ -18,6 +18,7 @@ input,select,textarea,button{font-family:inherit}
 .lb input:focus{border-color:var(--g)}
 .lbtn{width:100%;padding:12px;background:var(--g);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
 .lerr{color:var(--rd);font-size:12px;margin-top:8px;display:none}
+.urole{background:var(--cr);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:var(--gris);display:none}
 .app{display:none}
 .hdr{background:var(--g);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .hl{display:flex;align-items:center;gap:12px}
@@ -29,6 +30,7 @@ input,select,textarea,button{font-family:inherit}
 .nav{display:flex;background:white;border-bottom:1px solid var(--bd);overflow-x:auto}
 .nb{padding:11px 18px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2.5px solid transparent;white-space:nowrap}
 .nb.active{color:var(--g);border-bottom-color:var(--g)}
+.nb.hidden{display:none}
 .main{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
 .tab{display:none}.tab.show{display:block}
 .sl{font-size:10px;font-weight:600;color:var(--gris);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
@@ -40,17 +42,19 @@ input,select,textarea,button{font-family:inherit}
 .fld{margin-bottom:10px}
 .fld label{display:block;font-size:11px;color:var(--gris);margin-bottom:4px}
 .fld input,.fld select,.fld textarea{width:100%;padding:8px 11px;font-size:13px;border:1px solid var(--bd);border-radius:7px;background:white;color:var(--ink);outline:none}
-.fld input:focus,.fld select:focus{border-color:var(--g)}
-.fld textarea{resize:vertical;min-height:52px}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--g)}
+.fld textarea{resize:vertical;min-height:60px}
 .fr2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .bp{width:100%;padding:11px;background:var(--g);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px}
+.bp:hover{opacity:.9}
 .bs{padding:7px 14px;background:none;border:1px solid var(--g);color:var(--g);border-radius:7px;font-size:12px;cursor:pointer}
 .bsm{padding:5px 10px;background:none;border:1px solid var(--bd);color:var(--gris);border-radius:6px;font-size:11px;cursor:pointer}
 .bsm:hover{border-color:var(--g);color:var(--g)}
-.bwa{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#25D366;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;width:100%;justify-content:center}
+.bwa{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#25D366;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
+.bmail{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#1A6B3C;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;width:100%;justify-content:center}
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.bg{background:#D1FAE5;color:#065F46}.ba{background:#FEF3C7;color:#92400E}.br{background:#FEE2E2;color:#991B1B}.bb{background:#EFF6FF;color:#1E40AF}
+.bg{background:#D1FAE5;color:#065F46}.ba{background:#FEF3C7;color:#92400E}.br{background:#FEE2E2;color:#991B1B}.bb{background:#EFF6FF;color:#1E40AF}.bp2{background:#F3E8FF;color:#6B21A8}
 .sc{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
 .sc .et{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gris);margin-bottom:6px}
 .sc .nm{font-size:24px;font-weight:700;color:var(--ink)}.sc .nm.hl{color:var(--g)}.sc .nm.rd{color:var(--rd)}.sc .nm.am{color:var(--am)}
@@ -58,16 +62,19 @@ input,select,textarea,button{font-family:inherit}
 .pr:hover{background:var(--cr)}
 .pr.hdr2{background:var(--g);color:white;border-radius:8px 8px 0 0;font-weight:600;font-size:11px;padding:8px 12px}
 .pr.hdr2:hover{background:var(--g)}
-.pm2{background:var(--cr);border-radius:7px;padding:8px 10px}
-.pm2 .et{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gris);margin-bottom:2px}
-.pm2 .nm{font-size:15px;font-weight:600;color:var(--ink)}.pm2 .nm.hl{color:var(--g)}.pm2 .nm.rd{color:var(--rd)}
 .rr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.rr:last-child{border-bottom:none}
 .rr .lb{color:var(--gris)}
 .al{background:#FEF3C7;border-left:3px solid var(--am);border-radius:0 7px 7px 0;padding:10px 14px;font-size:12px;color:#92400E;margin:8px 0}
 .al.rd{background:#FEE2E2;border-left-color:var(--rd);color:#991B1B}
 .al.g{background:#D1FAE5;border-left-color:var(--g);color:#065F46}
-.cbar{display:flex;gap:3px;align-items:flex-end;height:60px;margin-top:8px}
-.cbar div{flex:1;border-radius:3px 3px 0 0;min-height:3px}
+.al.b{background:#EFF6FF;border-left-color:#3B82F6;color:#1E40AF}
+.transp-card{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:4px solid var(--g2)}
+.prob-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--bd);background:white;margin:3px;transition:all .15s}
+.prob-chip.sel{background:var(--g);color:white;border-color:var(--g)}
+.fecha-pago{background:var(--cr);border-radius:8px;padding:12px 14px;font-size:13px;border-left:3px solid var(--g2);margin-top:8px}
+.fecha-pago .fp-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gris);margin-bottom:4px}
+.fecha-pago .fp-val{font-size:18px;font-weight:700;color:var(--g)}
 @media(max-width:640px){.g2,.g3,.g4,.fr2,.fr3{grid-template-columns:1fr}.pr{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -76,23 +83,27 @@ input,select,textarea,button{font-family:inherit}
   <div class="lb">
     <div class="ll">AV</div>
     <div class="lt">Agrovip · Compras</div>
-    <div class="ls">Forecast & Gestión de Proveedores</div>
+    <div class="ls">Forecast, Producción & Transportistas</div>
+    <div class="urole" id="urole"></div>
     <input type="password" id="lp" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
     <button class="lbtn" onclick="login()">Ingresar</button>
     <div class="lerr" id="le">Contraseña incorrecta</div>
   </div>
 </div>
+
 <div class="app" id="aw">
   <div class="hdr">
-    <div class="hl"><div class="hlogo">AV</div><div class="htitle">COMPRAS & FORECAST <span>Agrovip · Ciclo jueves → miércoles</span></div></div>
+    <div class="hl"><div class="hlogo">AV</div><div class="htitle">COMPRAS & FORECAST <span id="roleLabel">Agrovip · Ciclo jueves → miércoles</span></div></div>
     <div style="display:flex;align-items:center;gap:12px"><div class="hdate" id="hd"></div><button class="blogout" onclick="logout()">Salir</button></div>
   </div>
   <div class="nav">
-    <button class="nb active" onclick="gt('pedido')">📦 Nuevo Pedido</button>
-    <button class="nb" onclick="gt('semana')">📅 Semana</button>
-    <button class="nb" onclick="gt('recepcion')">⚖️ Recepción</button>
-    <button class="nb" onclick="gt('productores')">🌿 Productores</button>
-    <button class="nb" onclick="gt('historico')">📊 Histórico</button>
+    <button class="nb active" onclick="gt('pedido')" id="nb-pedido">📦 Pedido</button>
+    <button class="nb" onclick="gt('semana')" id="nb-semana">📅 Semana</button>
+    <button class="nb" onclick="gt('transportista')" id="nb-transportista">🚛 Transportista</button>
+    <button class="nb" onclick="gt('recepcion')" id="nb-recepcion">⚖️ Recepción</button>
+    <button class="nb" onclick="gt('reporte')" id="nb-reporte">📷 Reporte</button>
+    <button class="nb" onclick="gt('productores')" id="nb-productores">🌿 Productores</button>
+    <button class="nb" onclick="gt('historico')" id="nb-historico">📊 Histórico</button>
   </div>
   <div class="main">
 
@@ -115,25 +126,41 @@ input,select,textarea,button{font-family:inherit}
               <div class="fld"><label>Gavetas estimadas</label><input type="number" id="pgav" placeholder="0"></div>
             </div>
             <div class="fr2">
-              <div class="fld"><label>Día de entrega</label><select id="pdia"><option>Lunes</option><option>Martes</option><option selected>Miércoles</option><option>Jueves</option><option>Viernes</option></select></div>
-              <div class="fld"><label>Transportista</label><select id="ptr"><option>Propio</option><option>Transpemazato</option><option>Alex Moran</option><option>Darwin Transpemazato</option><option>Otro</option></select></div>
+              <div class="fld"><label>Día de entrega</label>
+                <select id="pdia" onchange="calcFechaPago()">
+                  <option>Lunes</option><option>Martes</option><option selected>Miércoles</option>
+                  <option>Jueves</option><option>Viernes</option>
+                </select>
+              </div>
+              <div class="fld"><label>Tipo de venta</label>
+                <select id="ptipoventa" onchange="calcFechaPago()">
+                  <option value="maritimo">Marítimo (30 días desde viernes)</option>
+                  <option value="aereo">Aéreo (21 días desde +3 días)</option>
+                </select>
+              </div>
+            </div>
+            <div class="fld"><label>Transportista</label>
+              <select id="ptr">
+                <option>Propio</option><option>Transpemazato</option>
+                <option>Alex Moran</option><option>Darwin Transpemazato</option><option>Otro</option>
+              </select>
             </div>
             <div class="fld"><label>Notas / condiciones</label><textarea id="pnot" placeholder="Ej: entrega en finca, gavetas propias..."></textarea></div>
           </div>
           <div class="card">
             <div class="ct">📋 Condiciones y multas</div>
             <div class="fr2">
-              <div class="fld"><label>% máx. fruta pequeña (280-350g)</label><input type="number" id="pmaxp" value="10" step="1"></div>
-              <div class="fld"><label>% máx. rechazo permitido</label><input type="number" id="pmaxr" value="15" step="1"></div>
+              <div class="fld"><label>% máx. fruta pequeña</label><input type="number" id="pmaxp" value="10" step="1"></div>
+              <div class="fld"><label>% máx. rechazo</label><input type="number" id="pmaxr" value="15" step="1"></div>
             </div>
             <div class="fld"><label>Peso mínimo por gaveta (kg)</label><input type="number" id="pmgav" value="9" step="0.5"></div>
-            <div style="background:var(--cr);border-radius:8px;padding:12px;font-size:12px;color:var(--gris)">
+            <div style="background:var(--cr);border-radius:8px;padding:10px;font-size:12px;color:var(--gris)">
               <b style="color:var(--rd)">Multas:</b> Faltante → prorrateo flete · Rechazo excede → descuento liquidación · Fruta pequeña excede → valor agregado/donación
             </div>
           </div>
-          <div style="display:flex;gap:10px">
-            <button class="bp" style="flex:1;margin-top:0" onclick="gP()">💾 Guardar pedido</button>
-            <button class="bwa" style="width:auto;flex:1;margin-top:0" onclick="waP()">📱 WhatsApp productor</button>
+          <div style="display:flex;gap:8px">
+            <button class="bp" style="flex:1;margin-top:0" onclick="gP()">💾 Guardar</button>
+            <button class="bwa" style="flex:1" onclick="waP()">📱 WhatsApp productor</button>
           </div>
         </div>
         <div>
@@ -145,11 +172,16 @@ input,select,textarea,button{font-family:inherit}
             <div class="rr"><span class="lb">Valor estimado</span><span id="rval" style="font-weight:700;color:var(--g)">—</span></div>
             <div class="rr"><span class="lb">Rechazo histórico</span><span id="rrh">—</span></div>
             <div class="rr"><span class="lb">Precio histórico</span><span id="rph">—</span></div>
-            <div id="ralertp" style="display:none"></div>
+            <div id="ralertp"></div>
+            <div class="fecha-pago" id="fpPanel" style="display:none">
+              <div class="fp-lbl">📅 Fecha tentativa de pago</div>
+              <div class="fp-val" id="fpVal">—</div>
+              <div style="font-size:11px;color:var(--gris);margin-top:4px" id="fpDesc">—</div>
+            </div>
           </div>
           <div class="card" id="hpPanel" style="display:none">
-            <div class="ct">📈 Precio mercado por semana — <span id="hpn">—</span></div>
-            <div class="cbar" id="hpb"></div>
+            <div class="ct">📈 Precio mercado semanal — <span id="hpn">—</span></div>
+            <div style="display:flex;gap:3px;align-items:flex-end;height:60px" id="hpb"></div>
             <div style="font-size:11px;color:var(--gris);margin-top:6px" id="hpl"></div>
           </div>
         </div>
@@ -175,11 +207,48 @@ input,select,textarea,button{font-family:inherit}
       <div class="card">
         <div class="ct">🎯 Forecast vs Negociado</div>
         <div class="fr3">
-          <div class="fld"><label>Forecast kilos (objetivo semana)</label><input type="number" id="swf" placeholder="Ej: 17280" oninput="rFC()"></div>
+          <div class="fld"><label>Forecast kilos objetivo</label><input type="number" id="swf" placeholder="Ej: 17280" oninput="rFC()"></div>
           <div class="fld"><label>Kilos negociados (auto)</label><input type="text" id="swna" readonly style="background:var(--cr);font-weight:600;color:var(--g)"></div>
           <div class="fld"><label>Gap</label><input type="text" id="swg" readonly style="background:var(--cr);font-weight:600"></div>
         </div>
         <div id="fca"></div>
+      </div>
+    </div>
+
+    <!-- TRANSPORTISTA -->
+    <div class="tab" id="tab-transportista">
+      <div class="sl">Programación semanal al transportista</div>
+      <div class="card">
+        <div class="ct">🚛 Generar programación</div>
+        <div class="fr2">
+          <div class="fld"><label>Semana #</label><input type="number" id="tsem" onchange="cargarPedidosTransp()"></div>
+          <div class="fld"><label>Transportista principal</label>
+            <select id="ttr">
+              <option value="Transpemazato">Transpemazato</option>
+              <option value="Alex Moran">Alex Moran</option>
+              <option value="Darwin Transpemazato">Darwin Transpemazato</option>
+              <option value="Todos">Todos los transportistas</option>
+            </select>
+          </div>
+        </div>
+        <button class="bp" style="margin-top:0" onclick="cargarPedidosTransp()">Cargar pedidos</button>
+      </div>
+      <div id="transpPanel" style="display:none">
+        <div class="card">
+          <div class="ct">📋 Ruta de la semana</div>
+          <div id="transpLista"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button class="bwa" onclick="waTransp()">📱 Enviar programación al transportista</button>
+          <button class="bmail" onclick="mailTransp()" style="flex:1">📧 Enviar por email</button>
+        </div>
+      </div>
+
+      <!-- CONFIRMACIONES -->
+      <div class="card" style="margin-top:14px">
+        <div class="ct">✅ Links de confirmación</div>
+        <div style="font-size:12px;color:var(--gris);margin-bottom:12px">Genera links para que el transportista confirme retiro y la empacadora confirme llegada</div>
+        <div id="linksConfirmacion"><div style="font-size:13px;color:var(--gris)">Carga una semana primero.</div></div>
       </div>
     </div>
 
@@ -196,14 +265,29 @@ input,select,textarea,button{font-family:inherit}
           </div>
           <div class="fr2">
             <div class="fld"><label>Kilos rechazo</label><input type="number" id="recrej" step="0.5" value="0" oninput="cRec()"></div>
-            <div class="fld"><label>Destino rechazo</label><select id="recdest"><option value="Devolver">Devolver al productor</option><option value="Donar">Donar (no retirado 48h)</option><option value="Valor Agregado">Valor agregado</option></select></div>
+            <div class="fld"><label>Destino rechazo</label>
+              <select id="recdest">
+                <option value="Devolver">Devolver al productor</option>
+                <option value="Donar">Donar (no retirado 48h)</option>
+                <option value="Valor Agregado">Valor agregado</option>
+              </select>
+            </div>
           </div>
           <div class="fr2">
             <div class="fld"><label>Kg fruta pequeña (280-350g)</label><input type="number" id="recpeq" step="0.5" value="0" oninput="cRec()"></div>
-            <div class="fld"><label>Destino fruta pequeña</label><select id="recdestp"><option value="Aceptar">Aceptar (dentro del límite)</option><option value="Valor Agregado">Valor agregado</option><option value="Devolver">Devolver</option></select></div>
+            <div class="fld"><label>Destino fruta pequeña</label>
+              <select id="recdestp">
+                <option value="Aceptar">Aceptar (dentro del límite)</option>
+                <option value="Valor Agregado">Valor agregado</option>
+                <option value="Devolver">Devolver</option>
+              </select>
+            </div>
           </div>
-          <div class="fld"><label>Observaciones</label><textarea id="recobs" placeholder="Calidad, color, estado de gavetas..."></textarea></div>
-          <button class="bp" onclick="gRec()">💾 Registrar recepción</button>
+          <div class="fld"><label>Observaciones generales</label><textarea id="recobs" placeholder="Calidad, color, estado de gavetas..."></textarea></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="bp" style="margin-top:0;flex:1" onclick="gRec()">💾 Registrar</button>
+            <button class="bwa" style="flex:1" onclick="waRec()">📱 Notificar productor</button>
+          </div>
         </div>
         <div class="card">
           <div class="ct">📊 Resultado recepción</div>
@@ -214,22 +298,80 @@ input,select,textarea,button{font-family:inherit}
           <div class="rr"><span class="lb">% Rechazo</span><span id="rrprc">—</span></div>
           <div class="rr"><span class="lb">% Fruta pequeña</span><span id="rrprp">—</span></div>
           <div class="rr"><span class="lb">Valor neto a pagar</span><span id="rrval" style="font-weight:700;color:var(--g)">—</span></div>
+          <div class="rr"><span class="lb">Fecha tentativa pago</span><span id="rrfp" style="font-weight:600;color:var(--g)">—</span></div>
           <div id="rrmul" style="display:none">
             <div class="rr" style="color:var(--rd)"><span class="lb">Multa faltante</span><span id="rrm1">—</span></div>
             <div class="rr" style="color:var(--rd)"><span class="lb">Multa rechazo exc.</span><span id="rrm2">—</span></div>
           </div>
           <div id="rral"></div>
-          <button class="bwa" style="margin-top:14px" onclick="waRec()">📱 Enviar resultado al productor</button>
         </div>
+      </div>
+    </div>
+
+    <!-- REPORTE DE RECHAZO (Producción) -->
+    <div class="tab" id="tab-reporte">
+      <div class="sl">Reporte de rechazo — Producción</div>
+      <div class="card">
+        <div class="ct">📷 Reporte de problema</div>
+        <div class="fld"><label>Tu nombre</label>
+          <select id="rnom">
+            <option value="Samary">Samary</option>
+            <option value="David">David</option>
+            <option value="Alejandro">Alejandro</option>
+          </select>
+        </div>
+        <div class="fld"><label>Productor / pedido</label><select id="rprod"><option value="">— Seleccionar —</option></select></div>
+        <div class="fld"><label>O escribe el productor</label><input type="text" id="rprodman" placeholder="Nombre del productor"></div>
+        <div class="fld"><label>Tipo de problema (selecciona todos los que aplican)</label>
+          <div style="margin-top:6px">
+            <button class="prob-chip" data-prob="Rechazo por calidad" onclick="toggleChip(this)">🍎 Calidad</button>
+            <button class="prob-chip" data-prob="Rechazo por calibre" onclick="toggleChip(this)">📏 Calibre</button>
+            <button class="prob-chip" data-prob="Fruta pequeña excesiva" onclick="toggleChip(this)">🔹 Fruta pequeña</button>
+            <button class="prob-chip" data-prob="Daño en transporte" onclick="toggleChip(this)">🚛 Daño transporte</button>
+            <button class="prob-chip" data-prob="Fruta madura / sobremadurez" onclick="toggleChip(this)">🟠 Sobremadurez</button>
+            <button class="prob-chip" data-prob="Tierra / suciedad" onclick="toggleChip(this)">🌱 Suciedad</button>
+            <button class="prob-chip" data-prob="Hongos / moho" onclick="toggleChip(this)">🍄 Moho</button>
+            <button class="prob-chip" data-prob="Daño estético (apto para valor agregado)" onclick="toggleChip(this)">✨ Estético/VA</button>
+            <button class="prob-chip" data-prob="Otro problema" onclick="toggleChip(this)">❓ Otro</button>
+          </div>
+        </div>
+        <div class="fr2">
+          <div class="fld"><label>Kilos afectados</label><input type="number" id="rkg" step="0.5" placeholder="0"></div>
+          <div class="fld"><label>Destino</label>
+            <select id="rdest">
+              <option value="Devolver al productor">Devolver al productor</option>
+              <option value="Donar (no retirado 48h)">Donar (no retirado 48h)</option>
+              <option value="Valor agregado">Valor agregado</option>
+            </select>
+          </div>
+        </div>
+        <div class="fld"><label>Descripción detallada del problema</label><textarea id="rdesc" placeholder="Describe el problema con detalle: color, textura, olor, porcentaje afectado..."></textarea></div>
+        <div class="fld"><label>Hora del reporte</label><input type="time" id="rhora"></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">📧 Generar email con reporte</div>
+        <div class="al b" style="margin-bottom:12px">
+          Al hacer clic se abrirá tu app de correo con el reporte pre-llenado. 
+          <b>Solo adjunta las fotos del problema y envía.</b>
+        </div>
+        <div style="background:var(--cr);border-radius:8px;padding:12px;font-size:12px;color:var(--gris);margin-bottom:12px">
+          <b>Fotos que debes adjuntar:</b><br>
+          <span id="fotosGuia">Selecciona los problemas arriba para ver qué fotos necesitas.</span>
+        </div>
+        <button class="bmail" onclick="generarMailReporte()">📧 Abrir email con reporte pre-llenado</button>
+        <div style="margin-top:8px;font-size:11px;color:var(--gris);text-align:center">El correo irá a: Lili, Daniel y Pablo (informativo)</div>
       </div>
     </div>
 
     <!-- PRODUCTORES -->
     <div class="tab" id="tab-productores">
-      <div class="sl">Ranking — Histórico 2025-2026 (50 productores)</div>
+      <div class="sl">Ranking — Histórico 2025-2026</div>
       <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-        <select id="ftp" onchange="rProd()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white"><option value="">Vol. total</option><option value="top">Top rendimiento</option><option value="rechazo">Mayor rechazo</option></select>
-        <input type="text" id="bprod" placeholder="Buscar productor..." oninput="rProd()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;flex:1">
+        <select id="ftp" onchange="rProd()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white">
+          <option value="">Vol. total</option><option value="top">Top rendimiento</option><option value="rechazo">Mayor rechazo</option>
+        </select>
+        <input type="text" id="bprod" placeholder="Buscar..." oninput="rProd()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;flex:1">
       </div>
       <div class="pr hdr2"><span>Productor</span><span>Kg totales</span><span>Rendimiento</span><span>% Rechazo</span><span>Precio prom.</span><span>Entregas</span><span>Calificación</span><span></span></div>
       <div id="pl"></div>
@@ -239,9 +381,9 @@ input,select,textarea,button{font-family:inherit}
     <div class="tab" id="tab-historico">
       <div class="sl">Histórico de precios por semana 2026</div>
       <div class="g4" style="margin-bottom:16px">
-        <div class="sc"><div class="et">Precio prom. 2026</div><div class="nm hl" id="hpprom">—</div></div>
-        <div class="sc"><div class="et">Precio mínimo</div><div class="nm" id="hpmin">—</div></div>
-        <div class="sc"><div class="et">Precio máximo</div><div class="nm" id="hpmax">—</div></div>
+        <div class="sc"><div class="et">Precio prom.</div><div class="nm hl" id="hpprom">—</div></div>
+        <div class="sc"><div class="et">Precio mín.</div><div class="nm" id="hpmin">—</div></div>
+        <div class="sc"><div class="et">Precio máx.</div><div class="nm" id="hpmax">—</div></div>
         <div class="sc"><div class="et">Semanas reg.</div><div class="nm" id="hpsems">—</div></div>
       </div>
       <div class="card">
@@ -251,7 +393,7 @@ input,select,textarea,button{font-family:inherit}
       <div class="card">
         <div class="ct">📋 Detalle por semana</div>
         <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
-          <thead><tr style="background:var(--g);color:white"><th style="padding:8px 12px;text-align:left;font-size:11px">Semana</th><th style="padding:8px 12px;text-align:right;font-size:11px">Precio Prom.</th><th style="padding:8px 12px;text-align:right;font-size:11px">Kg Totales</th><th style="padding:8px 12px;text-align:right;font-size:11px">Entregas</th><th style="padding:8px 12px;text-align:left;font-size:11px">Tendencia</th></tr></thead>
+          <thead><tr style="background:var(--g);color:white"><th style="padding:8px 12px;text-align:left;font-size:11px">Semana</th><th style="padding:8px 12px;text-align:right;font-size:11px">Precio Prom.</th><th style="padding:8px 12px;text-align:right;font-size:11px">Kg Totales</th><th style="padding:8px 12px;text-align:right;font-size:11px">Entregas</th><th style="padding:8px 12px;font-size:11px">Tendencia</th></tr></thead>
           <tbody id="pt"></tbody>
         </table></div>
       </div>
@@ -259,8 +401,10 @@ input,select,textarea,button{font-family:inherit}
 
   </div>
 </div>
+
 <script>
-const PASS='Agrovip2026';
+const PASS_ADMIN='Agrovip2026';
+const PASS_PLANTA='PackVip2026';
 const HIST={
   "productores": [
     {
@@ -1037,93 +1181,417 @@ const HIST={
     }
   ]
 };
+const MAIL_LILI='lilibeth@agrovipsa.com';
+const MAIL_DANIEL='gerencia@agrovipsa.com';
+const MAIL_PABLO='gerencia@packvipsas.com';
+
 const f2=n=>{try{return'$'+parseFloat(n).toFixed(2);}catch{return'—';}};
 const fk=n=>{try{return'$'+Math.round(parseFloat(n)).toLocaleString();}catch{return'—';}};
+
+let ROLE='admin'; // admin | planta
+
 const lc={
   peds:()=>JSON.parse(localStorage.getItem('av_peds')||'[]'),
   sP:d=>localStorage.setItem('av_peds',JSON.stringify(d)),
   recs:()=>JSON.parse(localStorage.getItem('av_recs')||'[]'),
   sR:d=>localStorage.setItem('av_recs',JSON.stringify(d)),
 };
-function login(){if(document.getElementById('lp').value===PASS){document.getElementById('lw').style.display='none';document.getElementById('aw').style.display='block';init();}else document.getElementById('le').style.display='block';}
-function logout(){document.getElementById('lw').style.display='flex';document.getElementById('aw').style.display='none';document.getElementById('lp').value='';}
+
+function login(){
+  const pw=document.getElementById('lp').value;
+  if(pw===PASS_ADMIN){ROLE='admin';}
+  else if(pw===PASS_PLANTA){ROLE='planta';}
+  else{document.getElementById('le').style.display='block';return;}
+  document.getElementById('lw').style.display='none';
+  document.getElementById('aw').style.display='block';
+  configurarRol();
+  init();
+}
+
+function configurarRol(){
+  if(ROLE==='planta'){
+    // Planta solo ve Recepción y Reporte
+    ['pedido','semana','transportista','productores','historico'].forEach(t=>{
+      document.getElementById('nb-'+t).classList.add('hidden');
+    });
+    document.getElementById('roleLabel').textContent='Producción PackVip';
+    gt('recepcion');
+  }
+}
+
+function logout(){
+  document.getElementById('lw').style.display='flex';
+  document.getElementById('aw').style.display='none';
+  document.getElementById('lp').value='';
+  ROLE='admin';
+  ['pedido','semana','transportista','productores','historico','recepcion','reporte'].forEach(t=>{
+    const el=document.getElementById('nb-'+t);
+    if(el)el.classList.remove('hidden');
+  });
+}
+
 function init(){
   const now=new Date();
   document.getElementById('hd').textContent=now.toLocaleDateString('es-EC',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
   const sy=new Date(now.getFullYear(),0,1);
   const wk=Math.ceil(((now-sy)/86400000+sy.getDay()+1)/7);
-  document.getElementById('psem').value=wk;
-  document.getElementById('swn').value=wk;
+  if(document.getElementById('psem'))document.getElementById('psem').value=wk;
+  if(document.getElementById('swn'))document.getElementById('swn').value=wk;
+  if(document.getElementById('tsem'))document.getElementById('tsem').value=wk;
   const sel=document.getElementById('pp');
-  HIST.productores.map(p=>p.Productores).sort().forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
+  if(sel)HIST.productores.map(p=>p.Productores).sort().forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
+  poblarSelectsProduccion();
   rH();rProd();rSem();
 }
+
+function poblarSelectsProduccion(){
+  const sel=document.getElementById('rprod');
+  if(!sel)return;
+  const peds=lc.peds();
+  sel.innerHTML='<option value="">— Seleccionar pedido —</option>'+peds.map(p=>`<option value="${p.id}">${p.productor} · S${p.semana} · ${p.kilos}kg</option>`).join('');
+  const selRec=document.getElementById('recp');
+  if(selRec)selRec.innerHTML='<option value="">— Seleccionar pedido pendiente —</option>'+peds.filter(p=>p.estado!=='Recibido').map(p=>`<option value="${p.id}">${p.productor} · S${p.semana} · ${p.kilos}kg</option>`).join('');
+}
+
 function gt(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('show'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('show');
-  const idx={pedido:0,semana:1,recepcion:2,productores:3,historico:4}[id];
-  document.querySelectorAll('.nb')[idx].classList.add('active');
-  if(id==='semana')rSem();if(id==='recepcion')pSelRec();if(id==='productores')rProd();if(id==='historico')rH();
+  const nb=document.getElementById('nb-'+id);
+  if(nb)nb.classList.add('active');
+  if(id==='semana')rSem();
+  if(id==='recepcion')poblarSelectsProduccion();
+  if(id==='reporte')poblarSelectsProduccion();
+  if(id==='productores')rProd();
+  if(id==='historico')rH();
 }
-function chProd(){const n=document.getElementById('pp').value;if(!n){document.getElementById('hpPanel').style.display='none';return;}const p=HIST.productores.find(x=>x.Productores===n);if(!p){document.getElementById('hpPanel').style.display='none';return;}document.getElementById('hpPanel').style.display='block';document.getElementById('hpn').textContent=n;const ms=HIST.semanas;const mx=Math.max(...ms.map(s=>s.PrecioPromedio));document.getElementById('hpb').innerHTML=ms.map(s=>{const h=Math.max((s.PrecioPromedio/mx)*56,3);const c=s.PrecioPromedio>p.PrecioPromedio?'#C0392B':'#1A6B3C';return`<div style="flex:1;height:${h}px;background:${c};border-radius:3px 3px 0 0" title="S${s.Semana}: $${s.PrecioPromedio.toFixed(3)}"></div>`;}).join('');document.getElementById('hpl').textContent=`Histórico ${n}: $${p.PrecioPromedio.toFixed(3)}/kg prom. | Línea roja=precio sobre histórico, verde=por debajo`;calcP();}
-function calcP(){const n=document.getElementById('pp').value||document.getElementById('ppn').value;const pr=parseFloat(document.getElementById('ppr').value)||0;const kg=parseFloat(document.getElementById('pkg').value)||0;const p=HIST.productores.find(x=>x.Productores===n);document.getElementById('rp').textContent=n||'—';document.getElementById('rpr').textContent=pr?'$'+pr.toFixed(3)+'/kg':'—';document.getElementById('rkg').textContent=kg?kg.toFixed(1)+' kg':'—';document.getElementById('rval').textContent=pr&&kg?fk(pr*kg):'—';const al=document.getElementById('ralertp');if(p){document.getElementById('rrh').innerHTML=`<span style="color:${p.PctRechazoReal>0.15?'var(--rd)':'var(--g)'}">${(p.PctRechazoReal*100).toFixed(1)}% hist.</span>`;document.getElementById('rph').textContent=`$${p.PrecioPromedio.toFixed(3)}/kg (min $${p.PrecioMin.toFixed(2)}-max $${p.PrecioMax.toFixed(2)})`;if(pr>0){const d=((pr-p.PrecioPromedio)/p.PrecioPromedio)*100;if(d>10){al.style.display='block';al.innerHTML=`<div class="al rd">⚠ Precio ${d.toFixed(1)}% sobre histórico ($${p.PrecioPromedio.toFixed(3)}/kg). Considera negociar.</div>`;}else if(d<-10){al.style.display='block';al.innerHTML=`<div class="al g">✓ Precio ${Math.abs(d).toFixed(1)}% bajo histórico. Buen precio.</div>`;}else al.style.display='none';}}else{document.getElementById('rrh').textContent='Nuevo productor';document.getElementById('rph').textContent='—';al.style.display='none';}}
-function gP(){const n=document.getElementById('pp').value||document.getElementById('ppn').value;const pr=parseFloat(document.getElementById('ppr').value)||0;const kg=parseFloat(document.getElementById('pkg').value)||0;if(!n||!pr||!kg){alert('Completa productor, precio y kilos.');return;}const p={id:'p'+Date.now(),semana:parseInt(document.getElementById('psem').value)||0,productor:n,tipo:document.getElementById('pt').value,precio:pr,kilos:kg,gavetas:parseFloat(document.getElementById('pgav').value)||0,dia:document.getElementById('pdia').value,transporte:document.getElementById('ptr').value,notas:document.getElementById('pnot').value.trim(),maxP:parseFloat(document.getElementById('pmaxp').value)||10,maxR:parseFloat(document.getElementById('pmaxr').value)||15,minGav:parseFloat(document.getElementById('pmgav').value)||9,valor:pr*kg,estado:'Pendiente',fecha:new Date().toLocaleDateString('es-EC')};const peds=lc.peds();peds.unshift(p);lc.sP(peds);alert(`✓ Pedido guardado — ${n} · ${kg}kg · $${pr.toFixed(3)}/kg`);}
-function waP(){const n=document.getElementById('pp').value||document.getElementById('ppn').value;const pr=parseFloat(document.getElementById('ppr').value)||0;const kg=parseFloat(document.getElementById('pkg').value)||0;if(!n||!pr||!kg){alert('Completa los datos.');return;}const sem=document.getElementById('psem').value;const dia=document.getElementById('pdia').value;const mxp=document.getElementById('pmaxp').value;const mxr=document.getElementById('pmaxr').value;const not=document.getElementById('pnot').value.trim();const msg=`*CONFIRMACIÓN DE PEDIDO — AGROVIP S.A.*
 
-📅 Semana ${sem} · Entrega: ${dia}
+// FECHA DE PAGO
+function calcFechaPago(){
+  const dia=document.getElementById('pdia').value;
+  const tipo=document.getElementById('ptipoventa').value;
+  const now=new Date();
+  const days={'Lunes':1,'Martes':2,'Miércoles':3,'Jueves':4,'Viernes':5,'Sábado':6,'Domingo':0};
+  let fechaEntrega=new Date(now);
+  const diaNum=days[dia]||3;
+  const hoy=now.getDay();
+  let diff=diaNum-hoy;
+  if(diff<0)diff+=7;
+  fechaEntrega.setDate(now.getDate()+diff);
+  let fechaPago=new Date(fechaEntrega);
+  let desc='';
+  if(tipo==='maritimo'){
+    // 30 días desde el viernes siguiente
+    let viernes=new Date(fechaEntrega);
+    let diasHastaViernes=5-viernes.getDay();
+    if(diasHastaViernes<0)diasHastaViernes+=7;
+    if(diasHastaViernes===0)diasHastaViernes=7;
+    viernes.setDate(viernes.getDate()+diasHastaViernes);
+    fechaPago=new Date(viernes);
+    fechaPago.setDate(viernes.getDate()+30);
+    desc=`30 días desde el viernes ${viernes.toLocaleDateString('es-EC',{day:'2-digit',month:'short'})}`;
+  } else {
+    // Aéreo: 21 días desde 3 días después de entrega
+    fechaPago.setDate(fechaEntrega.getDate()+3+21);
+    desc=`21 días desde ${new Date(fechaEntrega.getTime()+3*86400000).toLocaleDateString('es-EC',{day:'2-digit',month:'short'})}`;
+  }
+  const fpStr=fechaPago.toLocaleDateString('es-EC',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('fpPanel').style.display='block';
+  document.getElementById('fpVal').textContent=fpStr.charAt(0).toUpperCase()+fpStr.slice(1);
+  document.getElementById('fpDesc').textContent=desc;
+  return{fechaPago:fpStr,desc};
+}
 
-👤 Estimado ${n},
+function chProd(){
+  const n=document.getElementById('pp').value;
+  if(!n){document.getElementById('hpPanel').style.display='none';return;}
+  const p=HIST.productores.find(x=>x.Productores===n);
+  if(!p){document.getElementById('hpPanel').style.display='none';return;}
+  document.getElementById('hpPanel').style.display='block';
+  document.getElementById('hpn').textContent=n;
+  const ms=HIST.semanas;const mx=Math.max(...ms.map(s=>s.PrecioPromedio));
+  document.getElementById('hpb').innerHTML=ms.map(s=>{const h=Math.max((s.PrecioPromedio/mx)*56,3);const c=s.PrecioPromedio>p.PrecioPromedio?'#C0392B':'#1A6B3C';return`<div style="flex:1;height:${h}px;background:${c};border-radius:3px 3px 0 0;min-height:3px" title="S${s.Semana}: $${s.PrecioPromedio.toFixed(3)}"></div>`;}).join('');
+  document.getElementById('hpl').textContent=`Histórico ${n}: $${p.PrecioPromedio.toFixed(3)}/kg · rojo=precio mercado sobre histórico`;
+  calcP();
+}
 
-Confirmamos el pedido de fruta:
+function calcP(){
+  const n=document.getElementById('pp').value||document.getElementById('ppn').value;
+  const pr=parseFloat(document.getElementById('ppr').value)||0;
+  const kg=parseFloat(document.getElementById('pkg').value)||0;
+  const p=HIST.productores.find(x=>x.Productores===n);
+  document.getElementById('rp').textContent=n||'—';
+  document.getElementById('rpr').textContent=pr?'$'+pr.toFixed(3)+'/kg':'—';
+  document.getElementById('rkg').textContent=kg?kg.toFixed(1)+' kg':'—';
+  document.getElementById('rval').textContent=pr&&kg?fk(pr*kg):'—';
+  const al=document.getElementById('ralertp');al.innerHTML='';
+  if(p){
+    document.getElementById('rrh').innerHTML=`<span style="color:${p.PctRechazoReal>0.15?'var(--rd)':'var(--g)'}">${(p.PctRechazoReal*100).toFixed(1)}% hist.</span>`;
+    document.getElementById('rph').textContent=`$${p.PrecioPromedio.toFixed(3)}/kg (min $${p.PrecioMin.toFixed(2)}-max $${p.PrecioMax.toFixed(2)})`;
+    if(pr>0){const d=((pr-p.PrecioPromedio)/p.PrecioPromedio)*100;if(d>10)al.innerHTML=`<div class="al rd">⚠ Precio ${d.toFixed(1)}% sobre histórico. Considera negociar.</div>`;else if(d<-10)al.innerHTML=`<div class="al g">✓ Precio ${Math.abs(d).toFixed(1)}% bajo histórico. Buen precio.</div>`;}
+  } else {document.getElementById('rrh').textContent='Nuevo productor';document.getElementById('rph').textContent='—';}
+  calcFechaPago();
+}
 
-🌿 Tipo: ${document.getElementById('pt').value}
-⚖️ Kilos negociados: *${kg.toFixed(1)} kg*
-💰 Precio pactado: *$${pr.toFixed(3)}/kg*
-💵 Valor estimado: *${fk(pr*kg)}*
+function gP(){
+  const n=document.getElementById('pp').value||document.getElementById('ppn').value;
+  const pr=parseFloat(document.getElementById('ppr').value)||0;
+  const kg=parseFloat(document.getElementById('pkg').value)||0;
+  if(!n||!pr||!kg){alert('Completa productor, precio y kilos.');return;}
+  const fp=calcFechaPago();
+  const p={id:'p'+Date.now(),semana:parseInt(document.getElementById('psem').value)||0,productor:n,tipo:document.getElementById('pt').value,precio:pr,kilos:kg,gavetas:parseFloat(document.getElementById('pgav').value)||0,dia:document.getElementById('pdia').value,tipoventa:document.getElementById('ptipoventa').value,transporte:document.getElementById('ptr').value,notas:document.getElementById('pnot').value.trim(),maxP:parseFloat(document.getElementById('pmaxp').value)||10,maxR:parseFloat(document.getElementById('pmaxr').value)||15,minGav:parseFloat(document.getElementById('pmgav').value)||9,valor:pr*kg,estado:'Pendiente',fecha:new Date().toLocaleDateString('es-EC'),fechaPago:fp.fechaPago,fechaPagoDesc:fp.desc};
+  const peds=lc.peds();peds.unshift(p);lc.sP(peds);
+  alert(`✓ Pedido guardado — ${n} · ${kg}kg · $${pr.toFixed(3)}/kg\nFecha pago: ${fp.fechaPago}`);
+}
 
-📋 *Condiciones de calidad:*
-• Fruta pequeña (280-350g): máximo ${mxp}%
-• Rechazo máximo: ${mxr}%
+function waP(){
+  const n=document.getElementById('pp').value||document.getElementById('ppn').value;
+  const pr=parseFloat(document.getElementById('ppr').value)||0;
+  const kg=parseFloat(document.getElementById('pkg').value)||0;
+  if(!n||!pr||!kg){alert('Completa los datos.');return;}
+  const sem=document.getElementById('psem').value;
+  const dia=document.getElementById('pdia').value;
+  const mxp=document.getElementById('pmaxp').value;
+  const mxr=document.getElementById('pmaxr').value;
+  const not=document.getElementById('pnot').value.trim();
+  const fp=calcFechaPago();
+  const msg=`*CONFIRMACIÓN DE PEDIDO — AGROVIP S.A.*\n\n📅 Semana ${sem} · Entrega: ${dia}\n\n👤 Estimado ${n},\n\nConfirmamos el pedido de fruta:\n\n🌿 Tipo: ${document.getElementById('pt').value}\n⚖️ Kilos negociados: *${kg.toFixed(1)} kg*\n💰 Precio pactado: *$${pr.toFixed(3)}/kg*\n💵 Valor estimado: *${fk(pr*kg)}*\n\n📅 *Fecha tentativa de pago: ${fp.fechaPago}*\n(${fp.desc})\n\n📋 *Condiciones de calidad:*\n• Fruta pequeña (280-350g): máximo ${mxp}%\n• Rechazo máximo: ${mxr}%\n\n⚠️ *Multas por incumplimiento:*\n• Faltante → prorrateo costo de transporte\n• Rechazo mayor al límite → descuento en liquidación\n• Fruta pequeña fuera del límite → valor agregado o donación\n${not?'\n📝 Notas: '+not:''}\n\nConfirmar recepción de este mensaje.\n\n*Agrovip S.A. · PackVip*`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+  gP();
+}
 
-⚠️ *Multas por incumplimiento:*
-• Faltante de kilos → prorrateo del costo de transporte
-• Rechazo mayor al límite → descuento en liquidación
-• Fruta pequeña fuera del límite → valor agregado o donación
-${not?'\n📝 Notas: '+not:''}
+// SEMANA
+function rSem(){
+  const s=parseInt(document.getElementById('swn').value)||0;
+  const peds=lc.peds().filter(p=>p.semana===s);
+  document.getElementById('swp').textContent=peds.length;
+  const tk=peds.reduce((a,p)=>a+p.kilos,0);
+  const tv=peds.reduce((a,p)=>a+p.valor,0);
+  document.getElementById('swk').textContent=tk.toFixed(0)+' kg';
+  document.getElementById('swv').textContent=fk(tv);
+  document.getElementById('swc').textContent=(tk/17280).toFixed(1);
+  document.getElementById('swna').value=tk.toFixed(0)+' kg';
+  if(!peds.length){document.getElementById('swl').innerHTML=`<div style="padding:20px;text-align:center;font-size:13px;color:var(--gris)">Sin pedidos para semana ${s}.</div>`;}
+  else{document.getElementById('swl').innerHTML=peds.map(p=>`<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 60px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px"><div><b>${p.productor}</b><br><span style="font-size:11px;color:var(--gris)">${p.tipo} · ${p.dia} · ${p.transporte}</span></div><div>${p.kilos.toFixed(0)} kg</div><div>$${p.precio.toFixed(3)}/kg</div><div style="font-weight:600;color:var(--g)">${fk(p.valor)}</div><div style="font-size:11px;color:var(--g)">${p.fechaPago||'—'}</div><div><span class="badge ${p.estado==='Recibido'?'bg':'bb'}">${p.estado}</span></div><div><button class="bsm" onclick="dP('${p.id}')">🗑</button></div></div>`).join('');}
+  rFC();
+}
 
-Por favor confirmar recepción de este mensaje.
+function rFC(){
+  const s=parseInt(document.getElementById('swn').value)||0;
+  const peds=lc.peds().filter(p=>p.semana===s);
+  const tk=peds.reduce((a,p)=>a+p.kilos,0);
+  const fc=parseFloat(document.getElementById('swf').value)||0;
+  const gap=tk-fc;
+  const ge=document.getElementById('swg');
+  ge.value=(gap>=0?'+':'')+gap.toFixed(0)+' kg';
+  ge.style.color=gap>=0?'#1A6B3C':gap>-2000?'#D4A017':'#C0392B';
+  if(fc>0){if(gap<-3000)document.getElementById('fca').innerHTML=`<div class="al rd">⚠ Faltante crítico de ${Math.abs(gap).toFixed(0)} kg.</div>`;else if(gap<0)document.getElementById('fca').innerHTML=`<div class="al">⚠ Faltante de ${Math.abs(gap).toFixed(0)} kg.</div>`;else document.getElementById('fca').innerHTML=`<div class="al g">✓ Forecast cubierto.</div>`;}
+  else document.getElementById('fca').innerHTML='';
+}
 
-*Agrovip S.A. · PackVip*`;window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');gP();}
-function rSem(){const s=parseInt(document.getElementById('swn').value)||0;const peds=lc.peds().filter(p=>p.semana===s);document.getElementById('swp').textContent=peds.length;const tk=peds.reduce((a,p)=>a+p.kilos,0);const tv=peds.reduce((a,p)=>a+p.valor,0);document.getElementById('swk').textContent=tk.toFixed(0)+' kg';document.getElementById('swv').textContent=fk(tv);document.getElementById('swc').textContent=(tk/17280).toFixed(1);document.getElementById('swna').value=tk.toFixed(0)+' kg';if(!peds.length){document.getElementById('swl').innerHTML=`<div style="padding:20px;text-align:center;font-size:13px;color:var(--gris)">Sin pedidos para semana ${s}.</div>`;}else{document.getElementById('swl').innerHTML=peds.map(p=>`<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 60px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px"><div><b>${p.productor}</b><br><span style="font-size:11px;color:var(--gris)">${p.tipo} · ${p.dia}</span></div><div>${p.kilos.toFixed(0)} kg</div><div>$${p.precio.toFixed(3)}/kg</div><div style="font-weight:600;color:var(--g)">${fk(p.valor)}</div><div><span class="badge ${p.estado==='Recibido'?'bg':'bb'}">${p.estado}</span></div><div><button class="bsm" onclick="dP('${p.id}')">🗑</button></div></div>`).join('');}rFC();}
-function rFC(){const s=parseInt(document.getElementById('swn').value)||0;const peds=lc.peds().filter(p=>p.semana===s);const tk=peds.reduce((a,p)=>a+p.kilos,0);const fc=parseFloat(document.getElementById('swf').value)||0;const gap=tk-fc;const ge=document.getElementById('swg');ge.value=(gap>=0?'+':'')+gap.toFixed(0)+' kg';ge.style.color=gap>=0?'#1A6B3C':gap>-2000?'#D4A017':'#C0392B';if(fc>0){if(gap<-3000)document.getElementById('fca').innerHTML=`<div class="al rd">⚠ Faltante crítico de ${Math.abs(gap).toFixed(0)} kg para completar forecast.</div>`;else if(gap<0)document.getElementById('fca').innerHTML=`<div class="al">⚠ Faltante de ${Math.abs(gap).toFixed(0)} kg.</div>`;else document.getElementById('fca').innerHTML=`<div class="al g">✓ Forecast cubierto correctamente.</div>`;}else document.getElementById('fca').innerHTML='';}
 function dP(id){if(!confirm('¿Eliminar pedido?'))return;lc.sP(lc.peds().filter(p=>p.id!==id));rSem();}
-function pSelRec(){const sel=document.getElementById('recp');const peds=lc.peds().filter(p=>p.estado!=='Recibido');sel.innerHTML='<option value="">— Seleccionar pedido pendiente —</option>'+peds.map(p=>`<option value="${p.id}">${p.productor} · S${p.semana} · ${p.kilos}kg</option>`).join('');}
+
+// TRANSPORTISTA
+function cargarPedidosTransp(){
+  const s=parseInt(document.getElementById('tsem').value)||0;
+  const tr=document.getElementById('ttr').value;
+  let peds=lc.peds().filter(p=>p.semana===s);
+  if(tr!=='Todos')peds=peds.filter(p=>p.transporte===tr||tr==='Todos');
+  if(!peds.length){document.getElementById('transpPanel').style.display='none';alert('Sin pedidos para esta semana/transportista.');return;}
+  document.getElementById('transpPanel').style.display='block';
+  // Agrupar por día
+  const porDia={};
+  peds.forEach(p=>{if(!porDia[p.dia])porDia[p.dia]=[];porDia[p.dia].push(p);});
+  const diasOrden=['Lunes','Martes','Miércoles','Jueves','Viernes'];
+  document.getElementById('transpLista').innerHTML=diasOrden.filter(d=>porDia[d]).map(d=>`
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--g);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;padding:4px 8px;background:var(--cr);border-radius:6px">${d}</div>
+      ${porDia[d].map(p=>`<div class="transp-card">
+        <div style="font-weight:600;font-size:14px">${p.productor}</div>
+        <div style="font-size:12px;color:var(--gris);margin-top:2px">${p.tipo} · ${p.kilos.toFixed(0)} kg · ${p.gavetas||'—'} gavetas · ${p.transporte}</div>
+        ${p.notas?`<div style="font-size:11px;color:var(--am);margin-top:4px">📝 ${p.notas}</div>`:''}
+      </div>`).join('')}
+    </div>`).join('');
+  // Links de confirmación
+  document.getElementById('linksConfirmacion').innerHTML=peds.map(p=>`
+    <div style="background:var(--cr);border-radius:8px;padding:10px 14px;margin-bottom:8px">
+      <div style="font-weight:600;font-size:13px">${p.productor} · ${p.dia}</div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button class="bwa" style="flex:1;font-size:11px" onclick="waConfirmarRetiro('${p.id}')">📱 Link retiro → transportista</button>
+        <button class="bwa" style="flex:1;font-size:11px;background:#1A6B3C" onclick="waConfirmarLlegada('${p.id}')">📱 Link llegada → empacadora</button>
+      </div>
+    </div>`).join('');
+}
+
+function waTransp(){
+  const s=parseInt(document.getElementById('tsem').value)||0;
+  const tr=document.getElementById('ttr').value;
+  let peds=lc.peds().filter(p=>p.semana===s);
+  if(tr!=='Todos')peds=peds.filter(p=>p.transporte===tr);
+  if(!peds.length)return;
+  const diasOrden=['Lunes','Martes','Miércoles','Jueves','Viernes'];
+  const porDia={};peds.forEach(p=>{if(!porDia[p.dia])porDia[p.dia]=[];porDia[p.dia].push(p);});
+  let rutas=diasOrden.filter(d=>porDia[d]).map(d=>`\n📅 *${d}:*\n`+porDia[d].map(p=>`  • ${p.productor} — ${p.kilos.toFixed(0)} kg (${p.gavetas||'—'} gavetas)${p.notas?' — '+p.notas:''}`).join('\n')).join('\n');
+  const msg=`*PROGRAMACIÓN SEMANAL — AGROVIP S.A.*\nSemana ${s}\n${rutas}\n\nPor favor confirmar retiro de cada entrega con hora, gavetas cargadas y cualquier novedad.\n\n*Agrovip S.A. · PackVip*`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+}
+
+function mailTransp(){
+  const s=parseInt(document.getElementById('tsem').value)||0;
+  const peds=lc.peds().filter(p=>p.semana===s);
+  if(!peds.length)return;
+  const diasOrden=['Lunes','Martes','Miércoles','Jueves','Viernes'];
+  const porDia={};peds.forEach(p=>{if(!porDia[p.dia])porDia[p.dia]=[];porDia[p.dia].push(p);});
+  let rutas=diasOrden.filter(d=>porDia[d]).map(d=>`${d}:\n`+porDia[d].map(p=>`  - ${p.productor}: ${p.kilos.toFixed(0)} kg (${p.gavetas||'—'} gavetas) · ${p.transporte}${p.notas?' — '+p.notas:''}`).join('\n')).join('\n\n');
+  const asunto=`Programación semanal S${s} — Agrovip`;
+  const cuerpo=`Programación de retiro de fruta\nSemana ${s}\n\n${rutas}\n\nConfirmar retiro con hora, gavetas y novedades.\n\nAgrovip S.A.`;
+  window.location.href=`mailto:${MAIL_LILI}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+}
+
+function waConfirmarRetiro(pedId){
+  const p=lc.peds().find(x=>x.id===pedId);if(!p)return;
+  const msg=`*CONFIRMAR RETIRO — AGROVIP*\n\n📦 Productor: ${p.productor}\nSemana ${p.semana} · ${p.dia}\nKilos estimados: ${p.kilos.toFixed(0)} kg\nGavetas: ${p.gavetas||'—'}\n\nPor favor responder con:\n1. ✅ Hora de retiro\n2. 📦 Gavetas cargadas realmente\n3. ⚠️ Cualquier novedad\n\n*Agrovip S.A.*`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+}
+
+function waConfirmarLlegada(pedId){
+  const p=lc.peds().find(x=>x.id===pedId);if(!p)return;
+  const msg=`*CONFIRMAR LLEGADA A PLANTA — AGROVIP*\n\n📦 ${p.productor} · Semana ${p.semana}\nKilos esperados: ${p.kilos.toFixed(0)} kg\n\nEmpacadora: por favor confirmar cuando llegue la carga:\n1. ✅ Hora de llegada\n2. 📦 Gavetas recibidas\n3. ⚖️ Kilos reales (si ya pesaron)\n4. ⚠️ Novedades de calidad\n\n*Agrovip S.A. · PackVip*`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+}
+
+// RECEPCIÓN
 let PA=null;
 function cPR(){const id=document.getElementById('recp').value;PA=lc.peds().find(p=>p.id===id)||null;if(PA){document.getElementById('recgav').value=PA.gavetas||'';cRec();}}
-function cRec(){if(!PA)return;const kr=parseFloat(document.getElementById('reckg').value)||0;const rej=parseFloat(document.getElementById('recrej').value)||0;const peq=parseFloat(document.getElementById('recpeq').value)||0;const kn=kr-rej;const pr=kr>0?rej/kr*100:0;const pp2=kr>0?peq/kr*100:0;document.getElementById('rrd').textContent=PA.productor;document.getElementById('rrn').textContent=PA.kilos.toFixed(1)+' kg';document.getElementById('rrr').textContent=kr.toFixed(1)+' kg';const diff=kr-PA.kilos;document.getElementById('rrdiff').textContent=(diff>=0?'+':'')+diff.toFixed(1)+' kg';document.getElementById('rrdiff').style.color=diff>=0?'#1A6B3C':'#C0392B';document.getElementById('rrprc').innerHTML=`<span style="color:${pr>PA.maxR?'var(--rd)':'var(--g)'}">${pr.toFixed(1)}%${pr>PA.maxR?' ⚠':''}</span>`;document.getElementById('rrprp').innerHTML=`<span style="color:${pp2>PA.maxP?'var(--am)':'var(--g)'}">${pp2.toFixed(1)}%${pp2>PA.maxP?' ⚠':''}</span>`;document.getElementById('rrval').textContent=f2(kn*PA.precio);let m1=0,m2=0,als=[];if(diff<0){m1=Math.abs(diff)*0.05;als.push(`<div class="al rd">⚠ Faltante ${Math.abs(diff).toFixed(1)} kg → multa estimada: ${f2(m1)}</div>`);}if(pr>PA.maxR){m2=(pr-PA.maxR)/100*kr*PA.precio;als.push(`<div class="al rd">⚠ Rechazo excede ${PA.maxR}% → descuento: ${f2(m2)}</div>`);}if(pp2>PA.maxP)als.push(`<div class="al">⚠ Fruta pequeña excede ${PA.maxP}% → destino: ${document.getElementById('recdestp').value}</div>`);if(m1>0||m2>0){document.getElementById('rrmul').style.display='';document.getElementById('rrm1').textContent=f2(m1);document.getElementById('rrm2').textContent=f2(m2);}else document.getElementById('rrmul').style.display='none';document.getElementById('rral').innerHTML=als.join('');}
-function gRec(){if(!PA){alert('Selecciona un pedido');return;}const kr=parseFloat(document.getElementById('reckg').value)||0;if(!kr){alert('Ingresa los kilos recibidos');return;}const rej=parseFloat(document.getElementById('recrej').value)||0;const peq=parseFloat(document.getElementById('recpeq').value)||0;const r={id:'r'+Date.now(),pedidoId:PA.id,productor:PA.productor,semana:PA.semana,precio:PA.precio,kNeg:PA.kilos,gavetas:parseFloat(document.getElementById('recgav').value)||0,kRec:kr,kNeto:kr-rej,rechazo:rej,pctRec:kr>0?rej/kr:0,pequena:peq,pctPeq:kr>0?peq/kr:0,destRej:document.getElementById('recdest').value,destPeq:document.getElementById('recdestp').value,valorNeto:(kr-rej)*PA.precio,obs:document.getElementById('recobs').value.trim(),fecha:new Date().toLocaleDateString('es-EC')};const rs=lc.recs();rs.unshift(r);lc.sR(rs);const peds=lc.peds();const i=peds.findIndex(p=>p.id===PA.id);if(i>=0){peds[i].estado='Recibido';lc.sP(peds);}alert(`✓ Recepción registrada — ${PA.productor}`);}
-function waRec(){if(!PA){alert('Selecciona pedido');return;}const kr=parseFloat(document.getElementById('reckg').value)||0;const rej=parseFloat(document.getElementById('recrej').value)||0;const peq=parseFloat(document.getElementById('recpeq').value)||0;const kn=kr-rej;const pr=kr>0?(rej/kr*100).toFixed(1):0;const msg=`*REPORTE DE RECEPCIÓN — AGROVIP S.A.*
+function cRec(){
+  if(!PA)return;
+  const kr=parseFloat(document.getElementById('reckg').value)||0;
+  const rej=parseFloat(document.getElementById('recrej').value)||0;
+  const peq=parseFloat(document.getElementById('recpeq').value)||0;
+  const kn=kr-rej;const pr=kr>0?rej/kr*100:0;const pp2=kr>0?peq/kr*100:0;
+  document.getElementById('rrd').textContent=PA.productor;
+  document.getElementById('rrn').textContent=PA.kilos.toFixed(1)+' kg';
+  document.getElementById('rrr').textContent=kr.toFixed(1)+' kg';
+  const diff=kr-PA.kilos;
+  document.getElementById('rrdiff').textContent=(diff>=0?'+':'')+diff.toFixed(1)+' kg';
+  document.getElementById('rrdiff').style.color=diff>=0?'#1A6B3C':'#C0392B';
+  document.getElementById('rrprc').innerHTML=`<span style="color:${pr>PA.maxR?'var(--rd)':'var(--g)'}">${pr.toFixed(1)}%${pr>PA.maxR?' ⚠':''}</span>`;
+  document.getElementById('rrprp').innerHTML=`<span style="color:${pp2>PA.maxP?'var(--am)':'var(--g)'}">${pp2.toFixed(1)}%${pp2>PA.maxP?' ⚠':''}</span>`;
+  document.getElementById('rrval').textContent=f2(kn*PA.precio);
+  document.getElementById('rrfp').textContent=PA.fechaPago||'—';
+  let m1=0,m2=0,als=[];
+  if(diff<0){m1=Math.abs(diff)*0.05;als.push(`<div class="al rd">⚠ Faltante ${Math.abs(diff).toFixed(1)} kg → multa: ${f2(m1)}</div>`);}
+  if(pr>PA.maxR){m2=(pr-PA.maxR)/100*kr*PA.precio;als.push(`<div class="al rd">⚠ Rechazo excede ${PA.maxR}% → descuento: ${f2(m2)}</div>`);}
+  if(pp2>PA.maxP)als.push(`<div class="al">⚠ Fruta pequeña excede ${PA.maxP}% → destino: ${document.getElementById('recdestp').value}</div>`);
+  if(m1>0||m2>0){document.getElementById('rrmul').style.display='';document.getElementById('rrm1').textContent=f2(m1);document.getElementById('rrm2').textContent=f2(m2);}
+  else document.getElementById('rrmul').style.display='none';
+  document.getElementById('rral').innerHTML=als.join('');
+}
 
-👤 ${PA.productor}
-📅 Semana ${PA.semana} · ${new Date().toLocaleDateString('es-EC')}
+function gRec(){
+  if(!PA){alert('Selecciona un pedido');return;}
+  const kr=parseFloat(document.getElementById('reckg').value)||0;
+  if(!kr){alert('Ingresa los kilos recibidos');return;}
+  const rej=parseFloat(document.getElementById('recrej').value)||0;
+  const peq=parseFloat(document.getElementById('recpeq').value)||0;
+  const r={id:'r'+Date.now(),pedidoId:PA.id,productor:PA.productor,semana:PA.semana,precio:PA.precio,kNeg:PA.kilos,gavetas:parseFloat(document.getElementById('recgav').value)||0,kRec:kr,kNeto:kr-rej,rechazo:rej,pctRec:kr>0?rej/kr:0,pequena:peq,pctPeq:kr>0?peq/kr:0,destRej:document.getElementById('recdest').value,destPeq:document.getElementById('recdestp').value,valorNeto:(kr-rej)*PA.precio,fechaPago:PA.fechaPago,obs:document.getElementById('recobs').value.trim(),fecha:new Date().toLocaleDateString('es-EC')};
+  const rs=lc.recs();rs.unshift(r);lc.sR(rs);
+  const peds=lc.peds();const i=peds.findIndex(p=>p.id===PA.id);
+  if(i>=0){peds[i].estado='Recibido';lc.sP(peds);}
+  alert(`✓ Recepción registrada — ${PA.productor}`);
+}
 
-📦 *Resumen de entrega:*
-• Kilos negociados: ${PA.kilos.toFixed(1)} kg
-• Kilos recibidos: ${kr.toFixed(1)} kg
-• Diferencia: ${(kr-PA.kilos>=0?'+':'')}${(kr-PA.kilos).toFixed(1)} kg
-• Rechazo: ${rej.toFixed(1)} kg (${pr}%)
-• Fruta pequeña: ${peq.toFixed(1)} kg
-• Kilos netos: *${kn.toFixed(1)} kg*
+function waRec(){
+  if(!PA)return;
+  const kr=parseFloat(document.getElementById('reckg').value)||0;
+  const rej=parseFloat(document.getElementById('recrej').value)||0;
+  const peq=parseFloat(document.getElementById('recpeq').value)||0;
+  const kn=kr-rej;const pr=kr>0?(rej/kr*100).toFixed(1):0;
+  const msg=`*REPORTE DE RECEPCIÓN — AGROVIP S.A.*\n\n👤 ${PA.productor}\n📅 Semana ${PA.semana} · ${new Date().toLocaleDateString('es-EC')}\n\n📦 Kilos negociados: ${PA.kilos.toFixed(1)} kg\n✅ Kilos recibidos: ${kr.toFixed(1)} kg\nDiferencia: ${(kr-PA.kilos>=0?'+':'')}${(kr-PA.kilos).toFixed(1)} kg\nRechazo: ${rej.toFixed(1)} kg (${pr}%)\nFruta pequeña: ${peq.toFixed(1)} kg\nKilos netos: *${kn.toFixed(1)} kg*\n\n💰 *Valor a liquidar: ${f2(kn*PA.precio)}*\n📅 *Fecha tentativa pago: ${PA.fechaPago||'—'}*\n\nGracias.\n*Agrovip S.A. · PackVip*`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+}
 
-💰 *Valor a liquidar: ${f2(kn*PA.precio)}*
-(${kn.toFixed(1)} kg × $${PA.precio.toFixed(3)}/kg)
+// REPORTE DE RECHAZO
+const fotosGuia={
+  'Rechazo por calidad':'Foto general de la fruta afectada · Foto de cerca mostrando el defecto',
+  'Rechazo por calibre':'Foto de la fruta pequeña junto a una de tamaño normal · Foto del lote separado',
+  'Fruta pequeña excesiva':'Foto del porcentaje visual del lote · Foto de muestra representativa',
+  'Daño en transporte':'Foto del estado de las gavetas · Foto de la fruta dañada',
+  'Fruta madura / sobremadurez':'Foto del color y textura · Foto del corte si aplica',
+  'Tierra / suciedad':'Foto general del lote · Foto de cerca de la suciedad',
+  'Hongos / moho':'Foto clara del hongo/moho · Foto del porcentaje afectado del lote',
+  'Daño estético (apto para valor agregado)':'Foto del daño estético · Foto mostrando que la pulpa está bien',
+  'Otro problema':'Foto general del problema · Foto de cerca del detalle',
+};
 
-Gracias por su entrega.
-*Agrovip S.A. · PackVip*`;window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');}
-function rProd(){const f=document.getElementById('ftp').value;const b=document.getElementById('bprod').value.toLowerCase();let ps=[...HIST.productores];if(b)ps=ps.filter(p=>p.Productores.toLowerCase().includes(b));if(f==='top')ps.sort((a,b2)=>b2.Rendimiento-a.Rendimiento);else if(f==='rechazo')ps.sort((a,b2)=>b2.PctRechazoReal-a.PctRechazoReal);else ps.sort((a,b2)=>b2.KilosTotales-a.KilosTotales);document.getElementById('pl').innerHTML=ps.map(p=>{const rend=p.Rendimiento;const prc=p.PctRechazoReal;const sc=rend*0.6+(1-prc)*0.4;const cc=sc>0.8?'#1A6B3C':sc>0.7?'#D4A017':'#C0392B';const cl=sc>0.8?'⭐ Excelente':sc>0.7?'✓ Bueno':'⚠ Regular';return`<div class="pr"><span style="font-weight:500">${p.Productores}</span><span>${(p.KilosTotales/1000).toFixed(1)}t</span><span style="color:${rend>0.85?'var(--g)':rend>0.75?'var(--am)':'var(--rd)'}">${(rend*100).toFixed(1)}%</span><span style="color:${prc>0.15?'var(--rd)':prc>0.10?'var(--am)':'var(--g)'}">${(prc*100).toFixed(1)}%</span><span>$${p.PrecioPromedio.toFixed(3)}</span><span>${p.Entregas}</span><span style="color:${cc};font-weight:600">${cl}</span><button class="bsm" onclick="uP('${p.Productores}')">→ Usar</button></div>`;}).join('');}
+function toggleChip(btn){
+  btn.classList.toggle('sel');
+  actualizarFotosGuia();
+}
+
+function actualizarFotosGuia(){
+  const sel=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>b.dataset.prob);
+  if(!sel.length){document.getElementById('fotosGuia').textContent='Selecciona los problemas arriba para ver qué fotos necesitas.';return;}
+  const guia=sel.map(p=>`• ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('\n');
+  document.getElementById('fotosGuia').textContent=guia;
+}
+
+function generarMailReporte(){
+  const nombre=document.getElementById('rnom').value;
+  const pedId=document.getElementById('rprod').value;
+  const prodMan=document.getElementById('rprodman').value;
+  const ped=lc.peds().find(p=>p.id===pedId);
+  const productor=ped?ped.productor:prodMan||'—';
+  const semana=ped?`S${ped.semana}`:'';
+  const kg=document.getElementById('rkg').value;
+  const dest=document.getElementById('rdest').value;
+  const desc=document.getElementById('rdesc').value;
+  const hora=document.getElementById('rhora').value;
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>b.dataset.prob);
+  if(!problemas.length){alert('Selecciona al menos un tipo de problema.');return;}
+  const fotos=problemas.map(p=>`📷 ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('\n');
+  const asunto=`⚠️ Reporte de rechazo — ${productor} ${semana} — ${new Date().toLocaleDateString('es-EC')}`;
+  const cuerpo=`REPORTE DE RECHAZO — AGROVIP S.A.\n\nReportado por: ${nombre}\nFecha: ${new Date().toLocaleDateString('es-EC')}${hora?' · Hora: '+hora:''}\nProductor: ${productor} ${semana}\nKilos afectados: ${kg||'—'} kg\nDestino: ${dest}\n\nPROBLEMAS DETECTADOS:\n${problemas.map(p=>'• '+p).join('\n')}\n\nDESCRIPCIÓN:\n${desc||'Sin descripción adicional.'}\n\n=====================================\nADJUNTAR FOTOS:\n${fotos}\n=====================================\n\nPor favor adjunta las fotos indicadas y envía este correo.\n\nAgrovip S.A. · PackVip`;
+  const dest_mail=`${MAIL_LILI},${MAIL_DANIEL}`;
+  const cc_mail=MAIL_PABLO;
+  window.location.href=`mailto:${dest_mail}?cc=${cc_mail}&subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+}
+
+// PRODUCTORES
+function rProd(){
+  const f=document.getElementById('ftp').value;
+  const b=document.getElementById('bprod').value.toLowerCase();
+  let ps=[...HIST.productores];
+  if(b)ps=ps.filter(p=>p.Productores.toLowerCase().includes(b));
+  if(f==='top')ps.sort((a,b2)=>b2.Rendimiento-a.Rendimiento);
+  else if(f==='rechazo')ps.sort((a,b2)=>b2.PctRechazoReal-a.PctRechazoReal);
+  else ps.sort((a,b2)=>b2.KilosTotales-a.KilosTotales);
+  document.getElementById('pl').innerHTML=ps.map(p=>{
+    const rend=p.Rendimiento;const prc=p.PctRechazoReal;const sc=rend*0.6+(1-prc)*0.4;
+    const cc=sc>0.8?'#1A6B3C':sc>0.7?'#D4A017':'#C0392B';
+    const cl=sc>0.8?'⭐ Excelente':sc>0.7?'✓ Bueno':'⚠ Regular';
+    return`<div class="pr"><span style="font-weight:500">${p.Productores}</span><span>${(p.KilosTotales/1000).toFixed(1)}t</span><span style="color:${rend>0.85?'var(--g)':rend>0.75?'var(--am)':'var(--rd)'}">${(rend*100).toFixed(1)}%</span><span style="color:${prc>0.15?'var(--rd)':prc>0.10?'var(--am)':'var(--g)'}">${(prc*100).toFixed(1)}%</span><span>$${p.PrecioPromedio.toFixed(3)}</span><span>${p.Entregas}</span><span style="color:${cc};font-weight:600">${cl}</span><button class="bsm" onclick="uP('${p.Productores}')">→ Usar</button></div>`;
+  }).join('');
+}
+
 function uP(n){document.getElementById('pp').value=n;chProd();gt('pedido');}
-function rH(){const ss=HIST.semanas.filter(s=>s.Semana>=1&&s.Semana<=52).sort((a,b)=>a.Semana-b.Semana);if(!ss.length)return;const ps=ss.map(s=>s.PrecioPromedio);const prom=ps.reduce((a,b)=>a+b,0)/ps.length;document.getElementById('hpprom').textContent=f2(prom)+'/kg';document.getElementById('hpmin').textContent=f2(Math.min(...ps))+'/kg';document.getElementById('hpmax').textContent=f2(Math.max(...ps))+'/kg';document.getElementById('hpsems').textContent=ss.length;const mx=Math.max(...ps);document.getElementById('pc').innerHTML=ss.map(s=>{const h=Math.max((s.PrecioPromedio/mx)*108,4);const c=s.PrecioPromedio>prom*1.1?'#C0392B':s.PrecioPromedio<prom*0.9?'#1A6B3C':'#D4A017';return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:9px;color:var(--gris)">$${s.PrecioPromedio.toFixed(2)}</div><div style="width:100%;height:${h}px;background:${c};border-radius:3px 3px 0 0;min-height:4px"></div></div>`;}).join('');document.getElementById('pcl').innerHTML=ss.map(s=>`<div style="flex:1;text-align:center;font-size:9px;color:var(--gris)">S${s.Semana}</div>`).join('');let prev=null;document.getElementById('pt').innerHTML=ss.map(s=>{const t=prev===null?'—':s.PrecioPromedio>prev?'↑':'↓';const tc=t==='↑'?'#C0392B':t==='↓'?'#1A6B3C':'#6B6B5A';prev=s.PrecioPromedio;return`<tr style="border-bottom:1px solid var(--bd)"><td style="padding:8px 12px;font-weight:600">Semana ${s.Semana}</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:${s.PrecioPromedio>prom?'#C0392B':'#1A6B3C'}">$${s.PrecioPromedio.toFixed(3)}/kg</td><td style="padding:8px 12px;text-align:right">${(s.KilosTotales/1000).toFixed(1)}t</td><td style="padding:8px 12px;text-align:right">${s.Entregas}</td><td style="padding:8px 12px;font-size:16px;color:${tc}">${t}</td></tr>`;}).join('');}
+
+// HISTORICO
+function rH(){
+  const ss=HIST.semanas.filter(s=>s.Semana>=1&&s.Semana<=52).sort((a,b)=>a.Semana-b.Semana);
+  if(!ss.length)return;
+  const ps=ss.map(s=>s.PrecioPromedio);
+  const prom=ps.reduce((a,b)=>a+b,0)/ps.length;
+  document.getElementById('hpprom').textContent='$'+prom.toFixed(3)+'/kg';
+  document.getElementById('hpmin').textContent='$'+Math.min(...ps).toFixed(3)+'/kg';
+  document.getElementById('hpmax').textContent='$'+Math.max(...ps).toFixed(3)+'/kg';
+  document.getElementById('hpsems').textContent=ss.length;
+  const mx=Math.max(...ps);
+  document.getElementById('pc').innerHTML=ss.map(s=>{const h=Math.max((s.PrecioPromedio/mx)*108,4);const c=s.PrecioPromedio>prom*1.1?'#C0392B':s.PrecioPromedio<prom*0.9?'#1A6B3C':'#D4A017';return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:9px;color:var(--gris)">$${s.PrecioPromedio.toFixed(2)}</div><div style="width:100%;height:${h}px;background:${c};border-radius:3px 3px 0 0"></div></div>`;}).join('');
+  document.getElementById('pcl').innerHTML=ss.map(s=>`<div style="flex:1;text-align:center;font-size:9px;color:var(--gris)">S${s.Semana}</div>`).join('');
+  let prev=null;
+  document.getElementById('pt').innerHTML=ss.map(s=>{const t=prev===null?'—':s.PrecioPromedio>prev?'↑':'↓';const tc=t==='↑'?'#C0392B':t==='↓'?'#1A6B3C':'#6B6B5A';prev=s.PrecioPromedio;return`<tr style="border-bottom:1px solid var(--bd)"><td style="padding:8px 12px;font-weight:600">Semana ${s.Semana}</td><td style="padding:8px 12px;text-align:right;font-weight:700;color:${s.PrecioPromedio>prom?'#C0392B':'#1A6B3C'}">$${s.PrecioPromedio.toFixed(3)}/kg</td><td style="padding:8px 12px;text-align:right">${(s.KilosTotales/1000).toFixed(1)}t</td><td style="padding:8px 12px;text-align:right">${s.Entregas}</td><td style="padding:8px 12px;font-size:16px;color:${tc}">${t}</td></tr>`;}).join('');
+}
 </script>
 </body>
 </html>
