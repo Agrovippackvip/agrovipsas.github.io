@@ -690,7 +690,7 @@ async function calcular(){
   const numCot='AGV-'+new Date().getFullYear()+String(new Date().getMonth()+1).padStart(2,'0')+String(new Date().getDate()).padStart(2,'0')+'-'+String(cotCount).padStart(3,'0');
   document.getElementById('cotResTitle').textContent='Cotización — '+clienteNombre;
   document.getElementById('cotResNum').textContent=numCot+' · '+fecha;
-  const rb=document.getElementById('cotResBadge');rb.textContent=margenReal>=margenObj?'✓ APROBADO':margenReal>=margenObj-4?'⚠ REVISAR':'✗ RECHAZADO';const bc=margenReal>=margenObj?'bg':margenReal>=margenObj-4?'ba':'br';rb.className='badge '+bc;
+  const rb=document.getElementById('cotResBadge');rb.textContent=margenReal>=margenObj?'✓ APROBADO':margenReal>=margenObj-4?'⚠ REVISAR':'✗ RECHAZADO';rb.className='badge '+(margenReal>=margenObj?'bg':margenReal>=margenObj-4?'ba':'br');
   if(ncMonto>0){document.getElementById('cotResNcAlert').style.display='';document.getElementById('cotResNcAlert').textContent='⚠ N/C de '+f2(ncMonto)+(ncMotivo?' — '+ncMotivo:'')+'  Cobrado: '+f2(valorCobrado);}
   else document.getElementById('cotResNcAlert').style.display='none';
   document.getElementById('cotResGrid').innerHTML=`
