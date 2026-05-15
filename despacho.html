@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agrovip · Despachos</title>
+<style>
+:root{--g:#1A6B3C;--g2:#7A9A2E;--am:#D4A017;--rd:#C0392B;--cr:#F5F0E8;--cr2:#EAE3D2;--gris:#6B6B5A;--ink:#1C1C1C;--bd:#E0D8C8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--cr);color:var(--ink);min-height:100vh}
+input,select,textarea,button{font-family:inherit}
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--g)}
+.lb{background:white;border-radius:12px;padding:40px 36px;width:340px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.ll{width:56px;height:56px;background:var(--g2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:white;margin:0 auto 16px}
+.lt{font-size:20px;font-weight:700;color:var(--g);margin-bottom:4px}
+.ls{font-size:13px;color:var(--gris);margin-bottom:24px}
+.lb input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:14px;margin-bottom:12px;outline:none}
+.lb input:focus{border-color:var(--g)}
+.lbtn{width:100%;padding:12px;background:var(--g);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.lerr{color:var(--rd);font-size:12px;margin-top:8px;display:none}
+.app{display:none}
+.hdr{background:var(--g);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.hl{display:flex;align-items:center;gap:12px}
+.hlogo{width:36px;height:36px;background:var(--g2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white}
+.htitle{font-size:14px;font-weight:600;color:white}
+.htitle span{opacity:.6;font-size:11px;display:block;margin-top:1px}
+.hdate{font-size:11px;color:rgba(255,255,255,.6)}
+.blogout{background:none;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.8);padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer}
+.nav{display:flex;background:white;border-bottom:1px solid var(--bd);overflow-x:auto}
+.nb{padding:11px 18px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2.5px solid transparent;white-space:nowrap}
+.nb.active{color:var(--g);border-bottom-color:var(--g)}
+.main{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
+.tab{display:none}.tab.show{display:block}
+.sl{font-size:10px;font-weight:600;color:var(--gris);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.card{background:white;border:1px solid var(--bd);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+.ct{font-size:12px;font-weight:600;color:var(--gris);margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:11px;color:var(--gris);margin-bottom:4px}
+.fld input,.fld select,.fld textarea{width:100%;padding:8px 11px;font-size:13px;border:1px solid var(--bd);border-radius:7px;background:white;color:var(--ink);outline:none}
+.fld input:focus,.fld select:focus{border-color:var(--g)}
+.fld textarea{resize:vertical;min-height:52px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.bp{width:100%;padding:11px;background:var(--g);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px}
+.bp:hover{opacity:.9}
+.bs{padding:7px 14px;background:none;border:1px solid var(--g);color:var(--g);border-radius:7px;font-size:12px;cursor:pointer}
+.bsm{padding:5px 10px;background:none;border:1px solid var(--bd);color:var(--gris);border-radius:6px;font-size:11px;cursor:pointer}
+.bsm:hover{border-color:var(--g);color:var(--g)}
+.bwa{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#25D366;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.bg{background:#D1FAE5;color:#065F46}.ba{background:#FEF3C7;color:#92400E}
+.br{background:#FEE2E2;color:#991B1B}.bb{background:#EFF6FF;color:#1E40AF}
+.bp2{background:#F3E8FF;color:#6B21A8}.bk{background:#F1F5F9;color:#475569}
+.sc{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.sc .et{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gris);margin-bottom:6px}
+.sc .nm{font-size:24px;font-weight:700;color:var(--ink)}.sc .nm.hl{color:var(--g)}
+.rr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.rr:last-child{border-bottom:none}
+.rr .lb{color:var(--gris)}
+.al{background:#FEF3C7;border-left:3px solid var(--am);border-radius:0 7px 7px 0;padding:10px 14px;font-size:12px;color:#92400E;margin:8px 0}
+.al.rd{background:#FEE2E2;border-left-color:var(--rd);color:#991B1B}
+.al.g{background:#D1FAE5;border-left-color:var(--g);color:#065F46}
+.desp-card{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px;border-left:4px solid var(--g)}
+.desp-card.aereo{border-left-color:#3B82F6}
+.desp-card.local{border-left-color:var(--am)}
+.prod-asig-row{display:grid;grid-template-columns:180px repeat(9,48px) 80px 80px 32px;gap:4px;align-items:center;margin-bottom:6px;font-size:12px}
+.prod-asig-row input{padding:5px 6px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center;width:100%}
+.prod-asig-row input:focus{border-color:var(--g);outline:none}
+.cal-header{display:grid;grid-template-columns:180px repeat(9,48px) 80px 80px 32px;gap:4px;margin-bottom:4px;font-size:10px;font-weight:600;color:var(--gris);text-align:center}
+.totals-row{display:grid;grid-template-columns:180px repeat(9,48px) 80px 80px 32px;gap:4px;padding:8px 0;border-top:2px solid var(--g);font-size:12px;font-weight:700;color:var(--g);text-align:center}
+.status-flow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.st-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);flex-shrink:0}
+.st-dot.active{background:var(--g)}
+.st-btn2{padding:4px 12px;border-radius:12px;font-size:11px;font-weight:600;border:none;cursor:pointer;opacity:.4}
+.st-btn2.act{opacity:1}
+.s-prog{background:#EFF6FF;color:#1E40AF}
+.s-trans{background:#FEF3C7;color:#92400E}
+.s-entregado{background:#D1FAE5;color:#065F46}
+.s-facturado{background:#F3E8FF;color:#6B21A8}
+@media(max-width:768px){.g2,.g3,.g4,.fr2,.fr3{grid-template-columns:1fr}.prod-asig-row,.cal-header,.totals-row{grid-template-columns:1fr;overflow-x:auto}}
+</style>
+</head>
+<body>
+
+<div class="lw" id="lw">
+  <div class="lb">
+    <div class="ll">AV</div>
+    <div class="lt">Agrovip · Despachos</div>
+    <div class="ls">Asignación de cajas y documentos de exportación</div>
+    <input type="password" id="lp" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
+    <button class="lbtn" onclick="login()">Ingresar</button>
+    <div class="lerr" id="le">Contraseña incorrecta</div>
+  </div>
+</div>
+
+<div class="app" id="aw">
+  <div class="hdr">
+    <div class="hl">
+      <div class="hlogo">AV</div>
+      <div class="htitle">DESPACHOS <span id="roleLabel">Agrovip S.A. · Exportación</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="hdate" id="hd"></div>
+      <button class="blogout" onclick="logout()">Salir</button>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nb active" onclick="gt('nuevo')">📦 Nuevo Despacho</button>
+    <button class="nb" onclick="gt('lista')">📋 Lista de Despachos</button>
+    <button class="nb" onclick="gt('reporte')">📊 Reporte</button>
+  </div>
+
+  <div class="main">
+
+    <!-- NUEVO DESPACHO -->
+    <div class="tab show" id="tab-nuevo">
+      <div class="sl">Nuevo despacho</div>
+      <div class="g2" style="margin-bottom:14px">
+        <div class="card">
+          <div class="ct">🚢 Datos del despacho</div>
+          <div class="fr2">
+            <div class="fld"><label>Tipo de despacho</label>
+              <select id="dtipo" onchange="actualizarTipo()">
+                <option value="maritimo">Marítimo (BL)</option>
+                <option value="aereo">Aéreo (AWB)</option>
+                <option value="local">Local (Guía)</option>
+              </select>
+            </div>
+            <div class="fld"><label id="docLabel">Número de BL</label>
+              <input type="text" id="ddoc" placeholder="Ej: MSKU1234567">
+            </div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Fecha de salida</label>
+              <input type="date" id="dfecha">
+            </div>
+            <div class="fld"><label>Semana #</label>
+              <input type="number" id="dsemana" placeholder="Ej: 20">
+            </div>
+          </div>
+          <div class="fld"><label>Cliente / Cotización</label>
+            <select id="dcot">
+              <option value="">— Seleccionar cotización —</option>
+            </select>
+          </div>
+          <div class="fld"><label>O escribe el cliente</label>
+            <input type="text" id="dcliente" placeholder="Ej: Veritas Commodities">
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Naviera / Aerolínea</label>
+              <input type="text" id="dnaviera" placeholder="Ej: Maersk, Copa Airlines">
+            </div>
+            <div class="fld"><label>Puerto / Aeropuerto destino</label>
+              <input type="text" id="ddestino" placeholder="Ej: Rotterdam, Miami">
+            </div>
+          </div>
+          <div class="fld"><label>Notas</label>
+            <textarea id="dnotas" placeholder="Observaciones del despacho..."></textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ct">📊 Resumen del despacho</div>
+          <div class="rr"><span class="lb">Tipo</span><span id="rs_tipo">—</span></div>
+          <div class="rr"><span class="lb">Documento</span><span id="rs_doc">—</span></div>
+          <div class="rr"><span class="lb">Cliente</span><span id="rs_cliente">—</span></div>
+          <div class="rr"><span class="lb">Fecha salida</span><span id="rs_fecha">—</span></div>
+          <div class="rr"><span class="lb">Total cajas asignadas</span><span id="rs_cajas" style="font-weight:700;color:var(--g)">0</span></div>
+          <div class="rr"><span class="lb">Total kg neto</span><span id="rs_kg" style="font-weight:700;color:var(--g)">0 kg</span></div>
+          <div class="rr"><span class="lb">Productores</span><span id="rs_prods">0</span></div>
+          <div id="rs_alert" style="margin-top:8px"></div>
+
+          <div style="margin-top:14px">
+            <div style="font-size:11px;font-weight:600;color:var(--gris);letter-spacing:1px;margin-bottom:8px">CAJAS POR CALIBRE (OBJETIVO)</div>
+            <div class="fr3">
+              <div class="fld"><label>Cajas objetivo total</label>
+                <input type="number" id="dcajas_obj" placeholder="3840" oninput="actualizarResumen()">
+              </div>
+              <div class="fld"><label>Kg por caja</label>
+                <input type="number" id="dkg_caja" value="4.5" step="0.05" oninput="actualizarResumen()">
+              </div>
+              <div class="fld"><label>Kg objetivo total</label>
+                <input type="text" id="dkg_obj" readonly style="background:var(--cr);font-weight:600;color:var(--g)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASIGNACIÓN DE CAJAS POR PRODUCTOR -->
+      <div class="card">
+        <div class="ct">🌿 Asignación de cajas por productor y calibre</div>
+        <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <select id="prodSel" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;flex:1">
+            <option value="">— Seleccionar productor —</option>
+          </select>
+          <button class="bs" onclick="agregarProductor()">+ Agregar productor</button>
+        </div>
+
+        <div style="overflow-x:auto">
+          <div class="cal-header">
+            <div style="text-align:left">PRODUCTOR</div>
+            <div>Cal 6</div><div>Cal 7</div><div>Cal 8</div><div>Cal 9</div>
+            <div>Cal 10</div><div>Cal 11</div><div>Cal 12</div><div>Cal 13</div><div>Cal 14</div>
+            <div>CAJAS</div><div>KG NETO</div><div></div>
+          </div>
+          <div id="asigRows">
+            <div style="padding:20px;text-align:center;font-size:13px;color:var(--gris)">Agrega productores para asignar cajas.</div>
+          </div>
+          <div class="totals-row" id="totalsRow" style="display:none">
+            <div style="text-align:left">TOTAL</div>
+            <div id="t6">0</div><div id="t7">0</div><div id="t8">0</div><div id="t9">0</div>
+            <div id="t10">0</div><div id="t11">0</div><div id="t12">0</div><div id="t13">0</div><div id="t14">0</div>
+            <div id="ttotal">0</div><div id="tkg">0</div><div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="bp" style="flex:2;margin-top:0" onclick="guardarDespacho()">💾 Guardar despacho</button>
+        <button class="bwa" style="flex:1" onclick="waDespacho()">📱 Resumen WhatsApp</button>
+      </div>
+    </div>
+
+    <!-- LISTA -->
+    <div class="tab" id="tab-lista">
+      <div class="g4" style="margin-bottom:16px">
+        <div class="sc"><div class="et">Total despachos</div><div class="nm hl" id="sl_total">0</div></div>
+        <div class="sc"><div class="et">Cajas totales</div><div class="nm hl" id="sl_cajas">0</div></div>
+        <div class="sc"><div class="et">Marítimos</div><div class="nm hl" id="sl_mar">0</div></div>
+        <div class="sc"><div class="et">Aéreos</div><div class="nm hl" id="sl_aer">0</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <select id="filtroTipo" onchange="renderLista()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white">
+          <option value="">Todos los tipos</option>
+          <option value="maritimo">Marítimo</option>
+          <option value="aereo">Aéreo</option>
+          <option value="local">Local</option>
+        </select>
+        <select id="filtroEstado" onchange="renderLista()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white">
+          <option value="">Todos los estados</option>
+          <option value="Programado">Programado</option>
+          <option value="En tránsito">En tránsito</option>
+          <option value="Entregado">Entregado</option>
+          <option value="Facturado">Facturado</option>
+        </select>
+      </div>
+      <div id="despLista"><div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">No hay despachos aún.</div></div>
+    </div>
+
+    <!-- REPORTE -->
+    <div class="tab" id="tab-reporte">
+      <div class="sl">Resumen de despachos</div>
+      <div class="g4" style="margin-bottom:16px">
+        <div class="sc"><div class="et">Total cajas despachadas</div><div class="nm hl" id="rp_cajas">0</div></div>
+        <div class="sc"><div class="et">Total kg neto</div><div class="nm hl" id="rp_kg">0</div></div>
+        <div class="sc"><div class="et">Marítimos</div><div class="nm hl" id="rp_mar">0</div></div>
+        <div class="sc"><div class="et">Aéreos</div><div class="nm hl" id="rp_aer">0</div></div>
+      </div>
+      <div class="card">
+        <div class="ct">📦 Cajas por calibre (histórico)</div>
+        <div id="rp_calibres" style="display:grid;grid-template-columns:repeat(9,1fr);gap:10px;text-align:center">
+          ${[6,7,8,9,10,11,12,13,14].map(c=>`
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px">
+            <div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL ${c}</div>
+            <div id="rp_cal_${c}" style="font-size:18px;font-weight:700;color:var(--g)">0</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct">🌿 Cajas por productor</div>
+        <div id="rp_prods"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0';
+const HIST={
+  "productores": [
+    {
+      "Productores": "Jorge Bailon/Alexandra Bailon",
+      "KilosTotales": 280593.52,
+      "KilosNetos": 243346.58,
+      "Entregas": 228,
+      "PrecioPromedio": 1.6092543859649124,
+      "PrecioMin": 0.2,
+      "PrecioMax": 5.2,
+      "RechazoKg": 38277.44,
+      "KilosParaPct": 280593.52,
+      "PctRechazoReal": 0.13641597995563118,
+      "Rendimiento": 0.867256592383174
+    },
+    {
+      "Productores": "Geovanni Zambrano",
+      "KilosTotales": 216691.74,
+      "KilosNetos": 187593.4,
+      "Entregas": 182,
+      "PrecioPromedio": 1.826813186813187,
+      "PrecioMin": 0.15,
+      "PrecioMax": 5.2,
+      "RechazoKg": 29098.34,
+      "KilosParaPct": 216691.74,
+      "PctRechazoReal": 0.13428449095475445,
+      "Rendimiento": 0.8657155090452455
+    },
+    {
+      "Productores": "Mao Lam",
+      "KilosTotales": 168524.9,
+      "KilosNetos": 168831.0,
+      "Entregas": 112,
+      "PrecioPromedio": 12.911339285714286,
+      "PrecioMin": 0.9,
+      "PrecioMax": 29.7,
+      "RechazoKg": -306.1,
+      "KilosParaPct": 168524.9,
+      "PctRechazoReal": -0.0018163488006816798,
+      "Rendimiento": 1.0018163488006817
+    },
+    {
+      "Productores": "Darwin Alcivar",
+      "KilosTotales": 146488.05,
+      "KilosNetos": 101176.05,
+      "Entregas": 293,
+      "PrecioPromedio": 2.4627303754266214,
+      "PrecioMin": 0.15,
+      "PrecioMax": 5.5,
+      "RechazoKg": 45312.0,
+      "KilosParaPct": 146488.05,
+      "PctRechazoReal": 0.30932215972565685,
+      "Rendimiento": 0.6906778402743433
+    },
+    {
+      "Productores": "Jorge Miño/MCFruits",
+      "KilosTotales": 130178.2,
+      "KilosNetos": 127485.0,
+      "Entregas": 48,
+      "PrecioPromedio": 7.634583333333333,
+      "PrecioMin": 0.3,
+      "PrecioMax": 23.85,
+      "RechazoKg": 2693.2,
+      "KilosParaPct": 130178.2,
+      "PctRechazoReal": 0.02068856383019584,
+      "Rendimiento": 0.9793114361698042
+    },
+    {
+      "Productores": "Manafruit",
+      "KilosTotales": 121047.23,
+      "KilosNetos": 103167.0,
+      "Entregas": 114,
+      "PrecioPromedio": 2.0396491228070177,
+      "PrecioMin": 0.2,
+      "PrecioMax": 5.1,
+      "RechazoKg": 17880.23,
+      "KilosParaPct": 121047.23,
+      "PctRechazoReal": 0.14771283902985635,
+      "Rendimiento": 0.8522871609701437
+    },
+    {
+      "Productores": "Emilio Chonglon/Zuely Trelles",
+      "KilosTotales": 114284.93,
+      "KilosNetos": 89687.43,
+      "Entregas": 84,
+      "PrecioPromedio": 1.4010714285714285,
+      "PrecioMin": 0.2,
+      "PrecioMax": 3.25,
+      "RechazoKg": 24597.5,
+      "KilosParaPct": 114284.93,
+      "PctRechazoReal": 0.21522960201314384,
+      "Rendimiento": 0.7847703979868562
+    },
+    {
+      "Productores": "Tomas Sabol",
+      "KilosTotales": 97596.2,
+      "KilosNetos": 83155.5,
+      "Entregas": 135,
+      "PrecioPromedio": 1.683037037037037,
+      "PrecioMin": 0.15,
+      "PrecioMax": 5.1,
+      "RechazoKg": 14440.7,
+      "KilosParaPct": 97596.2,
+      "PctRechazoReal": 0.14796375268709233,
+      "Rendimiento": 0.8520362473129077
+    },
+    {
+      "Productores": "Ferdinand Santana",
+      "KilosTotales": 87306.11,
+      "KilosNetos": 61717.5,
+      "Entregas": 49,
+      "PrecioPromedio": 2.2181632653061225,
+      "PrecioMin": 0.15,
+      "PrecioMax": 5.4,
+      "RechazoKg": 25588.61,
+      "KilosParaPct": 87306.11,
+      "PctRechazoReal": 0.29309071266604364,
+      "Rendimiento": 0.7069092873339563
+    },
+    {
+      "Productores": "Nixon Nagua",
+      "KilosTotales": 76504.95,
+      "KilosNetos": 57384.0,
+      "Entregas": 44,
+      "PrecioPromedio": 1.420909090909091,
+      "PrecioMin": 0.15,
+      "PrecioMax": 2.8,
+      "RechazoKg": 19120.95,
+      "KilosParaPct": 76504.95,
+      "PctRechazoReal": 0.24993088682497017,
+      "Rendimiento": 0.7500691131750299
+    },
+    {
+      "Productores": "Ricardo Barcia",
+      "KilosTotales": 72712.38,
+      "KilosNetos": 54689.05,
+      "Entregas": 165,
+      "PrecioPromedio": 2.127818181818182,
+      "PrecioMin": 0.2,
+      "PrecioMax": 5.3,
+      "RechazoKg": 18023.329999999998,
+      "KilosParaPct": 72712.38,
+      "PctRechazoReal": 0.24787154539570835,
+      "Rendimiento": 0.7521284546042916
+    },
+    {
+      "Productores": "Kerly Mendoza/Terranovafruit",
+      "KilosTotales": 58943.159999999996,
+      "KilosNetos": 48895.05,
+      "Entregas": 91,
+      "PrecioPromedio": 2.0615384615384613,
+      "PrecioMin": 0.3,
+      "PrecioMax": 5.1,
+      "RechazoKg": 10048.11,
+      "KilosParaPct": 58943.159999999996,
+      "PctRechazoReal": 0.17047117935312597,
+      "Rendimiento": 0.8295288206468742
+    },
+    {
+      "Productores": "Avifruit",
+      "KilosTotales": 57394.2,
+      "KilosNetos": 52083.0,
+      "Entregas": 90,
+      "PrecioPromedio": 2.461666666666667,
+      "PrecioMin": 0.2,
+      "PrecioMax": 5.3,
+      "RechazoKg": 5311.2,
+      "KilosParaPct": 57394.2,
+      "PctRechazoReal": 0.09253896735210178,
+      "Rendimiento": 0.9074610326478982
+    },
+    {
+      "Productores": "Maria Augusta",
+      "KilosTotales": 56279.99,
+      "KilosNetos": 47821.5,
+      "Entregas": 141,
+      "PrecioPromedio": 2.1395744680851063,
+      "PrecioMin": 0.15,
+      "PrecioMax": 5.1,
+      "RechazoKg": 8458.49,
+      "KilosParaPct": 56279.99,
+      "PctRechazoReal": 0.15029302599378572,
+      "Rendimiento": 0.8497069740062143
+    },
+    {
+      "Productores": "Ferdinand Santana#1",
+      "KilosTotales": 48416.2,
+      "KilosNetos": 37264.5,
+      "Entregas": 35,
+      "PrecioPromedio": 1.108,
+      "PrecioMin": 0.15,
+      "PrecioMax": 5.4,
+      "RechazoKg": 11151.7,
+      "KilosParaPct": 48416.2,
+      "PctRechazoReal": 0.23032993089090018,
+      "Rendimiento": 0.7696700691090999
+    },
+    {
+      "Productores": "Juan Romero/Ecubiogeni",
+      "KilosTotales": 44519.64,
+      "KilosNetos": 36759.28,
+      "Entregas": 27,
+      "PrecioPromedio": 1.0666666666666667,
+      "PrecioMin": 0.3,
+      "PrecioMax": 4.0,
+      "RechazoKg": 7760.360000000001,
+      "KilosParaPct": 44519.64,
+      "PctRechazoReal": 0.1743131795315506,
+      "Rendimiento": 0.8256868204684494
+    },
+    {
+      "Productores": "Jaime Naranjo/Sofarelsa",
+      "KilosTotales": 39175.63,
+      "KilosNetos": 34758.0,
+      "Entregas": 29,
+      "PrecioPromedio": 1.0517241379310345,
+      "PrecioMin": 0.5,
+      "PrecioMax": 1.8,
+      "RechazoKg": 4417.63,
+      "KilosParaPct": 39175.63,
+      "PctRechazoReal": 0.11276474685920815,
+      "Rendimiento": 0.8872352531407919
+    },
+    {
+      "Productores": "Angie Santander",
+      "KilosTotales": 36286.51,
+      "KilosNetos": 28233.0,
+      "Entregas": 75,
+      "PrecioPromedio": 1.2821333333333333,
+      "PrecioMin": 0.15,
+      "PrecioMax": 5.1,
+      "RechazoKg": 8053.51,
+      "KilosParaPct": 36286.51,
+      "PctRechazoReal": 0.22194225898274592,
+      "Rendimiento": 0.778057741017254
+    },
+    {
+      "Productores": "Ferdinand Santana#2",
+      "KilosTotales": 35986.8,
+      "KilosNetos": 24097.5,
+      "Entregas": 33,
+      "PrecioPromedio": 1.286060606060606,
+      "PrecioMin": 0.15,
+      "PrecioMax": 5.4,
+      "RechazoKg": 11889.3,
+      "KilosParaPct": 35986.8,
+      "PctRechazoReal": 0.3303794724732401,
+      "Rendimiento": 0.6696205275267597
+    },
+    {
+      "Productores": "Jakubowsky/Wated Alberto",
+      "KilosTotales": 34858.31,
+      "KilosNetos": 24640.38,
+      "Entregas": 74,
+      "PrecioPromedio": 1.227027027027027,
+      "PrecioMin": 0.2,
+      "PrecioMax": 5.2,
+      "RechazoKg": 10217.93,
+      "KilosParaPct": 34858.31,
+      "PctRechazoReal": 0.29312752109898615,
+      "Rendimiento": 0.7068724789010139
+    },
+    {
+      "Productores": "Agrilosbajos",
+      "KilosTotales": 34559.0,
+      "KilosNetos": 24718.5,
+      "Entregas": 10,
+      "PrecioPromedio": 1.4,
+      "PrecioMin": 0.8,
+      "PrecioMax": 1.9,
+      "RechazoKg": 9840.5,
+      "KilosParaPct": 34559.0,
+      "PctRechazoReal": 0.2847449289620649,
+      "Rendimiento": 0.7152550710379352
+    },
+    {
+      "Productores": "Jhonny Zambrano/Zamuagro",
+      "KilosTotales": 33279.36,
+      "KilosNetos": 25092.0,
+      "Entregas": 34,
+      "PrecioPromedio": 1.0999999999999999,
+      "PrecioMin": 0.15,
+      "PrecioMax": 2.8,
+      "RechazoKg": 8187.360000000001,
+      "KilosParaPct": 33279.36,
+      "PctRechazoReal": 0.24601915421450413,
+      "Rendimiento": 0.7539808457854958
+    },
+    {
+      "Productores": "Fernando Pin La Fortuna",
+      "KilosTotales": 31212.78,
+      "KilosNetos": 26644.5,
+      "Entregas": 38,
+      "PrecioPromedio": 2.3368421052631576,
+      "PrecioMin": 0.82,
+      "PrecioMax": 5.1,
+      "RechazoKg": 4568.28,
+      "KilosParaPct": 31212.78,
+      "PctRechazoReal": 0.14635927975656124,
+      "Rendimiento": 0.8536407202434387
+    },
+    {
+      "Productores": "Agroecuasol",
+      "KilosTotales": 26797.77,
+      "KilosNetos": 20872.3,
+      "Entregas": 32,
+      "PrecioPromedio": 2.159375,
+      "PrecioMin": 0.2,
+      "PrecioMax": 5.1,
+      "RechazoKg": 5925.47,
+      "KilosParaPct": 26797.77,
+      "PctRechazoReal": 0.2211180258655851,
+      "Rendimiento": 0.7788819741344148
+    },
+    {
+      "Productores": "Hernan Macias",
+      "KilosTotales": 25798.0,
+      "KilosNetos": 20628.0,
+      "Entregas": 30,
+      "PrecioPromedio": 1.5283333333333333,
+      "PrecioMin": 0.15,
+      "PrecioMax": 2.5,
+      "RechazoKg": 5170.0,
+      "KilosParaPct": 25798.0,
+      "PctRechazoReal": 0.20040313202573842,
+      "Rendimiento": 0.7995968679742615
+    },
+    {
+      "Productores": "Carlos Jhair Andrade",
+      "KilosTotales": 25235.82,
+      "KilosNetos": 17801.9,
+      "Entregas": 23,
+      "PrecioPromedio": 0.7630434782608696,
+      "PrecioMin": 0.15,
+      "PrecioMax": 3.0,
+      "RechazoKg": 7433.92,
+      "KilosParaPct": 25235.82,
+      "PctRechazoReal": 0.29457810366376047,
+      "Rendimiento": 0.7054218963362396
+    },
+    {
+      "Productores": "Finca Esther/Edmundo",
+      "KilosTotales": 25206.31,
+      "KilosNetos": 15437.65,
+      "Entregas": 25,
+      "PrecioPromedio": 0.8416,
+      "PrecioMin": 0.2,
+      "PrecioMax": 3.5,
+      "RechazoKg": 9768.66,
+      "KilosParaPct": 25206.31,
+      "PctRechazoReal": 0.38754819725695666,
+      "Rendimiento": 0.6124518027430432
+    },
+    {
+      "Productores": "Pacific Dragon Fruit",
+      "KilosTotales": 23775.98,
+      "KilosNetos": 10428.0,
+      "Entregas": 34,
+      "PrecioPromedio": 2.072058823529412,
+      "PrecioMin": 0.15,
+      "PrecioMax": 3.5,
+      "RechazoKg": 13347.98,
+      "KilosParaPct": 23775.98,
+      "PctRechazoReal": 0.5614060913577484,
+      "Rendimiento": 0.43859390864225156
+    },
+    {
+      "Productores": "Drasur",
+      "KilosTotales": 23625.63,
+      "KilosNetos": 12097.9,
+      "Entregas": 28,
+      "PrecioPromedio": 1.4414285714285715,
+      "PrecioMin": 0.3,
+      "PrecioMax": 5.2,
+      "RechazoKg": 11527.73,
+      "KilosParaPct": 23625.63,
+      "PctRechazoReal": 0.48793323183339443,
+      "Rendimiento": 0.5120667681666055
+    },
+    {
+      "Productores": "Belgica Garcia",
+      "KilosTotales": 22764.04,
+      "KilosNetos": 14520.5,
+      "Entregas": 114,
+      "PrecioPromedio": 3.1276315789473683,
+      "PrecioMin": 0.72,
+      "PrecioMax": 5.8,
+      "RechazoKg": 8243.54,
+      "KilosParaPct": 22764.04,
+      "PctRechazoReal": 0.36212992069948924,
+      "Rendimiento": 0.6378700793005108
+    },
+    {
+      "Productores": "Junior Gigler",
+      "KilosTotales": 22685.14,
+      "KilosNetos": 21244.5,
+      "Entregas": 40,
+      "PrecioPromedio": 2.228,
+      "PrecioMin": 0.6,
+      "PrecioMax": 5.5,
+      "RechazoKg": 1440.64,
+      "KilosParaPct": 22685.14,
+      "PctRechazoReal": 0.06350588975867022,
+      "Rendimiento": 0.9364941102413298
+    },
+    {
+      "Productores": "Mario Castro",
+      "KilosTotales": 22491.57,
+      "KilosNetos": 13878.0,
+      "Entregas": 28,
+      "PrecioPromedio": 1.1517857142857142,
+      "PrecioMin": 0.15,
+      "PrecioMax": 4.9,
+      "RechazoKg": 8613.57,
+      "KilosParaPct": 22491.57,
+      "PctRechazoReal": 0.3829688189841794,
+      "Rendimiento": 0.6170311810158206
+    },
+    {
+      "Productores": "Ernesto Villamarin",
+      "KilosTotales": 20554.05,
+      "KilosNetos": 13480.5,
+      "Entregas": 28,
+      "PrecioPromedio": 1.395,
+      "PrecioMin": 0.2,
+      "PrecioMax": 5.5,
+      "RechazoKg": 7073.55,
+      "KilosParaPct": 20554.05,
+      "PctRechazoReal": 0.3441438548607209,
+      "Rendimiento": 0.6558561451392791
+    },
+    {
+      "Productores": "Luber Valencia",
+      "KilosTotales": 19054.1,
+      "KilosNetos": 14197.5,
+      "Entregas": 13,
+      "PrecioPromedio": 1.3461538461538463,
+      "PrecioMin": 1.0,
+      "PrecioMax": 1.5,
+      "RechazoKg": 4856.599999999999,
+      "KilosParaPct": 19054.1,
+      "PctRechazoReal": 0.25488477545515137,
+      "Rendimiento": 0.7451152245448487
+    },
+    {
+      "Productores": "Mario Salvador",
+      "KilosTotales": 18249.0,
+      "KilosNetos": 15448.5,
+      "Entregas": 9,
+      "PrecioPromedio": 5.017888888888889,
+      "PrecioMin": 0.2,
+      "PrecioMax": 29.011,
+      "RechazoKg": 2800.5,
+      "KilosParaPct": 18249.0,
+      "PctRechazoReal": 0.15346046358704588,
+      "Rendimiento": 0.8465395364129541
+    },
+    {
+      "Productores": "Gusalri/Edmundo",
+      "KilosTotales": 18097.88,
+      "KilosNetos": 14202.0,
+      "Entregas": 5,
+      "PrecioPromedio": 0.48,
+      "PrecioMin": 0.45,
+      "PrecioMax": 0.5,
+      "RechazoKg": 3895.88,
+      "KilosParaPct": 18097.88,
+      "PctRechazoReal": 0.21526720256737253,
+      "Rendimiento": 0.7847327974326275
+    },
+    {
+      "Productores": "Ferdinand Santana #3",
+      "KilosTotales": 17837.2,
+      "KilosNetos": 13473.0,
+      "Entregas": 13,
+      "PrecioPromedio": 0.9846153846153847,
+      "PrecioMin": 0.15,
+      "PrecioMax": 2.2,
+      "RechazoKg": 4364.2,
+      "KilosParaPct": 17837.2,
+      "PctRechazoReal": 0.2446684457201803,
+      "Rendimiento": 0.7553315542798197
+    },
+    {
+      "Productores": "Fruexur",
+      "KilosTotales": 17354.2,
+      "KilosNetos": 11312.3,
+      "Entregas": 17,
+      "PrecioPromedio": 1.1458823529411766,
+      "PrecioMin": 0.3,
+      "PrecioMax": 5.1,
+      "RechazoKg": 6041.9,
+      "KilosParaPct": 17354.2,
+      "PctRechazoReal": 0.34815203236104225,
+      "Rendimiento": 0.6518479676389577
+    },
+    {
+      "Productores": "Mario Salvador Agroriobravo",
+      "KilosTotales": 17314.01,
+      "KilosNetos": 13905.0,
+      "Entregas": 33,
+      "PrecioPromedio": 4.981818181818182,
+      "PrecioMin": 1.3,
+      "PrecioMax": 5.8,
+      "RechazoKg": 3409.0099999999998,
+      "KilosParaPct": 17314.01,
+      "PctRechazoReal": 0.19689315184639491,
+      "Rendimiento": 0.8031068481536051
+    },
+    {
+      "Productores": "Enrique Loayza/Edmundo",
+      "KilosTotales": 17171.34,
+      "KilosNetos": 12258.0,
+      "Entregas": 25,
+      "PrecioPromedio": 1.99,
+      "PrecioMin": 0.45,
+      "PrecioMax": 3.5,
+      "RechazoKg": 4913.34,
+      "KilosParaPct": 17171.34,
+      "PctRechazoReal": 0.2861360848949471,
+      "Rendimiento": 0.713863915105053
+    },
+    {
+      "Productores": "Nobis Company",
+      "KilosTotales": 16515.3,
+      "KilosNetos": 10674.0,
+      "Entregas": 9,
+      "PrecioPromedio": 6.0055555555555555,
+      "PrecioMin": 0.7,
+      "PrecioMax": 16.5,
+      "RechazoKg": 5841.3,
+      "KilosParaPct": 16515.3,
+      "PctRechazoReal": 0.3536902145283465,
+      "Rendimiento": 0.6463097854716536
+    },
+    {
+      "Productores": "Lukfruit",
+      "KilosTotales": 16272.51,
+      "KilosNetos": 12184.56,
+      "Entregas": 25,
+      "PrecioPromedio": 0.408,
+      "PrecioMin": 0.2,
+      "PrecioMax": 0.8,
+      "RechazoKg": 4087.95,
+      "KilosParaPct": 16272.51,
+      "PctRechazoReal": 0.2512181587229014,
+      "Rendimiento": 0.7487818412770986
+    },
+    {
+      "Productores": "Alfonso Quirola/Emconis",
+      "KilosTotales": 15931.5,
+      "KilosNetos": 10520.0,
+      "Entregas": 16,
+      "PrecioPromedio": 1.34375,
+      "PrecioMin": 0.2,
+      "PrecioMax": 2.0,
+      "RechazoKg": 5411.5,
+      "KilosParaPct": 15931.5,
+      "PctRechazoReal": 0.3396729749238929,
+      "Rendimiento": 0.6603270250761071
+    },
+    {
+      "Productores": "Ceusky/Edmundo",
+      "KilosTotales": 15710.5,
+      "KilosNetos": 12739.5,
+      "Entregas": 6,
+      "PrecioPromedio": 0.20000000000000004,
+      "PrecioMin": 0.2,
+      "PrecioMax": 0.2,
+      "RechazoKg": 2971.0,
+      "KilosParaPct": 15710.5,
+      "PctRechazoReal": 0.18910919448776295,
+      "Rendimiento": 0.810890805512237
+    },
+    {
+      "Productores": "Ferdinand Santana#4",
+      "KilosTotales": 15352.5,
+      "KilosNetos": 12892.5,
+      "Entregas": 14,
+      "PrecioPromedio": 1.1857142857142857,
+      "PrecioMin": 0.15,
+      "PrecioMax": 2.2,
+      "RechazoKg": 2460.0,
+      "KilosParaPct": 15352.5,
+      "PctRechazoReal": 0.16023448949682462,
+      "Rendimiento": 0.8397655105031754
+    },
+    {
+      "Productores": "Danny Zambrano",
+      "KilosTotales": 14803.22,
+      "KilosNetos": 12285.0,
+      "Entregas": 77,
+      "PrecioPromedio": 1.3235064935064935,
+      "PrecioMin": 0.15,
+      "PrecioMax": 5.1,
+      "RechazoKg": 2518.2200000000003,
+      "KilosParaPct": 14803.22,
+      "PctRechazoReal": 0.17011298893078672,
+      "Rendimiento": 0.8298870110692134
+    },
+    {
+      "Productores": "Javier Alban",
+      "KilosTotales": 14338.26,
+      "KilosNetos": 13106.15,
+      "Entregas": 7,
+      "PrecioPromedio": 1.4285714285714286,
+      "PrecioMin": 0.4,
+      "PrecioMax": 4.0,
+      "RechazoKg": 1232.11,
+      "KilosParaPct": 14338.26,
+      "PctRechazoReal": 0.08593162629217213,
+      "Rendimiento": 0.9140683737078278
+    },
+    {
+      "Productores": "Leticia Reyes/Agroindustrial La Felipa",
+      "KilosTotales": 13242.5,
+      "KilosNetos": 12091.5,
+      "Entregas": 6,
+      "PrecioPromedio": 1.7583333333333335,
+      "PrecioMin": 1.6,
+      "PrecioMax": 1.85,
+      "RechazoKg": 1151.0,
+      "KilosParaPct": 13242.5,
+      "PctRechazoReal": 0.08691712289975458,
+      "Rendimiento": 0.9130828771002454
+    },
+    {
+      "Productores": "Tierra Santa",
+      "KilosTotales": 12798.14,
+      "KilosNetos": 11248.4,
+      "Entregas": 10,
+      "PrecioPromedio": 0.4,
+      "PrecioMin": 0.4,
+      "PrecioMax": 0.4,
+      "RechazoKg": 1549.74,
+      "KilosParaPct": 12798.14,
+      "PctRechazoReal": 0.12109103354081141,
+      "Rendimiento": 0.8789089664591886
+    },
+    {
+      "Productores": "Marcos Intriago",
+      "KilosTotales": 12772.45,
+      "KilosNetos": 10944.0,
+      "Entregas": 11,
+      "PrecioPromedio": 1.018181818181818,
+      "PrecioMin": 0.5,
+      "PrecioMax": 1.3,
+      "RechazoKg": 1828.45,
+      "KilosParaPct": 12772.45,
+      "PctRechazoReal": 0.14315577669123777,
+      "Rendimiento": 0.8568442233087622
+    }
+  ],
+  "semanas": [
+    {
+      "Semana": 1.0,
+      "PrecioPromedio": 1.268181818181818,
+      "KilosTotales": 11877.5,
+      "Entregas": 11
+    },
+    {
+      "Semana": 2.0,
+      "PrecioPromedio": 1.05625,
+      "KilosTotales": 10262.5,
+      "Entregas": 8
+    },
+    {
+      "Semana": 3.0,
+      "PrecioPromedio": 1.4375,
+      "KilosTotales": 18277.5,
+      "Entregas": 16
+    },
+    {
+      "Semana": 4.0,
+      "PrecioPromedio": 1.6041666666666667,
+      "KilosTotales": 15070.0,
+      "Entregas": 24
+    },
+    {
+      "Semana": 5.0,
+      "PrecioPromedio": 1.548360655737705,
+      "KilosTotales": 51687.5,
+      "Entregas": 61
+    },
+    {
+      "Semana": 6.0,
+      "PrecioPromedio": 2.068421052631579,
+      "KilosTotales": 20406.5,
+      "Entregas": 19
+    },
+    {
+      "Semana": 7.0,
+      "PrecioPromedio": 3.808333333333333,
+      "KilosTotales": 12054.0,
+      "Entregas": 12
+    },
+    {
+      "Semana": 8.0,
+      "PrecioPromedio": 1.8708333333333333,
+      "KilosTotales": 32547.5,
+      "Entregas": 24
+    },
+    {
+      "Semana": 9.0,
+      "PrecioPromedio": 2.4925925925925925,
+      "KilosTotales": 43255.0,
+      "Entregas": 27
+    },
+    {
+      "Semana": 10.0,
+      "PrecioPromedio": 1.7947368421052632,
+      "KilosTotales": 28164.5,
+      "Entregas": 38
+    },
+    {
+      "Semana": 11.0,
+      "PrecioPromedio": 2.1,
+      "KilosTotales": 1627.0,
+      "Entregas": 4
+    },
+    {
+      "Semana": 12.0,
+      "PrecioPromedio": 1.2,
+      "KilosTotales": 78.5,
+      "Entregas": 2
+    },
+    {
+      "Semana": 13.0,
+      "PrecioPromedio": 1.64,
+      "KilosTotales": 20581.5,
+      "Entregas": 35
+    },
+    {
+      "Semana": 14.0,
+      "PrecioPromedio": 2.1500000000000004,
+      "KilosTotales": 1775.5,
+      "Entregas": 4
+    },
+    {
+      "Semana": 15.0,
+      "PrecioPromedio": 2.492857142857143,
+      "KilosTotales": 7983.0,
+      "Entregas": 14
+    },
+    {
+      "Semana": 16.0,
+      "PrecioPromedio": 2.8428571428571425,
+      "KilosTotales": 1619.0,
+      "Entregas": 7
+    },
+    {
+      "Semana": 17.0,
+      "PrecioPromedio": 2.23265306122449,
+      "KilosTotales": 27909.0,
+      "Entregas": 49
+    },
+    {
+      "Semana": 18.0,
+      "PrecioPromedio": 2.525,
+      "KilosTotales": 1559.3,
+      "Entregas": 8
+    },
+    {
+      "Semana": 19.0,
+      "PrecioPromedio": 2.3333333333333335,
+      "KilosTotales": 419.0,
+      "Entregas": 3
+    },
+    {
+      "Semana": 53.0,
+      "PrecioPromedio": 0.5,
+      "KilosTotales": 4248.5,
+      "Entregas": 2
+    }
+  ]
+};
+const CALIBRES=[6,7,8,9,10,11,12,13,14];
+const KG_CAJA=4.5;
+let USUARIO_ACTUAL=null;
+let _desps=null;
+let productoresAsig=[];
+
+const f2=n=>{try{return'$'+parseFloat(n).toFixed(2);}catch{return'—';}};
+const fk=n=>{try{return'$'+Math.round(parseFloat(n)).toLocaleString();}catch{return'—';}};
+
+async function supaFetch(method,path,body){
+  const r=await fetch(SUPA_URL+'/rest/v1/'+path,{
+    method,
+    headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':method==='POST'?'return=representation':''},
+    body:body?JSON.stringify(body):undefined
+  });
+  if(!r.ok){console.error('Supa:',await r.text());return null;}
+  return r.status===204?true:r.json();
+}
+
+async function login(){
+  const pw=document.getElementById('lp').value.trim();
+  const data=await supaFetch('GET',`usuarios?clave=eq.${encodeURIComponent(pw)}&select=*`);
+  if(!data||!data.length){document.getElementById('le').style.display='block';return;}
+  USUARIO_ACTUAL=data[0];
+  document.getElementById('lw').style.display='none';
+  document.getElementById('aw').style.display='block';
+  document.getElementById('roleLabel').textContent=USUARIO_ACTUAL.nombre+' · Despachos';
+  init();
+}
+function logout(){document.getElementById('lw').style.display='flex';document.getElementById('aw').style.display='none';document.getElementById('lp').value='';USUARIO_ACTUAL=null;_desps=null;}
+
+async function init(){
+  const now=new Date();
+  document.getElementById('hd').textContent=now.toLocaleDateString('es-EC',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  document.getElementById('dfecha').value=now.toISOString().split('T')[0];
+  const sy=new Date(now.getFullYear(),0,1);
+  document.getElementById('dsemana').value=Math.ceil(((now-sy)/86400000+sy.getDay()+1)/7);
+  // Poblar productores
+  const sel=document.getElementById('prodSel');
+  HIST.productores.map(p=>p.Productores).sort().forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
+  // Cargar cotizaciones de Supabase
+  await cargarCotizaciones();
+  renderLista();
+  renderReporte();
+}
+
+async function cargarCotizaciones(){
+  const data=await supaFetch('GET','cotizaciones?select=id,num_cot,cliente,valor_cotizado,estado&order=created_at.desc');
+  const sel=document.getElementById('dcot');
+  if(data&&data.length){
+    data.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.id;
+      o.textContent=`${c.num_cot} · ${c.cliente} · ${c.estado}`;
+      o.dataset.cliente=c.cliente;
+      sel.appendChild(o);
+    });
+  }
+  sel.addEventListener('change',()=>{
+    const opt=sel.options[sel.selectedIndex];
+    if(opt&&opt.dataset.cliente)document.getElementById('dcliente').value=opt.dataset.cliente;
+    actualizarResumen();
+  });
+}
+
+function gt(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('show'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('show');
+  const idx={nuevo:0,lista:1,reporte:2}[id];
+  document.querySelectorAll('.nb')[idx].classList.add('active');
+  if(id==='lista')renderLista();
+  if(id==='reporte')renderReporte();
+}
+
+function actualizarTipo(){
+  const tipo=document.getElementById('dtipo').value;
+  const labels={maritimo:'Número de BL',aereo:'Número de AWB',local:'Número de guía'};
+  document.getElementById('docLabel').textContent=labels[tipo]||'Número de documento';
+  actualizarResumen();
+}
+
+function actualizarResumen(){
+  const tipo=document.getElementById('dtipo').value;
+  const tipoLabel={maritimo:'🚢 Marítimo',aereo:'✈️ Aéreo',local:'🚛 Local'}[tipo];
+  document.getElementById('rs_tipo').textContent=tipoLabel||'—';
+  document.getElementById('rs_doc').textContent=document.getElementById('ddoc').value||'—';
+  const cot=document.getElementById('dcot');
+  const cli=document.getElementById('dcliente').value||cot.options[cot.selectedIndex]?.dataset?.cliente||'—';
+  document.getElementById('rs_cliente').textContent=cli;
+  document.getElementById('rs_fecha').textContent=document.getElementById('dfecha').value||'—';
+  const cajasObj=parseFloat(document.getElementById('dcajas_obj').value)||0;
+  const kgCaja=parseFloat(document.getElementById('dkg_caja').value)||4.5;
+  document.getElementById('dkg_obj').value=cajasObj?(cajasObj*kgCaja).toFixed(1)+' kg':'';
+  calcTotales();
+}
+
+function agregarProductor(){
+  const sel=document.getElementById('prodSel');
+  const nombre=sel.value;
+  if(!nombre)return;
+  if(productoresAsig.find(p=>p.nombre===nombre)){alert('Este productor ya está agregado.');return;}
+  productoresAsig.push({nombre,cals:{}});
+  renderAsigRows();
+  sel.value='';
+}
+
+function renderAsigRows(){
+  const cont=document.getElementById('asigRows');
+  if(!productoresAsig.length){
+    cont.innerHTML='<div style="padding:20px;text-align:center;font-size:13px;color:var(--gris)">Agrega productores para asignar cajas.</div>';
+    document.getElementById('totalsRow').style.display='none';
+    return;
+  }
+  document.getElementById('totalsRow').style.display='';
+  cont.innerHTML=productoresAsig.map((p,i)=>`
+    <div class="prod-asig-row" id="prow_${i}">
+      <div style="font-weight:500;font-size:12px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.nombre}">${p.nombre}</div>
+      ${CALIBRES.map(c=>`<input type="number" min="0" step="1" placeholder="0" value="${p.cals[c]||''}" 
+        data-prod="${i}" data-cal="${c}" oninput="updateCal(${i},${c},this.value)" 
+        style="padding:5px 4px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center">`).join('')}
+      <div style="font-weight:700;color:var(--g);text-align:center" id="prow_cajas_${i}">0</div>
+      <div style="font-weight:700;color:var(--g);text-align:center" id="prow_kg_${i}">0</div>
+      <button class="bsm" onclick="eliminarProd(${i})">🗑</button>
+    </div>`).join('');
+  calcTotales();
+}
+
+function updateCal(prodIdx,cal,val){
+  productoresAsig[prodIdx].cals[cal]=parseInt(val)||0;
+  calcTotales();
+}
+
+function eliminarProd(i){
+  productoresAsig.splice(i,1);
+  renderAsigRows();
+}
+
+function calcTotales(){
+  const calTotals={};
+  CALIBRES.forEach(c=>calTotals[c]=0);
+  let totalCajas=0;
+  productoresAsig.forEach((p,i)=>{
+    let pCajas=0;
+    CALIBRES.forEach(c=>{
+      const v=p.cals[c]||0;
+      calTotals[c]+=v;
+      pCajas+=v;
+    });
+    const pKg=pCajas*4.5;
+    const cajasEl=document.getElementById('prow_cajas_'+i);
+    const kgEl=document.getElementById('prow_kg_'+i);
+    if(cajasEl)cajasEl.textContent=pCajas.toLocaleString();
+    if(kgEl)kgEl.textContent=pKg.toFixed(1);
+    totalCajas+=pCajas;
+  });
+  CALIBRES.forEach(c=>{const el=document.getElementById('t'+c);if(el)el.textContent=calTotals[c]||0;});
+  const totalKg=totalCajas*4.5;
+  const ttEl=document.getElementById('ttotal');if(ttEl)ttEl.textContent=totalCajas.toLocaleString();
+  const tkEl=document.getElementById('tkg');if(tkEl)tkEl.textContent=totalKg.toFixed(1);
+  document.getElementById('rs_cajas').textContent=totalCajas.toLocaleString();
+  document.getElementById('rs_kg').textContent=totalKg.toFixed(1)+' kg';
+  document.getElementById('rs_prods').textContent=productoresAsig.length;
+  // Alerta vs objetivo
+  const obj=parseFloat(document.getElementById('dcajas_obj').value)||0;
+  const alert=document.getElementById('rs_alert');
+  if(obj>0){
+    const diff=totalCajas-obj;
+    if(Math.abs(diff)<=10)alert.innerHTML='<div class="al g">✓ Cajas cuadran con el objetivo.</div>';
+    else if(diff<0)alert.innerHTML=`<div class="al rd">⚠ Faltan ${Math.abs(diff)} cajas para completar el objetivo.</div>`;
+    else alert.innerHTML=`<div class="al">⚠ Excede el objetivo por ${diff} cajas.</div>`;
+  } else alert.innerHTML='';
+}
+
+async function guardarDespacho(){
+  const tipo=document.getElementById('dtipo').value;
+  const doc=document.getElementById('ddoc').value.trim();
+  const fecha=document.getElementById('dfecha').value;
+  const cot=document.getElementById('dcot').value;
+  const cliente=document.getElementById('dcliente').value.trim()||document.getElementById('dcot').options[document.getElementById('dcot').selectedIndex]?.dataset?.cliente||'—';
+  if(!doc||!fecha){alert('Completa número de documento y fecha de salida.');return;}
+  if(!productoresAsig.length){alert('Agrega al menos un productor.');return;}
+  // Calcular totales
+  const calTotals={};let totalCajas=0;
+  CALIBRES.forEach(c=>{calTotals[c]=0;});
+  productoresAsig.forEach(p=>{CALIBRES.forEach(c=>{calTotals[c]+=(p.cals[c]||0);totalCajas+=(p.cals[c]||0);});});
+  const desp={
+    id:'d'+Date.now(),
+    tipo,documento:doc,fecha,semana:parseInt(document.getElementById('dsemana').value)||0,
+    cotizacion_id:cot||null,cliente,
+    naviera:document.getElementById('dnaviera').value.trim(),
+    destino:document.getElementById('ddestino').value.trim(),
+    notas:document.getElementById('dnotas').value.trim(),
+    cajas_obj:parseFloat(document.getElementById('dcajas_obj').value)||0,
+    kg_caja:parseFloat(document.getElementById('dkg_caja').value)||4.5,
+    total_cajas:totalCajas,
+    total_kg:totalCajas*4.5,
+    cal_6:calTotals[6],cal_7:calTotals[7],cal_8:calTotals[8],cal_9:calTotals[9],
+    cal_10:calTotals[10],cal_11:calTotals[11],cal_12:calTotals[12],cal_13:calTotals[13],cal_14:calTotals[14],
+    productores:JSON.stringify(productoresAsig),
+    estado:'Programado',
+    creado_por:USUARIO_ACTUAL?.nombre||'—'
+  };
+  await supaFetch('POST','despachos',desp);
+  _desps=null;
+  alert(`✓ Despacho guardado — ${doc} · ${totalCajas} cajas · ${(totalCajas*4.5).toFixed(1)} kg`);
+  productoresAsig=[];
+  renderAsigRows();
+}
+
+function waDespacho(){
+  const tipo=document.getElementById('dtipo').value;
+  const doc=document.getElementById('ddoc').value||'—';
+  const fecha=document.getElementById('dfecha').value||'—';
+  const cliente=document.getElementById('dcliente').value||'—';
+  const naviera=document.getElementById('dnaviera').value||'—';
+  const destino=document.getElementById('ddestino').value||'—';
+  const tipoLabel={maritimo:'🚢 Marítimo',aereo:'✈️ Aéreo',local:'🚛 Local'}[tipo];
+  let totalCajas=0;
+  const resumenProds=productoresAsig.map(p=>{
+    let pCajas=0;CALIBRES.forEach(c=>pCajas+=(p.cals[c]||0));totalCajas+=pCajas;
+    const calDetalle=CALIBRES.filter(c=>p.cals[c]>0).map(c=>`Cal${c}:${p.cals[c]}`).join(' ');
+    return`• ${p.nombre}: ${pCajas} cajas (${calDetalle})`;
+  }).join('\n');
+  const msg=`*DESPACHO AGROVIP S.A.*\n\n${tipoLabel}\n📄 ${doc}\n📅 Salida: ${fecha}\n👤 Cliente: ${cliente}\n🚢 ${naviera} → ${destino}\n\n📦 *Total: ${totalCajas} cajas · ${(totalCajas*4.5).toFixed(1)} kg*\n\n*Detalle por productor:*\n${resumenProds}\n\n*Agrovip S.A. · PackVip*`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+}
+
+async function loadDesps(){
+  if(_desps===null){const d=await supaFetch('GET','despachos?select=*&order=created_at.desc');_desps=d||[];}
+  return _desps;
+}
+
+async function renderLista(){
+  const desps=await loadDesps();
+  const filtTipo=document.getElementById('filtroTipo').value;
+  const filtEst=document.getElementById('filtroEstado').value;
+  let list=desps;
+  if(filtTipo)list=list.filter(d=>d.tipo===filtTipo);
+  if(filtEst)list=list.filter(d=>d.estado===filtEst);
+  document.getElementById('sl_total').textContent=desps.length;
+  document.getElementById('sl_cajas').textContent=desps.reduce((s,d)=>s+(d.total_cajas||0),0).toLocaleString();
+  document.getElementById('sl_mar').textContent=desps.filter(d=>d.tipo==='maritimo').length;
+  document.getElementById('sl_aer').textContent=desps.filter(d=>d.tipo==='aereo').length;
+  if(!list.length){document.getElementById('despLista').innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">No hay despachos con ese filtro.</div>';return;}
+  const tipoLabel={maritimo:'🚢 Marítimo',aereo:'✈️ Aéreo',local:'🚛 Local'};
+  const tipoClass={maritimo:'',aereo:' aereo',local:' local'};
+  document.getElementById('despLista').innerHTML=list.map(d=>{
+    const prods=JSON.parse(d.productores||'[]');
+    const ecls={Programado:'bb','En tránsito':'ba',Entregado:'bg',Facturado:'bp2'}[d.estado]||'bk';
+    return`<div class="desp-card${tipoClass[d.tipo]||''}" id="dc_${d.id}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-size:15px;font-weight:700">${tipoLabel[d.tipo]||d.tipo} · ${d.documento}</div>
+          <div style="font-size:12px;color:var(--gris);margin-top:2px">${d.fecha} · ${d.cliente} · ${d.naviera||'—'} → ${d.destino||'—'}</div>
+        </div>
+        <span class="badge ${ecls}">${d.estado}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:10px">
+        <div style="background:var(--cr);border-radius:7px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:1px">Cajas</div>
+          <div style="font-size:16px;font-weight:700;color:var(--g)">${(d.total_cajas||0).toLocaleString()}</div>
+        </div>
+        <div style="background:var(--cr);border-radius:7px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:1px">Kg neto</div>
+          <div style="font-size:16px;font-weight:700;color:var(--g)">${(d.total_kg||0).toFixed(1)}</div>
+        </div>
+        <div style="background:var(--cr);border-radius:7px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:1px">Productores</div>
+          <div style="font-size:16px;font-weight:700;color:var(--g)">${prods.length}</div>
+        </div>
+        <div style="background:var(--cr);border-radius:7px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:1px">Semana</div>
+          <div style="font-size:16px;font-weight:700;color:var(--g)">S${d.semana||'—'}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--gris);margin-bottom:10px">
+        ${prods.map(p=>{let pc=0;CALIBRES.forEach(c=>pc+=(p.cals[c]||0));return`<b>${p.nombre}</b>: ${pc} cajas`;}).join(' · ')}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:11px;color:var(--gris)">Estado:</span>
+        ${['Programado','En tránsito','Entregado','Facturado'].map(s=>`<button class="st-btn2 s-${s.toLowerCase().replace(' ','-')}" style="${d.estado===s?'opacity:1':'opacity:.4'}" onclick="cambiarEstadoDesp('${d.id}','${s}')">${s}</button>`).join('')}
+        <button class="bsm" onclick="eliminarDesp('${d.id}')">🗑</button>
+      </div>
+      ${d.notas?`<div style="margin-top:8px;font-size:12px;color:var(--gris);background:var(--cr);padding:8px 10px;border-radius:6px">${d.notas}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function cambiarEstadoDesp(id,estado){
+  await supaFetch('PATCH',`despachos?id=eq.${id}`,{estado});
+  _desps=null;renderLista();
+}
+async function eliminarDesp(id){
+  if(!confirm('¿Eliminar despacho?'))return;
+  await supaFetch('DELETE',`despachos?id=eq.${id}`);
+  _desps=null;renderLista();
+}
+
+async function renderReporte(){
+  const desps=await loadDesps();
+  document.getElementById('rp_cajas').textContent=desps.reduce((s,d)=>s+(d.total_cajas||0),0).toLocaleString();
+  document.getElementById('rp_kg').textContent=desps.reduce((s,d)=>s+(d.total_kg||0),0).toFixed(1)+' t';
+  document.getElementById('rp_mar').textContent=desps.filter(d=>d.tipo==='maritimo').length;
+  document.getElementById('rp_aer').textContent=desps.filter(d=>d.tipo==='aereo').length;
+  CALIBRES.forEach(c=>{
+    const tot=desps.reduce((s,d)=>s+(d['cal_'+c]||0),0);
+    const el=document.getElementById('rp_cal_'+c);if(el)el.textContent=tot.toLocaleString();
+  });
+  // Por productor
+  const byProd={};
+  desps.forEach(d=>{
+    const prods=JSON.parse(d.productores||'[]');
+    prods.forEach(p=>{
+      if(!byProd[p.nombre])byProd[p.nombre]=0;
+      CALIBRES.forEach(c=>byProd[p.nombre]+=(p.cals[c]||0));
+    });
+  });
+  const sorted=Object.entries(byProd).sort((a,b)=>b[1]-a[1]);
+  const max=sorted[0]?.[1]||1;
+  document.getElementById('rp_prods').innerHTML=sorted.map(([n,v])=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px">
+      <div style="width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--gris)">${n}</div>
+      <div style="flex:1;height:20px;background:var(--cr2);border-radius:4px;overflow:hidden">
+        <div style="height:100%;background:var(--g);width:${Math.min(v/max*100,100)}%;border-radius:4px;display:flex;align-items:center;padding-left:8px">
+          <span style="font-size:11px;color:white;font-weight:600">${v.toLocaleString()} cajas</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
