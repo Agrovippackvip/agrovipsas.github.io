@@ -187,7 +187,8 @@ input,select,textarea,button{font-family:inherit}
           </div>
           <div class="fld"><label>Nombre cliente</label><input type="text" id="clienteNombre" placeholder="Ej: Veritas Commodities"></div>
           <div class="fr2">
-            <div class="fld"><label>Cajas totales</label><input type="number" id="cajasTotal" value="3840"></div>
+            <div class="fld"><label>Tipo de pitahaya</label><select id="tipoPitahaya"><option value="Pitahaya Roja Pulpa Blanca">Roja Pulpa Blanca</option><option value="Pitahaya Roja Pulpa Roja">Roja Pulpa Roja</option><option value="Pitahaya Golden Yellow">Golden Yellow</option><option value="Pitahaya Amarilla">Amarilla</option></select></div>
+          <div class="fld"><label>Cajas totales</label><input type="number" id="cajasTotal" value="3840"></div>
             <div class="fld"><label>Kg / caja</label><input type="number" id="kgCaja" value="4.5" step="0.05"></div>
           </div>
           <div class="fr2">
@@ -689,7 +690,7 @@ async function calcular(){
   const numCot='AGV-'+new Date().getFullYear()+String(new Date().getMonth()+1).padStart(2,'0')+String(new Date().getDate()).padStart(2,'0')+'-'+String(cotCount).padStart(3,'0');
   document.getElementById('cotResTitle').textContent='Cotización — '+clienteNombre;
   document.getElementById('cotResNum').textContent=numCot+' · '+fecha;
-  const rb=document.getElementById('cotResBadge');rb.textContent=margenReal>=margenObj?'✓ APROBADO':margenReal>=margenObj-4?'⚠ REVISAR':'✗ RECHAZADO';rb.className='badge '+bc;
+  const rb=document.getElementById('cotResBadge');rb.textContent=margenReal>=margenObj?'✓ APROBADO':margenReal>=margenObj-4?'⚠ REVISAR':'✗ RECHAZADO';const bc=margenReal>=margenObj?'bg':margenReal>=margenObj-4?'ba':'br';rb.className='badge '+bc;
   if(ncMonto>0){document.getElementById('cotResNcAlert').style.display='';document.getElementById('cotResNcAlert').textContent='⚠ N/C de '+f2(ncMonto)+(ncMotivo?' — '+ncMotivo:'')+'  Cobrado: '+f2(valorCobrado);}
   else document.getElementById('cotResNcAlert').style.display='none';
   document.getElementById('cotResGrid').innerHTML=`
@@ -705,14 +706,17 @@ async function calcular(){
   const gap=pvProm-precioMin;
   document.getElementById('cotResNota').textContent=gap>=0?`Margen de maniobra de ${f2(gap)}/caja sobre el precio mínimo.`:`Necesitas subir ${f2(Math.abs(gap))}/caja para alcanzar el ${margenObj}% objetivo.`;
 
-  const cot={id:'cot_'+Date.now(),numCot,fecha,cliente:clienteNombre,tipo:tipoActual,estado:'Borrador',
+  const tipoPitahaya=document.getElementById('tipoPitahaya')?.value||'Pitahaya Roja Pulpa Blanca';
+  const cot={id:'cot_'+Date.now(),numCot,fecha,cliente:clienteNombre,tipo:tipoActual,tipo_pitahaya:tipoPitahaya,estado:'Borrador',
     valorCotizado:valorFacturado,valorCobrado,costoTotal,margenReal,precioMin,costoTotalCaja,
     pvProm,pFrutaProm,kgTotal,cajasTotal,utilidad,ncMonto,ncMotivo,notas,proveedores,
-    valorFacturadoReal:null,numFactura:null,fechaFactura:null,bc,margenObj,
-    semana:getSemana(),mes:getMes(),supaId:null,creado_por:USUARIO_ACTUAL?.nombre||'—'};
+    valor_facturado_real:null,num_factura:null,fecha_factura:null,margen_obj:margenObj,
+    semana:getSemana(),mes:getMes(),supa_id:null,creado_por:USUARIO_ACTUAL?.nombre||'—'};
   await lc.saveCots(cot);
+  _cots=null;
+  const allCots=await lc.cots();
   ultimoCalculo=cot;cotCount++;
-  const nb=document.getElementById('cotBadgeNav');nb.style.display='';nb.textContent=cots.length;
+  const nb=document.getElementById('cotBadgeNav');nb.style.display='';nb.textContent=allCots.length;
   document.getElementById('btnEnviarAprov').style.display='flex';
   document.getElementById('aprovPanel').style.display='none';
   document.getElementById('cotResPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -1008,7 +1012,7 @@ async function renderCots(){
 }
 
 function cotCard(c){
-  const ecls={'Borrador':'bk','Enviada':'bb','Aprobada':'bg','Facturada':'bp'}[c.estado]||'bk';
+  const ecls={'Borrador':'bk','Enviada':'bb','Aprobada':'bg','Facturada':'bp','Rechazado':'br'}[c.estado]||'bk';
   const scol=c.margenReal>=(c.margenObj||15)?'#1A6B3C':c.margenReal>=(c.margenObj||15)-4?'#D4A017':'#C0392B';
   return`<div class="cot-card">
     <div class="cot-head">
@@ -1302,7 +1306,7 @@ async function renderReporte(){
       </div>`;}).join('')+'</div>';
   document.getElementById('rptTbody').innerHTML=cots.map(c=>{
     const scol=c.margenReal>=(c.margenObj||15)?'#065F46':c.margenReal>=(c.margenObj||15)-4?'#92400E':'#991B1B';
-    const ecls={'Borrador':'bk','Enviada':'bb','Aprobada':'bg','Facturada':'bp'}[c.estado]||'bk';
+    const ecls={'Borrador':'bk','Enviada':'bb','Aprobada':'bg','Facturada':'bp','Rechazado':'br'}[c.estado]||'bk';
     return`<tr><td style="font-family:monospace;font-size:11px">${c.numCot}</td><td>${c.cliente}</td><td>${c.fecha}</td><td style="font-size:11px">${c.tipo}</td><td><span class="badge ${ecls}" style="font-size:10px">${c.estado}</span></td><td style="font-size:11px">${c.supaId?'🔗 En Supabase':'—'}</td><td style="text-align:right">${f2(c.valorCotizado)}</td><td style="text-align:right">${c.valorFacturadoReal?f2(c.valorFacturadoReal):f2(c.valorCobrado)}</td><td style="text-align:right;font-weight:700;color:${scol}">${(c.margenReal||0).toFixed(1)}%</td></tr>`;
   }).join('');
 }
