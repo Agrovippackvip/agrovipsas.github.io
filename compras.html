@@ -116,7 +116,7 @@ input,select,textarea,button{font-family:inherit}
             <div class="ct">🌿 Datos del pedido</div>
             <div class="fld"><label>Productor (histórico)</label><select id="pp" onchange="chProd()"><option value="">— Seleccionar —</option></select></div>
             <div class="fld"><label>O nuevo productor</label><input type="text" id="ppn" placeholder="Nombre del productor"></div>
-            <div class="fld"><label>Tipo de fruta</label><select id="pt"><option value="Pitahaya Roja Pulpa Blanca">Pitahaya Roja Pulpa Blanca</option><option value="Pitahaya Roja Pulpa Roja">Pitahaya Roja Pulpa Roja</option><option value="Pitahaya Golden Yellow">Pitahaya Golden Yellow</option><option value="Pitahaya Amarilla">Pitahaya Amarilla</option></select></div>
+            <div class="fld"><label>Tipo de fruta</label><select id="ptipofruta"><option value="Pitahaya Roja Pulpa Blanca">Pitahaya Roja Pulpa Blanca</option><option value="Pitahaya Roja Pulpa Roja">Pitahaya Roja Pulpa Roja</option><option value="Pitahaya Golden Yellow">Pitahaya Golden Yellow</option><option value="Pitahaya Amarilla">Pitahaya Amarilla</option></select></div>
             <div class="fr2">
               <div class="fld"><label>Semana #</label><input type="number" id="psem" placeholder="Ej: 20"></div>
               <div class="fld"><label>Precio pactado ($/kg)</label><input type="number" id="ppr" step="0.05" placeholder="0.00" oninput="calcP()"></div>
@@ -1391,7 +1391,7 @@ async function gP(){
     id:'p'+Date.now(),
     semana:parseInt(document.getElementById('psem').value)||0,
     productor:n,
-    tipo:document.getElementById('pt').value,
+    tipo:document.getElementById('ptipofruta').value,
     precio:pr,kilos:kg,
     gavetas:parseFloat(document.getElementById('pgav').value)||0,
     dia:document.getElementById('pdia').value,
@@ -1422,7 +1422,7 @@ async function waP(){
   const mxr=document.getElementById('pmaxr').value;
   const not=document.getElementById('pnot').value.trim();
   const fp=calcFechaPago();
-  const msg=`*CONFIRMACIÓN DE PEDIDO — AGROVIP S.A.*\n\n📅 Semana ${sem} · Entrega: ${dia}\n\n👤 Estimado ${n},\n\nConfirmamos el pedido de fruta:\n\n🌿 Tipo: ${document.getElementById('pt').value}\n⚖️ Kilos negociados: *${kg.toFixed(1)} kg*\n💰 Precio pactado: *$${pr.toFixed(3)}/kg*\n💵 Valor estimado: *${fk(pr*kg)}*\n\n📅 *Fecha tentativa de pago: ${fp.fechaPago}*\n(${fp.desc})\n\n📋 *Condiciones de calidad:*\n• Fruta pequeña (280-350g): máximo ${mxp}%\n• Rechazo máximo: ${mxr}%\n\n⚠️ *Multas por incumplimiento:*\n• Faltante → prorrateo costo de transporte\n• Rechazo mayor al límite → descuento en liquidación\n• Fruta pequeña fuera del límite → valor agregado o donación\n${not?'\n📝 Notas: '+not:''}\n\nConfirmar recepción de este mensaje.\n\n*Agrovip S.A. · PackVip*`;
+  const msg=`*CONFIRMACIÓN DE PEDIDO — AGROVIP S.A.*\n\n📅 Semana ${sem} · Entrega: ${dia}\n\n👤 Estimado ${n},\n\nConfirmamos el pedido de fruta:\n\n🌿 Tipo: ${document.getElementById('ptipofruta').value}\n⚖️ Kilos negociados: *${kg.toFixed(1)} kg*\n💰 Precio pactado: *$${pr.toFixed(3)}/kg*\n💵 Valor estimado: *${fk(pr*kg)}*\n\n📅 *Fecha tentativa de pago: ${fp.fechaPago}*\n(${fp.desc})\n\n📋 *Condiciones de calidad:*\n• Fruta pequeña (280-350g): máximo ${mxp}%\n• Rechazo máximo: ${mxr}%\n\n⚠️ *Multas por incumplimiento:*\n• Faltante → prorrateo costo de transporte\n• Rechazo mayor al límite → descuento en liquidación\n• Fruta pequeña fuera del límite → valor agregado o donación\n${not?'\n📝 Notas: '+not:''}\n\nConfirmar recepción de este mensaje.\n\n*Agrovip S.A. · PackVip*`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
   await gP();
 }
