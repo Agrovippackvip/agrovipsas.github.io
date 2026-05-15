@@ -4,87 +4,1331 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agrovip · Sistema Interno</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
-:root{--g:#1A6B3C;--g2:#7A9A2E;--cr:#F5F0E8;--gris:#6B6B5A;--bd:#E0D8C8}
+:root{--g:#1A6B3C;--g2:#7A9A2E;--am:#D4A017;--rd:#C0392B;--cr:#F5F0E8;--cr2:#EAE3D2;--gris:#6B6B5A;--ink:#1C1C1C;--bd:#E0D8C8}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--g);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-
-.logo-wrap{text-align:center;margin-bottom:40px}
-.logo{width:72px;height:72px;background:var(--g2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px;color:white;margin:0 auto 16px;box-shadow:0 4px 20px rgba(0,0,0,.2)}
-.logo-title{font-size:26px;font-weight:700;color:white;letter-spacing:.5px}
-.logo-sub{font-size:13px;color:rgba(255,255,255,.6);margin-top:4px}
-
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:560px}
-.module-card{background:white;border-radius:14px;padding:28px 24px;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column;align-items:flex-start;gap:10px;cursor:pointer;border:none}
-.module-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.15)}
-.module-card:active{transform:scale(.98)}
-.mc-icon{font-size:36px;line-height:1}
-.mc-title{font-size:18px;font-weight:700;color:var(--g)}
-.mc-desc{font-size:12px;color:var(--gris);line-height:1.5}
-.mc-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:#D1FAE5;color:#065F46;letter-spacing:.5px;margin-top:4px}
-.mc-badge.am{background:#FEF3C7;color:#92400E}
-
-.footer{margin-top:32px;text-align:center;font-size:11px;color:rgba(255,255,255,.4);line-height:1.8}
-.footer a{color:rgba(255,255,255,.5);text-decoration:none}
-
-.date-badge{background:rgba(255,255,255,.1);border-radius:20px;padding:5px 14px;font-size:11px;color:rgba(255,255,255,.7);margin-bottom:28px;letter-spacing:.5px}
-
-@media(max-width:480px){
-  .cards{grid-template-columns:1fr}
-  .logo-title{font-size:22px}
-}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--cr);color:var(--ink);min-height:100vh}
+input,select,textarea,button{font-family:inherit}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--g)}
+.login-box{background:white;border-radius:12px;padding:40px 36px;width:340px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.login-logo{width:56px;height:56px;background:var(--g2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:white;margin:0 auto 16px}
+.login-title{font-size:20px;font-weight:700;color:var(--g);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--gris);margin-bottom:24px}
+.login-box input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:14px;margin-bottom:12px;outline:none}
+.login-box input:focus{border-color:var(--g)}
+.login-btn{width:100%;padding:12px;background:var(--g);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.login-err{color:var(--rd);font-size:12px;margin-top:8px;display:none}
+.app{display:none}
+.hdr{background:var(--g);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.hdr-l{display:flex;align-items:center;gap:12px}
+.hdr-logo{width:36px;height:36px;background:var(--g2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white}
+.hdr-title{font-size:14px;font-weight:600;color:white}
+.hdr-title span{opacity:.6;font-size:11px;display:block;margin-top:1px}
+.hdr-date{font-size:11px;color:rgba(255,255,255,.6)}
+.btn-logout{background:none;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.8);padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer}
+.nav{display:flex;background:white;border-bottom:1px solid var(--bd);overflow-x:auto}
+.nav-btn{padding:11px 18px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2.5px solid transparent;white-space:nowrap}
+.nav-btn.active{color:var(--g);border-bottom-color:var(--g)}
+.nav-badge{background:var(--g);color:white;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px}
+.main{max-width:1100px;margin:0 auto;padding:20px 16px 40px}
+.tab{display:none}.tab.show{display:block}
+.sec-lbl{font-size:10px;font-weight:600;color:var(--gris);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.card{background:white;border:1px solid var(--bd);border-radius:10px;padding:16px 18px}
+.card-t{font-size:12px;font-weight:600;color:var(--gris);margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:11px;color:var(--gris);margin-bottom:4px}
+.fld input,.fld select,.fld textarea{width:100%;padding:8px 11px;font-size:13px;border:1px solid var(--bd);border-radius:7px;background:white;color:var(--ink);outline:none}
+.fld input:focus,.fld select:focus{border-color:var(--g)}
+.fld textarea{resize:vertical;min-height:52px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sec{margin-top:18px}
+.tipo-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tipo-tab{padding:5px 13px;font-size:11px;border:1px solid var(--bd);border-radius:20px;cursor:pointer;background:none;color:var(--gris)}
+.tipo-tab.active{background:var(--g);color:white;border-color:var(--g)}
+.fr-row{display:grid;grid-template-columns:2fr 1fr 1fr 28px;gap:6px;align-items:end;margin-bottom:6px}
+.fr-row label{font-size:10px;color:var(--gris);display:block;margin-bottom:3px}
+.btn-add{background:none;border:1px dashed var(--g);color:var(--g);border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer;width:100%;margin-top:4px}
+.btn-del{background:none;border:none;color:var(--gris);font-size:18px;cursor:pointer;padding:4px;line-height:1}
+.btn-p{width:100%;padding:11px;background:var(--g);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-s{padding:7px 14px;background:none;border:1px solid var(--g);color:var(--g);border-radius:7px;font-size:12px;cursor:pointer}
+.btn-sm{padding:5px 10px;background:none;border:1px solid var(--bd);color:var(--gris);border-radius:6px;font-size:11px;cursor:pointer}
+.btn-sm:hover{border-color:var(--g);color:var(--g)}
+.btn-wa{padding:9px 16px;background:#25D366;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-wa:hover{background:#1da851}
+.sem{border-radius:10px;padding:18px;background:var(--g);color:white}
+.sem-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-bottom:4px}
+.sem-val{font-size:44px;font-weight:700;line-height:1}
+.sem-desc{font-size:12px;margin-top:5px;opacity:.85}
+.sem-v .sem-val{color:#6EE7A0}.sem-a .sem-val{color:#FDE68A}.sem-r .sem-val{color:#FCA5A5}
+.dr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.dr:last-child{border-bottom:none}
+.dr .lb{color:var(--gris)}
+.dr.tot{border-top:2px solid var(--g);margin-top:4px;font-weight:600;border-bottom:none}
+.dr.tot .lb,.dr.tot .vl{color:var(--g)}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.bg{background:#D1FAE5;color:#065F46}.ba{background:#FEF3C7;color:#92400E}
+.br{background:#FEE2E2;color:#991B1B}.bb{background:#EFF6FF;color:#1E40AF}
+.bp{background:#F3E8FF;color:#6B21A8}.bk{background:#F1F5F9;color:#475569}
+.bwa{background:#E8FFF1;color:#065F46}
+.st-btn{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;border:none;cursor:pointer;opacity:.4;transition:opacity .15s}
+.st-btn.act{opacity:1}
+.s-borrador{background:#F1F5F9;color:#475569}.s-enviada{background:#EFF6FF;color:#1E40AF}
+.s-aprobada{background:#D1FAE5;color:#065F46}.s-facturada{background:#F3E8FF;color:#6B21A8}
+.cot-card{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.cot-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.cot-title{font-size:14px;font-weight:600;color:var(--ink)}
+.cot-sub{font-size:11px;color:var(--gris);margin-top:2px}
+.cot-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:10px}
+.cot-m{background:var(--cr);border-radius:7px;padding:8px 10px}
+.cot-m .et{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gris);margin-bottom:2px}
+.cot-m .nm{font-size:15px;font-weight:600;color:var(--ink)}
+.cot-m .nm.hl{color:var(--g)}
+.cot-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.stat-c{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.stat-c .et{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gris);margin-bottom:6px}
+.stat-c .nm{font-size:24px;font-weight:700;color:var(--ink)}
+.stat-c .nm.hl{color:var(--g)}
+.cli-card{background:white;border:1px solid var(--bd);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cli-name{font-size:14px;font-weight:600;color:var(--ink)}
+.cli-sub{font-size:11px;color:var(--gris);margin-top:2px}
+.rpt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.rpt-card{background:white;border:1px solid var(--bd);border-radius:10px;padding:16px}
+.rpt-card .lbl{font-size:11px;color:var(--gris);margin-bottom:4px}
+.rpt-card .val{font-size:22px;font-weight:700;color:var(--g)}
+.chart-bar{height:8px;background:var(--cr2);border-radius:4px;margin-top:6px;overflow:hidden}
+.chart-bar-fill{height:100%;background:var(--g);border-radius:4px}
+.rpt-table{width:100%;border-collapse:collapse;font-size:13px}
+.rpt-table th{background:var(--g);color:white;padding:8px 12px;text-align:left;font-size:11px}
+.rpt-table td{padding:8px 12px;border-bottom:1px solid var(--bd)}
+.rpt-table tr:hover td{background:var(--cr)}
+.nc-alert{background:#FEF3C7;border-left:3px solid var(--am);border-radius:0 7px 7px 0;padding:8px 12px;font-size:12px;color:#92400E;margin-bottom:10px}
+.cot-nota{background:var(--cr);border-radius:7px;padding:10px 14px;font-size:12px;color:var(--gris);border-left:3px solid var(--g2)}
+.modal-ov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-ov.show{display:flex}
+.modal{background:white;border-radius:12px;padding:22px;width:420px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--g)}
+.aprov-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.aprov-row:last-child{border-bottom:none}
+.aprov-name{font-weight:600;color:var(--ink)}
+.aprov-status{font-size:11px;font-weight:600}
+.aprov-ok{color:#065F46}.aprov-pend{color:var(--gris)}
+.ai-box{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-top:16px}
+.ai-msgs{min-height:60px;max-height:180px;overflow-y:auto;margin-bottom:10px;padding:10px 12px;background:var(--cr);border-radius:7px;font-size:13px;line-height:1.6}
+.ai-mb{color:var(--g);margin-bottom:8px}.ai-mb strong{display:block;font-size:10px;letter-spacing:1px;color:var(--gris);margin-bottom:2px}
+.ai-mu{color:var(--ink);margin-bottom:8px;text-align:right}.ai-mu strong{display:block;font-size:10px;color:var(--gris);margin-bottom:2px}
+.ai-row{display:flex;gap:8px}.ai-row input{flex:1}
+.btn-send{padding:8px 16px;background:var(--g2);color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
+.btn-send:disabled{opacity:.5;cursor:not-allowed}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filter-bar select{padding:6px 10px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white}
+.empty{padding:24px;text-align:center;font-size:13px;color:var(--gris)}
+.check-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;cursor:pointer}
+.check-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--g)}
+.aprov-panel{background:#F0F9F4;border:1px solid #A7D7B8;border-radius:10px;padding:16px;margin-top:14px}
+.aprov-panel-title{font-size:13px;font-weight:700;color:var(--g);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+@media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}.fr2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<div class="logo-wrap">
-  <div class="logo">AV</div>
-  <div class="logo-title">Agrovip S.A.</div>
-  <div class="logo-sub">Sistema interno · PackVip</div>
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">AV</div>
+    <div class="login-title">Agrovip S.A.</div>
+    <div class="login-sub">Sistema interno de cotizaciones</div>
+    <input type="password" id="loginPass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
+    <button class="login-btn" onclick="login()">Ingresar</button>
+    <div class="login-err" id="loginErr">Contraseña incorrecta</div>
+  </div>
 </div>
 
-<div class="date-badge" id="dateBadge">—</div>
+<!-- APP -->
+<div class="app" id="appWrap">
+  <div class="hdr">
+    <div class="hdr-l">
+      <div class="hdr-logo">AV</div>
+      <div class="hdr-title">AGROVIP S.A. <span>Sistema de cotizaciones · PackVip</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="hdr-date" id="hdrDate"></div>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="goTab('calc')">📊 Calcular</button>
+    <button class="nav-btn" onclick="goTab('cots')">📋 Cotizaciones <span class="nav-badge" id="cotBadgeNav" style="display:none"></span></button>
+    <button class="nav-btn" onclick="goTab('clientes')">👥 Clientes</button>
+    <button class="nav-btn" onclick="goTab('reportes')">📈 Reportes</button>
+  </div>
 
-<div class="cards">
-  <a class="module-card" href="./cotizaciones.html">
-    <div class="mc-icon">📋</div>
-    <div class="mc-title">Cotizaciones</div>
-    <div class="mc-desc">Calcular márgenes, gestionar clientes, aprobaciones y seguimiento de ventas.</div>
-    <div class="mc-badge">Ventas · Comercial</div>
-  </a>
+  <div class="main">
 
-  <a class="module-card" href="./compras.html">
-    <div class="mc-icon">🌿</div>
-    <div class="mc-title">Compras & Forecast</div>
-    <div class="mc-desc">Pedidos de fruta, recepción en planta, transportistas y análisis de proveedores.</div>
-    <div class="mc-badge am">Compras · Producción</div>
-  </a>
+    <!-- CALCULAR -->
+    <div class="tab show" id="tab-calc">
+      <div class="sec-lbl" style="margin-bottom:12px">Tipo de operación</div>
+      <div class="tipo-tabs" id="tipoTabs">
+        <button class="tipo-tab active" data-tipo="maritimo_sea">Marítimo Sea</button>
+        <button class="tipo-tab" data-tipo="maritimo_dole">Marítimo Dole/Veritas</button>
+        <button class="tipo-tab" data-tipo="aereo">Aéreo</button>
+        <button class="tipo-tab" data-tipo="local">Local</button>
+      </div>
+      <div class="g2" style="margin-bottom:14px">
+        <div class="card">
+          <div class="card-t">Cliente y venta</div>
+          <div class="fld"><label>Cargar cliente guardado</label>
+            <select id="clienteSel" onchange="cargarCliente(this.value)"><option value="">— Seleccionar —</option></select>
+          </div>
+          <div class="fld"><label>Nombre cliente</label><input type="text" id="clienteNombre" placeholder="Ej: Veritas Commodities"></div>
+          <div class="fr2">
+            <div class="fld"><label>Cajas totales</label><input type="number" id="cajasTotal" value="3840"></div>
+            <div class="fld"><label>Kg / caja</label><input type="number" id="kgCaja" value="4.5" step="0.05"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Margen objetivo (%)</label><input type="number" id="margenObj" value="15" step="0.5"></div>
+            <div class="fld"><label>Gtos. Adm. prorrateo</label><input type="number" id="gastosAdm" value="0" step="100"></div>
+          </div>
+          <div class="fld"><label>Notas</label><textarea id="cotNotas" placeholder="Condiciones especiales..."></textarea></div>
+        </div>
+        <div class="card">
+          <div class="card-t">Precio de venta</div>
+          <div class="fr2">
+            <div class="fld"><label>Precio PB ($/caja)</label><input type="number" id="pvPB" step="0.01" placeholder="0.00"></div>
+            <div class="fld"><label>Cajas PB</label><input type="number" id="cajasPB" step="1"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Precio PR ($/caja)</label><input type="number" id="pvPR" step="0.01" placeholder="0.00"></div>
+            <div class="fld"><label>Cajas PR</label><input type="number" id="cajasPR" step="1"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Nota de crédito (USD)</label><input type="number" id="ncMonto" value="0"></div>
+            <div class="fld"><label>Motivo N/C</label><input type="text" id="ncMotivo" placeholder="Ej: Moho..."></div>
+          </div>
+        </div>
+      </div>
+      <div class="g2" style="margin-bottom:14px">
+        <div class="card">
+          <div class="card-t">Fruta — proveedores</div>
+          <div id="frutaRows">
+            <div class="fr-row">
+              <div><label>Proveedor</label><input type="text" class="fp" placeholder="Nombre"></div>
+              <div><label>$/kg</label><input type="number" class="fpr" step="0.05" placeholder="0.00"></div>
+              <div><label>Kg</label><input type="number" class="fkg" step="0.5" placeholder="0"></div>
+              <div><button class="btn-del" onclick="delFruta(this)">×</button></div>
+            </div>
+          </div>
+          <button class="btn-add" onclick="addFruta()">+ Agregar proveedor</button>
+          <div id="resumenFruta" style="margin-top:8px;font-size:12px;color:var(--gris)"></div>
+        </div>
+        <div class="card">
+          <div class="card-t">Flete y operación</div>
+          <div class="fr2" id="fieldFleteMar">
+            <div class="fld"><label>Flete marítimo (USD)</label><input type="number" id="fleteMar" value="7598" step="10"></div>
+            <div class="fld"><label>Aduana / operador</label><input type="number" id="aduana" value="1005" step="10"></div>
+          </div>
+          <div class="fld" id="fieldFleteAer" style="display:none"><label>Flete aéreo total (USD)</label><input type="number" id="fleteAer" value="0"></div>
+          <div class="fr2">
+            <div class="fld"><label>FITO Agrocaldad</label><input type="number" id="fito" value="42.66" step="1"></div>
+            <div class="fld"><label>IICA inspección</label><input type="number" id="iica" value="0" step="1"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Empaque PB ($/caja)</label><input type="number" id="empPB" value="2" step="0.05"></div>
+            <div class="fld"><label>Empaque PR ($/caja)</label><input type="number" id="empPR" value="2.25" step="0.05"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Caja cartón ($/u)</label><input type="number" id="ctnCosto" value="0.73" step="0.01"></div>
+            <div class="fld"><label>Termógrafos/filtros</label><input type="number" id="termos" value="59.8" step="1"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Sachets/etiquetas</label><input type="number" id="sachets" value="0"></div>
+            <div class="fld"><label>Transporte interno</label><input type="number" id="transp" value="0" step="10"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Fundas/otros</label><input type="number" id="otros" value="0"></div>
+            <div class="fld"><label>Comisión bancos</label><input type="number" id="comBancos" value="70" step="5"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-p" onclick="calcular()">▶ CALCULAR Y GUARDAR COTIZACIÓN</button>
+      <div id="secRes" style="display:none;margin-top:18px">
+        <div class="sec-lbl">Resultados</div>
+        <div class="g3" style="margin-bottom:14px">
+          <div class="sem" id="semBlock">
+            <div class="sem-lbl">Margen Agrovip real</div>
+            <div class="sem-val" id="semVal">—</div>
+            <div class="sem-desc" id="semDesc">—</div>
+          </div>
+          <div class="card">
+            <div class="card-t">Desglose / caja</div>
+            <div class="dr"><span class="lb">Fruta prom.</span><span id="d_fr">—</span></div>
+            <div class="dr"><span class="lb">Flete + aduana</span><span id="d_fl">—</span></div>
+            <div class="dr"><span class="lb">Empaque PackVip</span><span id="d_em">—</span></div>
+            <div class="dr"><span class="lb">Caja cartón</span><span id="d_ct">—</span></div>
+            <div class="dr"><span class="lb">Agrocaldad + otros</span><span id="d_ot">—</span></div>
+            <div class="dr" id="d_admRow" style="display:none"><span class="lb">Gtos. adm.</span><span id="d_adm">—</span></div>
+            <div class="dr tot"><span class="lb">COSTO CIF/CAJA</span><span id="d_tot">—</span></div>
+          </div>
+          <div class="card">
+            <div class="card-t">Resultado operación</div>
+            <div class="dr"><span class="lb">Valor facturado</span><span id="r_fa">—</span></div>
+            <div class="dr" id="r_ncRow"><span class="lb">Nota crédito</span><span id="r_nc" style="color:var(--rd)">—</span></div>
+            <div class="dr"><span class="lb">Valor cobrado</span><span id="r_co">—</span></div>
+            <div class="dr"><span class="lb">Costo total</span><span id="r_cs">—</span></div>
+            <div class="dr"><span class="lb">Precio mínimo/caja</span><span id="r_pm">—</span></div>
+            <div class="dr tot"><span class="lb">UTILIDAD BRUTA</span><span id="r_ut">—</span></div>
+          </div>
+        </div>
+        <div class="card" id="cotResPanel" style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bd)">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:var(--g)" id="cotResTitle">Cotización</div>
+              <div style="font-size:11px;color:var(--gris);margin-top:2px" id="cotResNum"></div>
+            </div>
+            <span class="badge" id="cotResBadge">—</span>
+          </div>
+          <div id="cotResNcAlert" class="nc-alert" style="display:none"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px" id="cotResGrid"></div>
+          <div class="cot-nota" id="cotResNota"></div>
 
-  <a class="module-card" href="./compras.html" onclick="sessionStorage.setItem('avTab','recepcion')">
-    <div class="mc-icon">⚖️</div>
-    <div class="mc-title">Recepción</div>
-    <div class="mc-desc">Registrar llegada de fruta, kilos reales, rechazo y reporte de problemas.</div>
-    <div class="mc-badge am">Producción · Planta</div>
-  </a>
+          <!-- PANEL APROBACIONES -->
+          <div class="aprov-panel" id="aprovPanel" style="display:none">
+            <div class="aprov-panel-title">✅ Estado de aprobaciones</div>
+            <div class="aprov-row">
+              <div><div class="aprov-name">Pablo Moysam</div><div style="font-size:11px;color:var(--gris)">Gerente General</div></div>
+              <span class="aprov-status aprov-pend" id="ap_pablo">⏳ Pendiente</span>
+            </div>
+            <div class="aprov-row">
+              <div><div class="aprov-name">Daniel Polit</div><div style="font-size:11px;color:var(--gris)">Ventas</div></div>
+              <span class="aprov-status aprov-pend" id="ap_daniel">⏳ Pendiente</span>
+            </div>
+            <div class="aprov-row">
+              <div><div class="aprov-name" id="ap_cli_nombre">Cliente</div><div style="font-size:11px;color:var(--gris)">Confirmación</div></div>
+              <span class="aprov-status aprov-pend" id="ap_cliente">⏳ Pendiente</span>
+            </div>
+            <div style="margin-top:12px;font-size:11px;color:var(--gris);text-align:center" id="ap_refresh_hint">Actualiza la página para ver cambios en tiempo real</div>
+          </div>
 
-  <a class="module-card" href="./compras.html" onclick="sessionStorage.setItem('avTab','reporte')">
-    <div class="mc-icon">📷</div>
-    <div class="mc-title">Reporte de Rechazo</div>
-    <div class="mc-desc">Reportar problemas de calidad con guía de fotos para Samary, David y Alejandro.</div>
-    <div class="mc-badge am">Producción · Planta</div>
-  </a>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn-s" onclick="copiarCot()">📋 Copiar resumen</button>
+            <button class="btn-wa" id="btnEnviarAprov" onclick="enviarAprobacion()" style="display:none">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Enviar para aprobación
+            </button>
+            <button class="btn-sm" onclick="goTab('cots')">Ver cotizaciones →</button>
+          </div>
+        </div>
+        <div class="ai-box">
+          <div class="card-t">🤖 Asistente de negociación</div>
+          <div class="ai-msgs" id="aiMsgs">
+            <div class="ai-mb"><strong>CLAUDE · AGROVIP</strong>Operación calculada. Puedo analizar si conviene el precio, cómo negociar, o qué ajuste maximiza el margen.</div>
+          </div>
+          <div class="ai-row">
+            <input type="text" id="aiInput" placeholder="Ej: ¿Conviene si la fruta sube $0.10/kg?" onkeydown="if(event.key==='Enter')enviarIA()">
+            <button class="btn-send" id="btnSend" onclick="enviarIA()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COTIZACIONES -->
+    <div class="tab" id="tab-cots">
+      <div class="g4" style="margin-bottom:16px">
+        <div class="stat-c"><div class="et">Total</div><div class="nm hl" id="st_total">0</div></div>
+        <div class="stat-c"><div class="et">Valor cotizado</div><div class="nm hl" id="st_cotizado">$0</div></div>
+        <div class="stat-c"><div class="et">Valor facturado</div><div class="nm hl" id="st_facturado">$0</div></div>
+        <div class="stat-c"><div class="et">Conversión</div><div class="nm hl" id="st_conv">0%</div></div>
+      </div>
+      <div class="filter-bar">
+        <select id="filtroEstado" onchange="renderCots()">
+          <option value="">Todos los estados</option>
+          <option>Borrador</option><option>Enviada</option><option>Aprobada</option><option>Facturada</option>
+        </select>
+        <select id="filtroCliente" onchange="renderCots()"><option value="">Todos los clientes</option></select>
+      </div>
+      <div id="cotsList"><div class="empty">No hay cotizaciones aún.</div></div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="tab" id="tab-clientes">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="sec-lbl" style="margin:0">Clientes guardados</div>
+        <button class="btn-s" onclick="abrirModalCliente()">+ Nuevo cliente</button>
+      </div>
+      <div id="clientesList"><div class="empty">No hay clientes guardados.</div></div>
+    </div>
+
+    <!-- REPORTES -->
+    <div class="tab" id="tab-reportes">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="sec-lbl" style="margin:0">Período</div>
+        <div style="display:flex;gap:8px">
+          <select id="rptPeriodo" onchange="renderReporte()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white">
+            <option value="semana">Esta semana</option>
+            <option value="mes" selected>Este mes</option>
+            <option value="trimestre">Este trimestre</option>
+            <option value="todo">Todo el historial</option>
+          </select>
+          <button class="btn-s" onclick="exportarReporte()">⬇ Exportar CSV</button>
+        </div>
+      </div>
+      <div class="rpt-grid" id="rptKpis"></div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-t">Margen por cliente</div>
+        <div id="rptClienteChart"></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-t">Evolución semanal</div>
+        <div id="rptSemanalChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-t">Detalle de operaciones</div>
+        <div style="overflow-x:auto">
+          <table class="rpt-table">
+            <thead><tr><th>Cotización</th><th>Cliente</th><th>Fecha</th><th>Tipo</th><th>Estado</th><th>Aprobaciones</th><th>Cotizado</th><th>Facturado</th><th>Margen%</th></tr></thead>
+            <tbody id="rptTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="footer">
-  <div>Agrovip S.A. · Palora, Ecuador</div>
-  <div><a href="mailto:lilibeth@agrovipsa.com">lilibeth@agrovipsa.com</a> · <a href="https://agrovipsas.com">agrovipsas.com</a></div>
+<!-- MODAL CLIENTE -->
+<div class="modal-ov" id="modalCliente">
+  <div class="modal">
+    <div class="modal-title" id="modalCliTitle">Nuevo cliente</div>
+    <div class="fld"><label>Nombre empresa</label><input type="text" id="mc_nombre" placeholder="Ej: Veritas Commodities"></div>
+    <div class="fr2">
+      <div class="fld"><label>País / mercado</label><input type="text" id="mc_pais" placeholder="Ej: España"></div>
+      <div class="fld"><label>Tipo de venta habitual</label>
+        <select id="mc_tipo">
+          <option value="maritimo_sea">Marítimo Sea</option>
+          <option value="maritimo_dole">Marítimo Dole/Veritas</option>
+          <option value="aereo">Aéreo</option>
+          <option value="local">Local</option>
+        </select>
+      </div>
+    </div>
+    <div class="fr2">
+      <div class="fld"><label>Cajas habituales</label><input type="number" id="mc_cajas" placeholder="3840"></div>
+      <div class="fld"><label>Margen objetivo (%)</label><input type="number" id="mc_margen" placeholder="15"></div>
+    </div>
+    <div class="fld"><label>Contacto principal</label><input type="text" id="mc_contacto" placeholder="Nombre y cargo"></div>
+    <div class="fld"><label>Email</label><input type="email" id="mc_email" placeholder="contacto@empresa.com"></div>
+    <div class="fr2">
+      <div class="fld"><label>WhatsApp (código país)</label><input type="text" id="mc_wapais" placeholder="+1" value="+1"></div>
+      <div class="fld"><label>Número</label><input type="tel" id="mc_wanum" placeholder="305 555 0100"></div>
+    </div>
+    <label class="check-row"><input type="checkbox" id="mc_notif_wa" checked> Enviar por WhatsApp</label>
+    <label class="check-row"><input type="checkbox" id="mc_req_aprov"> Requiere aprobación del cliente</label>
+    <div class="fld" style="margin-top:8px"><label>Condiciones / notas</label><textarea id="mc_notas" placeholder="Factoring, plazos, requisitos..."></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn-p" style="margin-top:0" onclick="guardarCliente()">Guardar cliente</button>
+      <button class="btn-sm" onclick="cerrarModal('modalCliente')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FACTURA -->
+<div class="modal-ov" id="modalFactura">
+  <div class="modal">
+    <div class="modal-title">Registrar facturación</div>
+    <div class="fld"><label>N° Factura Agrovip</label><input type="text" id="mf_factura" placeholder="001-001-000000XXX"></div>
+    <div class="fr2">
+      <div class="fld"><label>Valor facturado real (USD)</label><input type="number" id="mf_valor" step="0.01" oninput="calcMfPorCaja()"></div>
+      <div class="fld"><label>Fecha</label><input type="date" id="mf_fecha"></div>
+    </div>
+    <div class="fr2">
+      <div class="fld"><label>Cajas facturadas</label><input type="number" id="mf_cajas" step="1" oninput="calcMfPorCaja()"></div>
+      <div class="fld"><label>Valor por caja (auto)</label><input type="text" id="mf_porcaja" readonly style="background:var(--cr);color:var(--g);font-weight:600"></div>
+    </div>
+    <div style="background:var(--cr);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:600;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Nota de crédito (si aplica)</div>
+      <div class="fld"><label>Tipo de N/C</label>
+        <select id="mf_nc_tipo">
+          <option value="">— Sin nota de crédito —</option>
+          <option value="Calidad">Calidad — problema con la fruta</option>
+          <option value="Comercial">Comercial — ajuste de precio</option>
+          <option value="Demoras">Demoras — retraso en entrega</option>
+          <option value="Calidad+Comercial">Calidad + Comercial</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      <div class="fr2">
+        <div class="fld"><label>Monto N/C (USD)</label><input type="number" id="mf_nc_monto" step="0.01" placeholder="0.00" oninput="calcMfPorCaja()"></div>
+        <div class="fld"><label>Detalle N/C</label><input type="text" id="mf_nc_detalle" placeholder="Observación..."></div>
+      </div>
+      <div id="mf_nc_resumen" style="font-size:12px;color:var(--rd);font-weight:600;display:none"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn-p" style="margin-top:0" onclick="confirmarFactura()">Guardar factura</button>
+      <button class="btn-sm" onclick="cerrarModal('modalFactura')">Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <script>
-const now = new Date();
-document.getElementById('dateBadge').textContent = now.toLocaleDateString('es-EC',{
-  weekday:'long', day:'2-digit', month:'long', year:'numeric'
-}).toUpperCase();
+const PASS='Agrovip2026';
+const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0';
+const BASE_URL='https://app.agrovipsas.com';
+const WA_AGROVIP='+593995938213';
+
+// AUTH
+function login(){
+  if(document.getElementById('loginPass').value===PASS){
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('appWrap').style.display='block';
+    init();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+  }
+}
+function logout(){
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('appWrap').style.display='none';
+  document.getElementById('loginPass').value='';
+}
+function init(){
+  const now=new Date();
+  document.getElementById('hdrDate').textContent=now.toLocaleDateString('es-EC',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  poblClienteSel();updateStats();
+  // Check if aprobacion page
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('aprobar')){procesarAprobacion(params.get('aprobar'),params.get('rol'),params.get('token'));}
+}
+
+// STORAGE
+let _cots=null, _clis=null;
+const lc={
+  cots: async ()=>{
+    if(_cots===null){const d=await supaFetch('GET','cotizaciones?select=*&order=created_at.desc');_cots=d||[];}
+    return _cots;
+  },
+  saveCots: async (cot)=>{
+    await supaFetch('POST','cotizaciones',cot);_cots=null;
+  },
+  updateCot: async (id,data)=>{
+    await supaFetch('PATCH',`cotizaciones?id=eq.${id}`,data);_cots=null;
+  },
+  delCot: async (id)=>{
+    await supaFetch('DELETE',`cotizaciones?id=eq.${id}`);_cots=null;
+  },
+  clis: async ()=>{
+    if(_clis===null){const d=await supaFetch('GET','clientes?select=*&order=created_at.desc');_clis=d||[];}
+    return _clis;
+  },
+  saveClis: async (cli)=>{
+    await supaFetch('POST','clientes',cli);_clis=null;
+  },
+  updateCli: async (id,data)=>{
+    await supaFetch('PATCH',`clientes?id=eq.${id}`,data);_clis=null;
+  },
+  delCli: async (id)=>{
+    await supaFetch('DELETE',`clientes?id=eq.${id}`);_clis=null;
+  },
+};
+
+// UTILS
+const f2=n=>{try{return'$'+parseFloat(n).toFixed(2);}catch{return'—';}};
+const fk=n=>{try{return'$'+Math.round(parseFloat(n)).toLocaleString();}catch{return'—';}};
+const fp=n=>{try{return parseFloat(n).toFixed(1)+'%';}catch{return'—';}};
+function genToken(){return Math.random().toString(36).substr(2,12)+Date.now().toString(36);}
+function getSemana(){const d=new Date(),y=d.getFullYear(),start=new Date(y,0,1);return y+'-W'+Math.ceil(((d-start)/86400000+start.getDay()+1)/7).toString().padStart(2,'0');}
+function getMes(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+
+// SUPABASE
+async function supaFetch(method,path,body){
+  const r=await fetch(SUPA_URL+'/rest/v1/'+path,{
+    method,
+    headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':method==='POST'?'return=representation':''},
+    body:body?JSON.stringify(body):undefined
+  });
+  if(!r.ok){const e=await r.text();console.error('Supabase error:',e);return null;}
+  return r.status===204?true:r.json();
+}
+
+// TABS
+let tipoActual='maritimo_sea';
+function goTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('show'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('show');
+  const idx={calc:0,cots:1,clientes:2,reportes:3}[id];
+  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  if(id==='cots'){renderCots();updateStats();}
+  if(id==='clientes')renderClientes();
+  if(id==='reportes')renderReporte();
+}
+
+document.querySelectorAll('#tipoTabs .tipo-tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#tipoTabs .tipo-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');tipoActual=btn.dataset.tipo;actualizarUI();
+  });
+});
+function actualizarUI(){
+  const ea=tipoActual==='aereo',el=tipoActual==='local';
+  document.getElementById('fieldFleteMar').style.display=(ea||el)?'none':'';
+  document.getElementById('fieldFleteAer').style.display=ea?'':'none';
+  if(tipoActual==='maritimo_sea'){document.getElementById('fleteMar').value=7598;document.getElementById('aduana').value=1005;document.getElementById('comBancos').value=70;}
+  else if(tipoActual==='maritimo_dole'){document.getElementById('fleteMar').value=7598;document.getElementById('aduana').value=1334;document.getElementById('comBancos').value=70;}
+  else if(tipoActual==='aereo'){document.getElementById('fleteAer').value='';document.getElementById('comBancos').value=70;}
+  else{document.getElementById('comBancos').value=1;document.getElementById('fito').value=0;document.getElementById('iica').value=0;}
+}
+
+// FRUTA
+function addFruta(){
+  const d=document.createElement('div');d.className='fr-row';
+  d.innerHTML='<div><label>Proveedor</label><input type="text" class="fp" placeholder="Nombre"></div><div><label>$/kg</label><input type="number" class="fpr" step="0.05" placeholder="0.00"></div><div><label>Kg</label><input type="number" class="fkg" step="0.5" placeholder="0"></div><div><button class="btn-del" onclick="delFruta(this)">×</button></div>';
+  document.getElementById('frutaRows').appendChild(d);
+}
+function delFruta(btn){if(document.querySelectorAll('#frutaRows .fr-row').length>1)btn.closest('.fr-row').remove();}
+function calcFruta(){
+  const prs=document.querySelectorAll('#frutaRows .fpr'),kgs=document.querySelectorAll('#frutaRows .fkg');
+  let tc=0,tk=0;
+  for(let i=0;i<prs.length;i++){const pr=parseFloat(prs[i].value)||0,kg=parseFloat(kgs[i].value)||0;tc+=pr*kg;tk+=kg;}
+  const prom=tk>0?tc/tk:0;
+  document.getElementById('resumenFruta').textContent=tk>0?`${tk.toFixed(1)} kg · prom. $${prom.toFixed(3)}/kg · total $${tc.toFixed(2)}`:'';
+  const fps=Array.from(document.querySelectorAll('#frutaRows .fp')).map(e=>e.value.trim());
+  return{tc,tk,prom,proveedores:fps.map((n,i)=>({nombre:n,precio:parseFloat(prs[i].value)||0,kilos:parseFloat(kgs[i].value)||0})).filter(p=>p.kilos>0)};
+}
+document.getElementById('frutaRows').addEventListener('input',calcFruta);
+
+// CALCULAR
+let ultimoCalculo=null,cotCount=1;
+function calcular(){
+  const cajasTotal=parseFloat(document.getElementById('cajasTotal').value)||3840;
+  const kgCaja=parseFloat(document.getElementById('kgCaja').value)||4.5;
+  const margenObj=parseFloat(document.getElementById('margenObj').value)||15;
+  const gastosAdm=parseFloat(document.getElementById('gastosAdm').value)||0;
+  const pvPB=parseFloat(document.getElementById('pvPB').value)||0;
+  const cajasPBin=parseFloat(document.getElementById('cajasPB').value)||0;
+  const cajasPB=cajasPBin>0?cajasPBin:(pvPB>0?cajasTotal:0);
+  const pvPR=parseFloat(document.getElementById('pvPR').value)||0;
+  const cajasPR=parseFloat(document.getElementById('cajasPR').value)||0;
+  const ncMonto=parseFloat(document.getElementById('ncMonto').value)||0;
+  const ncMotivo=document.getElementById('ncMotivo').value.trim();
+  const notas=document.getElementById('cotNotas').value.trim();
+  const clienteNombre=document.getElementById('clienteNombre').value.trim()||'Sin cliente';
+  const{tc:costFruta,tk:kgTotal,prom:pFrutaProm,proveedores}=calcFruta();
+  const ea=tipoActual==='aereo',el=tipoActual==='local';
+  const fleteMar=parseFloat(document.getElementById('fleteMar').value)||0;
+  const aduana=parseFloat(document.getElementById('aduana').value)||0;
+  const fleteAer=parseFloat(document.getElementById('fleteAer').value)||0;
+  const fito=parseFloat(document.getElementById('fito').value)||0;
+  const iica=parseFloat(document.getElementById('iica').value)||(kgTotal*0.035);
+  const empPB=parseFloat(document.getElementById('empPB').value)||2;
+  const empPR=parseFloat(document.getElementById('empPR').value)||2.25;
+  const ctnCosto=parseFloat(document.getElementById('ctnCosto').value)||0.73;
+  const termos=parseFloat(document.getElementById('termos').value)||0;
+  const sachets=parseFloat(document.getElementById('sachets').value)||0;
+  const otros=parseFloat(document.getElementById('otros').value)||0;
+  const transp=parseFloat(document.getElementById('transp').value)||0;
+  const comBancos=parseFloat(document.getElementById('comBancos').value)||0;
+  const fleteTotal=ea?fleteAer:(el?0:fleteMar+aduana);
+  const costoFrutaCaja=kgTotal>0?costFruta/cajasTotal:pFrutaProm*kgCaja;
+  const costoFleteCaja=fleteTotal/cajasTotal;
+  const cajasCon=(cajasPB+cajasPR)||cajasTotal;
+  const empProm=cajasCon>0?(empPB*cajasPB+empPR*cajasPR)/cajasCon:empPB;
+  const costoOtrosCaja=((fito+iica)+termos+sachets+otros+transp+comBancos)/cajasTotal;
+  const costoAdmCaja=gastosAdm/cajasTotal;
+  const costoTotalCaja=costoFrutaCaja+costoFleteCaja+empProm+ctnCosto+costoOtrosCaja+costoAdmCaja;
+  const costoTotal=costoTotalCaja*cajasTotal;
+  const valorFacturado=pvPB*cajasPB+pvPR*cajasPR;
+  const valorCobrado=valorFacturado-ncMonto;
+  const pvProm=cajasTotal>0?valorCobrado/cajasTotal:0;
+  const utilidad=valorCobrado-costoTotal;
+  const margenReal=valorCobrado>0?(utilidad/valorCobrado)*100:0;
+  const precioMin=costoTotalCaja/(1-margenObj/100);
+
+  document.getElementById('d_fr').textContent=f2(costoFrutaCaja);
+  document.getElementById('d_fl').textContent=f2(costoFleteCaja);
+  document.getElementById('d_em').textContent=f2(empProm);
+  document.getElementById('d_ct').textContent=f2(ctnCosto);
+  document.getElementById('d_ot').textContent=f2(costoOtrosCaja);
+  document.getElementById('d_tot').textContent=f2(costoTotalCaja);
+  if(gastosAdm>0){document.getElementById('d_admRow').style.display='';document.getElementById('d_adm').textContent=f2(costoAdmCaja);}
+  else document.getElementById('d_admRow').style.display='none';
+  document.getElementById('r_fa').textContent=f2(valorFacturado);
+  if(ncMonto>0){document.getElementById('r_ncRow').style.display='';document.getElementById('r_nc').textContent='-'+f2(ncMonto)+(ncMotivo?' ('+ncMotivo+')':'');}
+  else document.getElementById('r_ncRow').style.display='none';
+  document.getElementById('r_co').textContent=f2(valorCobrado);
+  document.getElementById('r_cs').textContent=f2(costoTotal);
+  document.getElementById('r_pm').textContent=f2(precioMin);
+  document.getElementById('r_ut').textContent=f2(utilidad);
+
+  const sem=document.getElementById('semBlock');
+  document.getElementById('semVal').textContent=fp(margenReal);
+  sem.className='sem';
+  let estado,desc,bc;
+  if(margenReal>=margenObj){estado='sem-v';desc='✓ Dentro del objetivo — aprobado';bc='bg';}
+  else if(margenReal>=margenObj-4){estado='sem-a';desc='⚠ Ajustado — negociar precio';bc='ba';}
+  else{estado='sem-r';desc='✗ Por debajo del objetivo';bc='br';}
+  sem.classList.add(estado);document.getElementById('semDesc').textContent=desc;
+  document.getElementById('secRes').style.display='';
+
+  const fecha=new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const numCot='AGV-'+new Date().getFullYear()+String(new Date().getMonth()+1).padStart(2,'0')+String(new Date().getDate()).padStart(2,'0')+'-'+String(cotCount).padStart(3,'0');
+  document.getElementById('cotResTitle').textContent='Cotización — '+clienteNombre;
+  document.getElementById('cotResNum').textContent=numCot+' · '+fecha;
+  const rb=document.getElementById('cotResBadge');rb.textContent=margenReal>=margenObj?'✓ APROBADO':margenReal>=margenObj-4?'⚠ REVISAR':'✗ RECHAZADO';rb.className='badge '+bc;
+  if(ncMonto>0){document.getElementById('cotResNcAlert').style.display='';document.getElementById('cotResNcAlert').textContent='⚠ N/C de '+f2(ncMonto)+(ncMotivo?' — '+ncMotivo:'')+'  Cobrado: '+f2(valorCobrado);}
+  else document.getElementById('cotResNcAlert').style.display='none';
+  document.getElementById('cotResGrid').innerHTML=`
+    <div class="cot-m"><div class="et">Cliente</div><div class="nm">${clienteNombre}</div></div>
+    <div class="cot-m"><div class="et">Valor cotizado</div><div class="nm hl">${f2(valorFacturado)}</div></div>
+    <div class="cot-m"><div class="et">Costo CIF/caja</div><div class="nm">${f2(costoTotalCaja)}</div></div>
+    <div class="cot-m"><div class="et">Precio prom./caja</div><div class="nm">${f2(pvProm)}</div></div>
+    <div class="cot-m"><div class="et">Margen real</div><div class="nm hl">${fp(margenReal)}</div></div>
+    <div class="cot-m"><div class="et">Precio mínimo</div><div class="nm">${f2(precioMin)}/caja</div></div>
+    <div class="cot-m"><div class="et">Utilidad bruta</div><div class="nm hl">${f2(utilidad)}</div></div>
+    <div class="cot-m"><div class="et">Fruta prom.</div><div class="nm">$${pFrutaProm.toFixed(3)}/kg</div></div>
+  `;
+  const gap=pvProm-precioMin;
+  document.getElementById('cotResNota').textContent=gap>=0?`Margen de maniobra de ${f2(gap)}/caja sobre el precio mínimo.`:`Necesitas subir ${f2(Math.abs(gap))}/caja para alcanzar el ${margenObj}% objetivo.`;
+
+  const cot={id:'cot_'+Date.now(),numCot,fecha,cliente:clienteNombre,tipo:tipoActual,estado:'Borrador',
+    valorCotizado:valorFacturado,valorCobrado,costoTotal,margenReal,precioMin,costoTotalCaja,
+    pvProm,pFrutaProm,kgTotal,cajasTotal,utilidad,ncMonto,ncMotivo,notas,proveedores,
+    valorFacturadoReal:null,numFactura:null,fechaFactura:null,bc,margenObj,
+    semana:getSemana(),mes:getMes(),supaId:null};
+  const cots=lc.cots();cots.unshift(cot);lc.saveCots(cots);
+  ultimoCalculo=cot;cotCount++;
+  const nb=document.getElementById('cotBadgeNav');nb.style.display='';nb.textContent=cots.length;
+  document.getElementById('btnEnviarAprov').style.display='flex';
+  document.getElementById('aprovPanel').style.display='none';
+  document.getElementById('cotResPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// APROBACIONES
+async function enviarAprobacion(){
+  if(!ultimoCalculo){alert('Primero calcula una cotización.');return;}
+  const c=ultimoCalculo;
+  const tokenDaniel=genToken(),tokenPablo=genToken(),tokenCliente=genToken();
+
+  // Guardar en Supabase
+  const data=await supaFetch('POST','aprobaciones',{
+    cot_id:c.id,num_cot:c.numCot,cliente:c.cliente,
+    valor:c.valorCotizado,margen:c.margenReal,
+    token_daniel:tokenDaniel,token_pablo:tokenPablo,token_cliente:tokenCliente
+  });
+  if(!data){alert('Error al guardar en Supabase. Verifica la conexión.');return;}
+
+  const supaId=data[0]?.id||data?.id;
+
+  // Actualizar cotización local con supaId
+  const cots=lc.cots();const idx=cots.findIndex(x=>x.id===c.id);
+  if(idx>=0){cots[idx].supaId=supaId;cots[idx].estado='Enviada';lc.saveCots(cots);}
+  ultimoCalculo.supaId=supaId;
+
+  const linkDaniel=`${BASE_URL}?aprobar=${supaId}&rol=daniel&token=${tokenDaniel}`;
+  const linkPablo=`${BASE_URL}?aprobar=${supaId}&rol=pablo&token=${tokenPablo}`;
+  const linkCliente=`${BASE_URL}?aprobar=${supaId}&rol=cliente&token=${tokenCliente}`;
+
+  const msgInterno=`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n*Aprobar aquí:*\n${linkDaniel}`;
+  const msgPablo=`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n*Aprobar aquí:*\n${linkPablo}`;
+  const msgCliente=`Estimado cliente,\n\nAdjuntamos cotización *${c.numCot}* de Agrovip S.A.\n\n📦 Valor: ${f2(c.valorCotizado)}\n\nPor favor confirme su aprobación en el siguiente enlace:\n${linkCliente}\n\nAgrovip S.A. · agrovipsas.com`;
+
+  // Mostrar panel de aprobaciones
+  document.getElementById('aprovPanel').style.display='block';
+  document.getElementById('ap_cli_nombre').textContent=c.cliente;
+
+  const waNumDaniel='593998945387';
+  const waNumPablo='593996404584';
+
+  // Links para copiar
+  const todosLosLinks=`*LINKS DE APROBACIÓN — ${c.numCot}*\n\n👤 Daniel Polit:\n${linkDaniel}\n\n👤 Pablo Moysam:\n${linkPablo}\n\n🏢 Cliente ${c.cliente}:\n${linkCliente}`;
+  navigator.clipboard.writeText(todosLosLinks).catch(()=>{});
+
+  // Mensajes WhatsApp
+  const waDaniel=`https://wa.me/${waNumDaniel}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkDaniel}`)}`;
+  const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkPablo}`)}`;
+
+  // Mostrar botones de envío manual
+  document.getElementById('aprovPanel').style.display='block';
+  document.getElementById('ap_cli_nombre').textContent=c.cliente;
+
+  // Agregar botones WhatsApp al panel
+  const btnPanel=document.getElementById('ap_refresh_hint');
+  btnPanel.innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+      <div style="font-size:12px;color:#065F46;font-weight:600;margin-bottom:4px">Envía los links de aprobación:</div>
+      <a href="${waDaniel}" target="_blank" style="display:flex;align-items:center;gap:8px;background:#25D366;color:white;padding:10px 14px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Enviar a Daniel Polit
+      </a>
+      <a href="${waPablo}" target="_blank" style="display:flex;align-items:center;gap:8px;background:#25D366;color:white;padding:10px 14px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Enviar a Pablo Moysam
+      </a>
+      <button onclick="navigator.clipboard.writeText('${linkCliente}').then(()=>alert('✓ Link del cliente copiado'))" style="display:flex;align-items:center;gap:8px;background:#1A6B3C;color:white;padding:10px 14px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;width:100%">
+        📋 Copiar link para ${c.cliente}
+      </button>
+    </div>`;
+
+  // Polling para actualizar estado
+  iniciarPolling(supaId);
+}
+
+function iniciarPolling(supaId){
+  if(!supaId)return;
+  const interval=setInterval(async()=>{
+    const data=await supaFetch('GET',`aprobaciones?id=eq.${supaId}&select=*`);
+    if(!data||!data[0])return;
+    const r=data[0];
+    const elDaniel=document.getElementById('ap_daniel');
+    const elPablo=document.getElementById('ap_pablo');
+    const elCliente=document.getElementById('ap_cliente');
+    if(elDaniel)elDaniel.textContent=r.aprobado_daniel?'✅ Aprobado '+r.fecha_daniel?.split('T')[0]:'⏳ Pendiente';
+    if(elDaniel)elDaniel.className='aprov-status '+(r.aprobado_daniel?'aprov-ok':'aprov-pend');
+    if(elPablo)elPablo.textContent=r.aprobado_pablo?'✅ Aprobado '+r.fecha_pablo?.split('T')[0]:'⏳ Pendiente';
+    if(elPablo)elPablo.className='aprov-status '+(r.aprobado_pablo?'aprov-ok':'aprov-pend');
+    if(elCliente)elCliente.textContent=r.aprobado_cliente?'✅ Aprobado '+r.fecha_cliente?.split('T')[0]:'⏳ Pendiente';
+    if(elCliente)elCliente.className='aprov-status '+(r.aprobado_cliente?'aprov-ok':'aprov-pend');
+    if(r.aprobado_daniel&&r.aprobado_pablo&&r.aprobado_cliente){
+      clearInterval(interval);
+      const cots=lc.cots();const idx=cots.findIndex(x=>x.supaId===supaId);
+      if(idx>=0){cots[idx].estado='Aprobada';lc.saveCots(cots);}
+      document.getElementById('ap_refresh_hint').textContent='✅ ¡Cotización completamente aprobada!';
+      document.getElementById('ap_refresh_hint').style.color='#065F46';
+    }
+  },5000);
+}
+
+async function procesarAprobacion(supaId,rol,token){
+  // Esta función corre cuando alguien hace clic en el link de aprobación
+  document.getElementById('loginWrap').style.display='none';
+  document.body.innerHTML=`
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#1A6B3C;font-family:sans-serif">
+      <div style="background:white;border-radius:12px;padding:40px;width:380px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.3)">
+        <div style="width:56px;height:56px;background:#7A9A2E;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:white;margin:0 auto 16px">AV</div>
+        <div style="font-size:20px;font-weight:700;color:#1A6B3C;margin-bottom:8px">Agrovip S.A.</div>
+        <div id="aprovMsg" style="font-size:14px;color:#6B6B5A;margin-bottom:24px">Verificando...</div>
+        <div id="aprovBtn"></div>
+      </div>
+    </div>`;
+
+  const data=await supaFetch('GET',`aprobaciones?id=eq.${supaId}&select=*`);
+  if(!data||!data[0]){document.getElementById('aprovMsg').textContent='Link inválido o expirado.';return;}
+  const r=data[0];
+  const tokenField={'daniel':'token_daniel','pablo':'token_pablo','cliente':'token_cliente'}[rol];
+  if(r[tokenField]!==token){document.getElementById('aprovMsg').textContent='Token inválido.';return;}
+  const yaAprobado={'daniel':r.aprobado_daniel,'pablo':r.aprobado_pablo,'cliente':r.aprobado_cliente}[rol];
+  const nombre={'daniel':'Daniel Polit','pablo':'Pablo Moysam','cliente':r.cliente}[rol];
+
+  // Detalle cotización
+  document.getElementById('aprovMsg').innerHTML=`
+    <div style="text-align:left;background:#F5F0E8;border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px">
+      <div style="font-weight:700;color:#1A6B3C;margin-bottom:8px">📋 ${r.num_cot}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div><span style="color:#6B6B5A;font-size:11px">CLIENTE</span><br><b>${r.cliente}</b></div>
+        <div><span style="color:#6B6B5A;font-size:11px">VALOR</span><br><b>$${parseFloat(r.valor).toFixed(2)}</b></div>
+      </div>
+    </div>`;
+
+  if(yaAprobado){
+    document.getElementById('aprovBtn').innerHTML=`<div style="background:#D1FAE5;color:#065F46;padding:14px;border-radius:8px;font-weight:600;text-align:center">✅ Ya aprobado anteriormente<br><span style="font-size:12px;font-weight:400">Gracias por su confirmación.</span></div>`;
+    return;
+  }
+
+  // Pantalla diferente para cliente vs interno
+  if(rol==='cliente'){
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="text-align:left">
+        <div style="font-size:13px;font-weight:700;color:#1A6B3C;margin-bottom:10px">📄 Política de Ventas y Reclamos</div>
+        <div style="font-size:12px;color:#333;background:#fff;border:1px solid #E0D8C8;border-radius:8px;padding:14px;max-height:200px;overflow-y:auto;margin-bottom:14px;line-height:1.6">
+          <b>1. Precios:</b> Los precios acordados aplican para la operación en curso. No hay ajustes retroactivos.<br><br>
+          <b>2. Entrega:</b> El Incoterm aplicable (FOB/CIF) se define antes del despacho. La responsabilidad se transfiere según lo acordado.<br><br>
+          <b>3. Reclamos de calidad:</b> Deben notificarse dentro de los <b>3 días calendario</b> desde la llegada de la carga, con evidencia fotográfica o de video (fecha y hora visible).<br><br>
+          <b>4. Documentación de reclamos:</b> La documentación completa (factura, guía, fotos, informe de calidad) debe entregarse dentro de los <b>15 días calendario</b> desde la llegada.<br><br>
+          <b>5. Pago:</b> Según condiciones pactadas. Agrovip se reserva el derecho de revisar condiciones de crédito ante atrasos.<br><br>
+          <i>Documento completo disponible en agrovipsas.com · Versión 4.0 · Mayo 2026</i>
+        </div>
+        <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px;cursor:pointer;background:#F0F9F4;border-radius:7px;padding:10px">
+          <input type="checkbox" id="chk_politica" style="width:18px;height:18px;margin-top:1px;accent-color:#1A6B3C;flex-shrink:0">
+          <span>He leído y acepto la <b>Política de Ventas y Gestión de Reclamos</b> de Agrovip S.A.</span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;font-size:13px;cursor:pointer;background:#F0F9F4;border-radius:7px;padding:10px">
+          <input type="checkbox" id="chk_cotizacion" style="width:18px;height:18px;margin-top:1px;accent-color:#1A6B3C;flex-shrink:0">
+          <span>Apruebo la cotización <b>${r.num_cot}</b> por valor de <b>$${parseFloat(r.valor).toFixed(2)}</b> y confirmo el pedido.</span>
+        </label>
+        <button onclick="confirmarAprobacion('${supaId}','${rol}')" style="width:100%;padding:14px;background:#1A6B3C;color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;opacity:.4" id="btnAprobarFinal" disabled>✅ CONFIRMAR Y APROBAR</button>
+        <div style="font-size:11px;color:#6B6B5A;text-align:center;margin-top:8px">Debes marcar ambas casillas para continuar</div>
+      </div>`;
+    // Activar botón solo si ambos checks marcados
+    setTimeout(()=>{
+      const c1=document.getElementById('chk_politica'),c2=document.getElementById('chk_cotizacion'),b=document.getElementById('btnAprobarFinal');
+      if(c1&&c2&&b){
+        const check=()=>{b.disabled=!(c1.checked&&c2.checked);b.style.opacity=b.disabled?'.4':'1';};
+        c1.addEventListener('change',check);c2.addEventListener('change',check);
+      }
+    },100);
+  } else {
+    // Daniel y Pablo — pantalla simple
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="text-align:left">
+        <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;font-size:13px;cursor:pointer;background:#F0F9F4;border-radius:7px;padding:10px">
+          <input type="checkbox" id="chk_interno" style="width:18px;height:18px;margin-top:1px;accent-color:#1A6B3C;flex-shrink:0">
+          <span>Revisé los márgenes y costos. Apruebo la cotización <b>${r.num_cot}</b> para <b>${r.cliente}</b> por <b>$${parseFloat(r.valor).toFixed(2)}</b>.</span>
+        </label>
+        <button onclick="confirmarAprobacion('${supaId}','${rol}')" style="width:100%;padding:14px;background:#1A6B3C;color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;opacity:.4" id="btnAprobarFinal" disabled>✅ APROBAR</button>
+      </div>`;
+    setTimeout(()=>{
+      const c=document.getElementById('chk_interno'),b=document.getElementById('btnAprobarFinal');
+      if(c&&b){c.addEventListener('change',()=>{b.disabled=!c.checked;b.style.opacity=b.disabled?'.4':'1';});}
+    },100);
+  }
+}
+
+// EMAILJS
+const EJS_SVC='service_lptgrd5';
+const EJS_TPL='template_2z6dond';
+const EJS_KEY='ZvrnAlzPIyQhSUzWj';
+const MAIL_LILI='lilibeth@agrovipsa.com';
+const MAIL_PABLO='gerencia@packvipsas.com';
+const MAIL_GERENCIA='gerencia@agrovipsa.com';
+
+
+async function enviarEmail(para, asunto, mensaje){
+  try{
+    await fetch('https://api.emailjs.com/api/v1.0/email/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        service_id:EJS_SVC,
+        template_id:EJS_TPL,
+        user_id:EJS_KEY,
+        template_params:{to_email:para, asunto, mensaje}
+      })
+    });
+  }catch(e){console.log('Email error:',e);}
+}
+
+async function confirmarAprobacion(supaId,rol){
+  const campo={'daniel':'aprobado_daniel','pablo':'aprobado_pablo','cliente':'aprobado_cliente'}[rol];
+  const campofecha={'daniel':'fecha_daniel','pablo':'fecha_pablo','cliente':'fecha_cliente'}[rol];
+  const update={[campo]:true,[campofecha]:new Date().toISOString()};
+  await supaFetch('PATCH',`aprobaciones?id=eq.${supaId}`,update);
+
+  // Obtener datos completos
+  const data=await supaFetch('GET',`aprobaciones?id=eq.${supaId}&select=*`);
+  const r=data?.[0];
+  const nombre={'daniel':'Daniel Polit','pablo':'Pablo Moysam','cliente':r?.cliente||'Cliente'}[rol];
+  const fecha=new Date().toLocaleDateString('es-EC');
+  const linkPablo=`${BASE_URL}?aprobar=${supaId}&rol=pablo&token=${r?.token_pablo}`;
+  const linkCliente=`${BASE_URL}?aprobar=${supaId}&rol=cliente&token=${r?.token_cliente}`;
+  const waNumPablo='593996404584';
+
+  // CADENA SECUENCIAL
+  if(rol==='daniel'){
+    // Email a Lili, Pablo y Daniel: Daniel aprobó
+    const asunto=`✅ Daniel aprobó cotización ${r?.num_cot} — ${r?.cliente}`;
+    const utilidad=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
+    const msg=`Hola,\n\nDaniel Polit (Ventas) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad.toFixed(2)}\n📅 Fecha: ${fecha}\n\nPablo — por favor revisa y aprueba aquí:\n${linkPablo}\n\nAgrovip S.A.`;
+    await enviarEmail(MAIL_LILI, asunto, msg);
+    await enviarEmail(MAIL_PABLO, asunto, msg);
+    await enviarEmail(MAIL_GERENCIA, asunto, msg);
+    // WhatsApp a Pablo
+    const utilidadWa=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
+    const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Tu aprobación es requerida*\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad: $${utilidadWa.toFixed(2)}\n\n✅ Daniel Polit ya aprobó.\n\n👉 Aprobar aquí:\n${linkPablo}`)}`;
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center;margin-bottom:12px">
+        <div style="font-size:28px;margin-bottom:6px">✅</div>
+        <div style="font-size:15px;font-weight:700;color:#065F46">¡Aprobado! Gracias Daniel.</div>
+        <div style="font-size:12px;color:#065F46;margin-top:4px">Se notificó a Lili y Pablo por email.</div>
+      </div>
+      <a href="${waPablo}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:white;padding:12px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Enviar WhatsApp a Pablo Moysam
+      </a>`;
+
+  } else if(rol==='pablo'){
+    // Email a Lili y Daniel: Pablo aprobó — listo para cliente
+    const asunto=`✅ Pablo aprobó ${r?.num_cot} — Listo para enviar al cliente`;
+    const utilidad2=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
+    const msg=`Hola,\n\nPablo Moysam (Gerencia) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad2.toFixed(2)}\n📅 Fecha: ${fecha}\n\n✅ Ambas aprobaciones internas completadas.\n\nLili — envía el link al cliente:\n${linkCliente}\n\nAgrovip S.A.`;
+    await enviarEmail(MAIL_LILI, asunto, msg);
+    await enviarEmail(MAIL_GERENCIA, asunto, msg);
+    // Pablo ya sabe que aprobó, no le reenviamos
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center;margin-bottom:12px">
+        <div style="font-size:28px;margin-bottom:6px">✅</div>
+        <div style="font-size:15px;font-weight:700;color:#065F46">¡Aprobado! Gracias Pablo.</div>
+        <div style="font-size:12px;color:#065F46;margin-top:4px">Se notificó a Lili y Daniel por email.</div>
+        <div style="font-size:12px;color:#065F46;margin-top:4px">Lili recibirá el link para enviar al cliente.</div>
+      </div>`;
+
+  } else if(rol==='cliente'){
+    // Email a Lili, Daniel y Pablo: cliente aprobó — crear OF
+    const asunto=`🎉 ${r?.cliente} aprobó ${r?.num_cot} — Crear Orden de Fabricación`;
+    const utilidad3=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
+    const msg=`¡Cotización completamente aprobada! 🎉\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad3.toFixed(2)}\n📅 Fecha: ${fecha}\n\n✅ Daniel Polit aprobó\n✅ Pablo Moysam aprobó\n✅ ${r?.cliente} aprobó y aceptó política de ventas\n\n⚡ Próximo paso: crear Orden de Fabricación en Odoo.\n\nAgrovip S.A.`;
+    await enviarEmail(MAIL_LILI, asunto, msg);
+    await enviarEmail(MAIL_GERENCIA, asunto, msg);
+    await enviarEmail(MAIL_PABLO, asunto, msg);
+    document.getElementById('aprovBtn').innerHTML=`
+      <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">🎉</div>
+        <div style="font-size:16px;font-weight:700;color:#065F46">¡Cotización completamente aprobada!</div>
+        <div style="font-size:13px;color:#065F46;margin-top:6px">${r?.cliente} · ${fecha}</div>
+        <div style="font-size:12px;color:#6B6B5A;margin-top:8px">Agrovip ha sido notificado. Se creará la Orden de Fabricación en Odoo.</div>
+      </div>`;
+  }
+}
+
+// COTIZACIONES
+function renderCots(){
+  const filtEst=document.getElementById('filtroEstado').value;
+  const filtCli=document.getElementById('filtroCliente').value;
+  let cots=lc.cots();
+  const clientes=[...new Set(cots.map(c=>c.cliente))];
+  const sel=document.getElementById('filtroCliente');const cur=sel.value;
+  sel.innerHTML='<option value="">Todos los clientes</option>'+clientes.map(c=>`<option ${c===cur?'selected':''}>${c}</option>`).join('');
+  if(filtEst)cots=cots.filter(c=>c.estado===filtEst);
+  if(filtCli)cots=cots.filter(c=>c.cliente===filtCli);
+  if(!cots.length){document.getElementById('cotsList').innerHTML='<div class="empty">No hay cotizaciones con ese filtro.</div>';return;}
+  document.getElementById('cotsList').innerHTML=cots.map(c=>cotCard(c)).join('');
+  updateStats();
+}
+
+function cotCard(c){
+  const ecls={'Borrador':'bk','Enviada':'bb','Aprobada':'bg','Facturada':'bp'}[c.estado]||'bk';
+  const scol=c.margenReal>=(c.margenObj||15)?'#1A6B3C':c.margenReal>=(c.margenObj||15)-4?'#D4A017':'#C0392B';
+  return`<div class="cot-card">
+    <div class="cot-head">
+      <div>
+        <div class="cot-title">${c.cliente} <span style="color:var(--gris);font-weight:400;font-size:12px">· ${c.numCot}</span></div>
+        <div class="cot-sub">${c.fecha} · ${c.tipo} · ${(c.cajasTotal||0).toLocaleString()} cajas</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <span class="badge ${ecls}">${c.estado}</span>
+        <span style="font-size:13px;font-weight:700;color:${scol}">${(c.margenReal||0).toFixed(1)}%</span>
+      </div>
+    </div>
+    <div class="cot-metrics">
+      <div class="cot-m"><div class="et">Valor cotizado</div><div class="nm hl">${f2(c.valorCotizado)}</div></div>
+      <div class="cot-m"><div class="et">Valor cobrado</div><div class="nm">${f2(c.valorCobrado)}</div></div>
+      <div class="cot-m"><div class="et">Costo CIF/caja</div><div class="nm">${f2(c.costoTotalCaja)}</div></div>
+      <div class="cot-m"><div class="et">Utilidad bruta</div><div class="nm hl">${f2(c.utilidad)}</div></div>
+      ${c.estado==='Facturada'&&c.valorFacturadoReal?`
+        <div class="cot-m"><div class="et">Facturado real</div><div class="nm hl">${f2(c.valorFacturadoReal)}</div></div>
+        <div class="cot-m"><div class="et">Cajas facturadas</div><div class="nm">${(c.cajasFacturadas||c.cajasTotal||0).toLocaleString()}</div></div>
+        <div class="cot-m"><div class="et">Valor/caja real</div><div class="nm hl">${c.valorPorCajaFact?'$'+c.valorPorCajaFact.toFixed(2):'—'}</div></div>
+        ${c.ncFacturaMonto>0?`<div class="cot-m" style="border-left:3px solid var(--am)"><div class="et">N/C ${c.ncFacturaTipo||''}</div><div class="nm" style="color:var(--rd)">-${f2(c.ncFacturaMonto)}</div>${c.ncFacturaDetalle?`<div style="font-size:10px;color:var(--gris)">${c.ncFacturaDetalle}</div>`:''}</div>`:''}
+        <div class="cot-m"><div class="et">N° Factura</div><div class="nm" style="font-size:12px">${c.numFactura||'—'}</div></div>
+      `:''}
+    </div>
+    ${c.notas?`<div style="font-size:12px;color:var(--gris);margin-bottom:10px;padding:8px 10px;background:var(--cr);border-radius:7px">${c.notas}</div>`:''}
+    <div class="cot-actions">
+      <span style="font-size:11px;color:var(--gris);margin-right:2px">Estado:</span>
+      ${['Borrador','Enviada','Aprobada','Facturada'].map(s=>`<button class="st-btn s-${s.toLowerCase()} ${c.estado===s?'act':''}" onclick="cambiarEstado('${c.id}','${s}')">${s}</button>`).join('')}
+      ${c.estado==='Borrador'?`<button class="btn-sm" onclick="editarCotizacion('${c.id}')" style="border-color:#1A6B3C;color:#1A6B3C">✏ Editar</button>`:''}
+      ${(c.estado==='Aprobada'||c.estado==='Facturada')?`<button class="btn-sm" onclick="abrirModalFactura('${c.id}')">📄 Factura</button>`:''}
+      <button class="btn-sm" onclick="eliminarCot('${c.id}')">🗑</button>
+    </div>
+  </div>`;
+}
+
+function cambiarEstado(id,estado){
+  const cots=lc.cots();const i=cots.findIndex(c=>c.id===id);
+  if(i>=0){cots[i].estado=estado;lc.saveCots(cots);renderCots();}
+}
+function editarCotizacion(id){
+  const c=lc.cots().find(x=>x.id===id);if(!c)return;
+  goTab('calc');
+  document.getElementById('clienteNombre').value=c.cliente||'';
+  document.getElementById('cajasTotal').value=c.cajasTotal||3840;
+  document.getElementById('kgCaja').value=c.kgCaja||4.5;
+  document.getElementById('margenObj').value=c.margenObj||15;
+  document.getElementById('cotNotas').value=c.notas||'';
+  document.getElementById('pvPB').value=c.pvPB||'';
+  document.getElementById('cajasPB').value=c.cajasPB||'';
+  document.getElementById('pvPR').value=c.pvPR||'';
+  document.getElementById('cajasPR').value=c.cajasPR||'';
+  document.getElementById('ncMonto').value=c.ncMonto||0;
+  document.getElementById('ncMotivo').value=c.ncMotivo||'';
+  // Cargar tipo
+  document.querySelectorAll('#tipoTabs .tipo-tab').forEach(t=>{t.classList.remove('active');if(t.dataset.tipo===c.tipo)t.classList.add('active');});
+  tipoActual=c.tipo||'maritimo_sea';actualizarUI();
+  // Eliminar el borrador y recalcular
+  lc.saveCots(lc.cots().filter(x=>x.id!==id));
+  setTimeout(()=>document.getElementById('cajasTotal').scrollIntoView({behavior:'smooth'}),200);
+  alert(`Cotización ${c.numCot} cargada para editar. Ajusta los valores y presiona Calcular.`);
+}
+
+
+function updateStats(){
+  const cots=lc.cots();const fac=cots.filter(c=>c.estado==='Facturada');
+  document.getElementById('st_total').textContent=cots.length;
+  document.getElementById('st_cotizado').textContent=fk(cots.reduce((s,c)=>s+(c.valorCotizado||0),0));
+  document.getElementById('st_facturado').textContent=fk(fac.reduce((s,c)=>s+(c.valorFacturadoReal||c.valorCobrado||0),0));
+  const conv=cots.length?(fac.length/cots.length*100):0;
+  document.getElementById('st_conv').textContent=conv.toFixed(0)+'%';
+  const nb=document.getElementById('cotBadgeNav');nb.style.display=cots.length?'':'none';if(cots.length)nb.textContent=cots.length;
+}
+
+// MODAL FACTURA
+let facturaTargetId=null;
+function abrirModalFactura(id){
+  facturaTargetId=id;
+  const c=lc.cots().find(x=>x.id===id);
+  document.getElementById('mf_fecha').value=new Date().toISOString().split('T')[0];
+  document.getElementById('mf_factura').value='';
+  document.getElementById('mf_valor').value=c?.valorCobrado?.toFixed(2)||'';
+  document.getElementById('mf_cajas').value=c?.cajasTotal||'';
+  document.getElementById('mf_nc_tipo').value='';
+  document.getElementById('mf_nc_monto').value='';
+  document.getElementById('mf_nc_detalle').value='';
+  document.getElementById('mf_nc_resumen').style.display='none';
+  calcMfPorCaja();
+  document.getElementById('modalFactura').classList.add('show');
+}
+
+function calcMfPorCaja(){
+  const valor=parseFloat(document.getElementById('mf_valor').value)||0;
+  const cajas=parseFloat(document.getElementById('mf_cajas').value)||0;
+  const nc=parseFloat(document.getElementById('mf_nc_monto').value)||0;
+  const valorNeto=valor-nc;
+  if(cajas>0){
+    document.getElementById('mf_porcaja').value='$'+(valorNeto/cajas).toFixed(2)+'/caja';
+  } else {
+    document.getElementById('mf_porcaja').value='—';
+  }
+  const resumen=document.getElementById('mf_nc_resumen');
+  if(nc>0){
+    resumen.style.display='block';
+    resumen.textContent=`Valor neto después de N/C: $${valorNeto.toFixed(2)}`;
+  } else {
+    resumen.style.display='none';
+  }
+}
+
+function confirmarFactura(){
+  const cots=lc.cots();const i=cots.findIndex(c=>c.id===facturaTargetId);
+  if(i>=0){
+    const valor=parseFloat(document.getElementById('mf_valor').value)||cots[i].valorCobrado;
+    const cajas=parseFloat(document.getElementById('mf_cajas').value)||cots[i].cajasTotal;
+    const ncMonto=parseFloat(document.getElementById('mf_nc_monto').value)||0;
+    const ncTipo=document.getElementById('mf_nc_tipo').value;
+    const ncDetalle=document.getElementById('mf_nc_detalle').value.trim();
+    cots[i].numFactura=document.getElementById('mf_factura').value.trim();
+    cots[i].valorFacturadoReal=valor;
+    cots[i].cajasFacturadas=cajas;
+    cots[i].valorPorCajaFact=cajas>0?((valor-ncMonto)/cajas):0;
+    cots[i].ncFacturaTipo=ncTipo;
+    cots[i].ncFacturaMonto=ncMonto;
+    cots[i].ncFacturaDetalle=ncDetalle;
+    cots[i].valorNetoFact=valor-ncMonto;
+    cots[i].fechaFactura=document.getElementById('mf_fecha').value;
+    cots[i].estado='Facturada';
+    lc.saveCots(cots);
+  }
+  cerrarModal('modalFactura');renderCots();
+}
+
+// CLIENTES
+let editCliId=null;
+function renderClientes(){
+  const clis=lc.clis();poblClienteSel();
+  if(!clis.length){document.getElementById('clientesList').innerHTML='<div class="empty">No hay clientes guardados.</div>';return;}
+  document.getElementById('clientesList').innerHTML=clis.map(c=>`
+    <div class="cli-card">
+      <div><div class="cli-name">${c.nombre}</div>
+        <div class="cli-sub">${c.pais||'—'} · ${c.tipo} · ${c.cajas||'—'} cajas${c.email?' · '+c.email:''}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm" onclick="usarCliente('${c.id}')">→ Usar</button>
+        <button class="btn-sm" onclick="abrirModalCliente('${c.id}')">✏</button>
+        <button class="btn-sm" onclick="eliminarCliente('${c.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+function poblClienteSel(){
+  const sel=document.getElementById('clienteSel');const clis=lc.clis();
+  sel.innerHTML='<option value="">— Seleccionar —</option>'+clis.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+}
+function cargarCliente(id){
+  if(!id)return;const c=lc.clis().find(x=>x.id===id);if(!c)return;
+  document.getElementById('clienteNombre').value=c.nombre;
+  if(c.cajas)document.getElementById('cajasTotal').value=c.cajas;
+  if(c.margen)document.getElementById('margenObj').value=c.margen;
+  document.querySelectorAll('#tipoTabs .tipo-tab').forEach(t=>{t.classList.remove('active');if(t.dataset.tipo===c.tipo)t.classList.add('active');});
+  tipoActual=c.tipo||tipoActual;actualizarUI();
+}
+function abrirModalCliente(id){
+  editCliId=id||null;const c=id?lc.clis().find(x=>x.id===id):null;
+  document.getElementById('modalCliTitle').textContent=id?'Editar cliente':'Nuevo cliente';
+  document.getElementById('mc_nombre').value=c?.nombre||'';
+  document.getElementById('mc_pais').value=c?.pais||'';
+  document.getElementById('mc_tipo').value=c?.tipo||'maritimo_sea';
+  document.getElementById('mc_cajas').value=c?.cajas||'';
+  document.getElementById('mc_margen').value=c?.margen||'';
+  document.getElementById('mc_contacto').value=c?.contacto||'';
+  document.getElementById('mc_email').value=c?.email||'';
+  document.getElementById('mc_wapais').value=c?.wapais||'+1';
+  document.getElementById('mc_wanum').value=c?.wanum||'';
+  document.getElementById('mc_notif_wa').checked=c?.notifWa!==false;
+  document.getElementById('mc_req_aprov').checked=c?.reqAprov||false;
+  document.getElementById('mc_notas').value=c?.notas||'';
+  document.getElementById('modalCliente').classList.add('show');
+}
+function guardarCliente(){
+  const nombre=document.getElementById('mc_nombre').value.trim();if(!nombre){alert('Ingresa el nombre');return;}
+  const wapais=document.getElementById('mc_wapais').value.trim();
+  const wanum=document.getElementById('mc_wanum').value.trim();
+  const whatsapp=(wapais+wanum).replace(/[\s\-\(\)]/g,'');
+  const clis=lc.clis();
+  const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notifWa:document.getElementById('mc_notif_wa').checked,reqAprov:document.getElementById('mc_req_aprov').checked,notas:document.getElementById('mc_notas').value.trim()};
+  if(editCliId){const i=clis.findIndex(c=>c.id===editCliId);if(i>=0)clis[i]=datos;}else clis.push(datos);
+  lc.saveClis(clis);cerrarModal('modalCliente');renderClientes();poblClienteSel();
+}
+function eliminarCliente(id){if(!confirm('¿Eliminar cliente?'))return;lc.saveClis(lc.clis().filter(c=>c.id!==id));renderClientes();poblClienteSel();}
+function usarCliente(id){cargarCliente(id);goTab('calc');}
+function cerrarModal(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
+
+// COPIAR
+function copiarCot(){
+  if(!ultimoCalculo)return;const c=ultimoCalculo;
+  const txt=`*COTIZACIÓN AGROVIP · ${c.numCot}*\n📅 ${c.fecha} | ${c.cliente}\n\n💰 Cotizado: ${f2(c.valorCotizado)}\n📦 Costo CIF/caja: ${f2(c.costoTotalCaja)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n✅ Utilidad: ${f2(c.utilidad)}\n⚠ Precio mínimo: ${f2(c.precioMin)}/caja\n🌿 Fruta: $${c.pFrutaProm.toFixed(3)}/kg\nCajas: ${c.cajasTotal.toLocaleString()}\n\nAgrovip S.A. · agrovipsas.com`;
+  navigator.clipboard.writeText(txt).catch(()=>{});
+  alert('✓ Copiado — listo para WhatsApp');
+}
+
+// REPORTES
+function filtrarCotsPeriodo(){
+  const p=document.getElementById('rptPeriodo').value,cots=lc.cots(),now=new Date();
+  if(p==='semana')return cots.filter(c=>c.semana===getSemana());
+  if(p==='mes')return cots.filter(c=>c.mes===getMes());
+  if(p==='trimestre'){const y=now.getFullYear(),q=Math.floor(now.getMonth()/3),ms=q*3,me=ms+2;return cots.filter(c=>{if(!c.mes)return false;const[cy,cm]=c.mes.split('-');return parseInt(cy)===y&&parseInt(cm)-1>=ms&&parseInt(cm)-1<=me;});}
+  return cots;
+}
+function renderReporte(){
+  const cots=filtrarCotsPeriodo();
+  if(!cots.length){document.getElementById('rptKpis').innerHTML='<div class="empty" style="grid-column:1/-1">No hay datos para este período.</div>';document.getElementById('rptTbody').innerHTML='';document.getElementById('rptClienteChart').innerHTML='';document.getElementById('rptSemanalChart').innerHTML='';return;}
+  const totalCot=cots.reduce((s,c)=>s+(c.valorCotizado||0),0);
+  const totalFac=cots.filter(c=>c.estado==='Facturada').reduce((s,c)=>s+(c.valorFacturadoReal||c.valorCobrado||0),0);
+  const totalUtil=cots.reduce((s,c)=>s+(c.utilidad||0),0);
+  const margenProm=cots.length?cots.reduce((s,c)=>s+(c.margenReal||0),0)/cots.length:0;
+  const conv=cots.length?cots.filter(c=>c.estado==='Facturada').length/cots.length*100:0;
+
+  // Pipeline counts
+  const nBorrador=cots.filter(c=>c.estado==='Borrador').length;
+  const nEnviada=cots.filter(c=>c.estado==='Enviada').length;
+  const nAprobada=cots.filter(c=>c.estado==='Aprobada').length;
+  const nFacturada=cots.filter(c=>c.estado==='Facturada').length;
+  const valorEnviado=cots.filter(c=>c.estado==='Enviada').reduce((s,c)=>s+(c.valorCotizado||0),0);
+  const valorAprobado=cots.filter(c=>c.estado==='Aprobada'||c.estado==='Facturada').reduce((s,c)=>s+(c.valorCotizado||0),0);
+  const pipelineTotal=cots.length||1;
+
+  document.getElementById('rptKpis').innerHTML=`
+    <div class="rpt-card"><div class="lbl">Total cotizaciones</div><div class="val">${cots.length}</div><div style="font-size:11px;color:var(--gris)">en el período</div></div>
+    <div class="rpt-card"><div class="lbl">Valor cotizado</div><div class="val">${fk(totalCot)}</div></div>
+    <div class="rpt-card"><div class="lbl">Valor facturado</div><div class="val">${fk(totalFac)}</div><div style="font-size:11px;color:var(--gris)">${conv.toFixed(0)}% conversión</div></div>
+    <div class="rpt-card"><div class="lbl">Utilidad bruta</div><div class="val">${fk(totalUtil)}</div></div>
+    <div class="rpt-card"><div class="lbl">Margen promedio</div><div class="val">${margenProm.toFixed(1)}%</div><div class="chart-bar"><div class="chart-bar-fill" style="width:${Math.min(margenProm/20*100,100)}%"></div></div></div>
+  `;
+
+  // PIPELINE KPIs
+  const pipelineEl = document.getElementById('rptKpis');
+  pipelineEl.innerHTML += `
+    <div style="grid-column:1/-1;margin-top:4px">
+      <div style="font-size:10px;font-weight:600;color:var(--gris);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)">PIPELINE DE COTIZACIONES</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid #94A3B8">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📝 Borradores</div>
+          <div style="font-size:28px;font-weight:700;color:#475569">${nBorrador}</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${((nBorrador/pipelineTotal)*100).toFixed(0)}% del total</div>
+        </div>
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid #3B82F6">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📤 Enviadas a cliente</div>
+          <div style="font-size:28px;font-weight:700;color:#1E40AF">${nEnviada}</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${fk(valorEnviado)} en juego</div>
+        </div>
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid #1A6B3C">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">✅ Aprobadas</div>
+          <div style="font-size:28px;font-weight:700;color:#1A6B3C">${nAprobada}</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${fk(valorAprobado)} aprobado</div>
+        </div>
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid #6B21A8">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">🧾 Facturadas</div>
+          <div style="font-size:28px;font-weight:700;color:#6B21A8">${nFacturada}</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${fk(totalFac)} cobrado</div>
+        </div>
+        <div style="background:white;border:1px solid var(--bd);border-radius:10px;padding:14px;border-top:3px solid var(--am)">
+          <div style="font-size:10px;color:var(--gris);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">🎯 Tasa de cierre</div>
+          <div style="font-size:28px;font-weight:700;color:${conv>=50?'#1A6B3C':conv>=25?'#D4A017':'#C0392B'}">${conv.toFixed(0)}%</div>
+          <div style="font-size:11px;color:var(--gris);margin-top:4px">${nFacturada} de ${cots.length} cerradas</div>
+          <div class="chart-bar" style="margin-top:6px"><div class="chart-bar-fill" style="width:${Math.min(conv,100)}%;background:${conv>=50?'#1A6B3C':conv>=25?'#D4A017':'#C0392B'}"></div></div>
+        </div>
+      </div>
+    </div>
+  `;
+  const byCli={};cots.forEach(c=>{if(!byCli[c.cliente])byCli[c.cliente]={util:0,margen:[],ap:0,total:0};byCli[c.cliente].util+=c.utilidad||0;byCli[c.cliente].margen.push(c.margenReal||0);byCli[c.cliente].total++;if(c.estado==='Aprobada'||c.estado==='Facturada')byCli[c.cliente].ap++;});
+  const maxU=Math.max(...Object.values(byCli).map(v=>v.util),1);
+  document.getElementById('rptClienteChart').innerHTML=Object.entries(byCli).sort((a,b)=>b[1].util-a[1].util).map(([cli,v])=>{
+    const prom=v.margen.reduce((s,x)=>s+x,0)/v.margen.length;
+    const col=prom>=15?'#1A6B3C':prom>=11?'#D4A017':'#C0392B';
+    return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px">
+      <div style="width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--gris)">${cli}</div>
+      <div style="flex:1;height:20px;background:var(--cr2);border-radius:4px;overflow:hidden">
+        <div style="height:100%;background:${col};width:${Math.min(v.util/maxU*100,100)}%;border-radius:4px;display:flex;align-items:center;padding-left:8px">
+          <span style="font-size:11px;color:white;font-weight:600">${fk(v.util)}</span>
+        </div>
+      </div>
+      <div style="width:48px;text-align:right;font-weight:700;color:${col}">${prom.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+  const bySem={};cots.forEach(c=>{const s=c.semana||'—';if(!bySem[s])bySem[s]={util:0,margen:[],n:0};bySem[s].util+=c.utilidad||0;bySem[s].margen.push(c.margenReal||0);bySem[s].n++;});
+  const semanas=Object.keys(bySem).sort();const maxSU=Math.max(...Object.values(bySem).map(v=>v.util),1);
+  document.getElementById('rptSemanalChart').innerHTML=`<div style="display:flex;gap:8px;align-items:flex-end;height:100px;padding:0 4px">`+
+    semanas.map(s=>{const v=bySem[s];const prom=v.margen.reduce((a,b)=>a+b,0)/v.margen.length;const h=Math.max(v.util/maxSU*100,4);const col=prom>=15?'#1A6B3C':prom>=11?'#D4A017':'#C0392B';
+      return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div style="font-size:10px;color:var(--gris)">${fk(v.util)}</div>
+        <div style="width:100%;background:${col};border-radius:4px 4px 0 0;height:${h}px"></div>
+        <div style="font-size:9px;color:var(--gris)">${s.replace(/^\d+-W/,'W')}</div>
+      </div>`;}).join('')+'</div>';
+  document.getElementById('rptTbody').innerHTML=cots.map(c=>{
+    const scol=c.margenReal>=(c.margenObj||15)?'#065F46':c.margenReal>=(c.margenObj||15)-4?'#92400E':'#991B1B';
+    const ecls={'Borrador':'bk','Enviada':'bb','Aprobada':'bg','Facturada':'bp'}[c.estado]||'bk';
+    return`<tr><td style="font-family:monospace;font-size:11px">${c.numCot}</td><td>${c.cliente}</td><td>${c.fecha}</td><td style="font-size:11px">${c.tipo}</td><td><span class="badge ${ecls}" style="font-size:10px">${c.estado}</span></td><td style="font-size:11px">${c.supaId?'🔗 En Supabase':'—'}</td><td style="text-align:right">${f2(c.valorCotizado)}</td><td style="text-align:right">${c.valorFacturadoReal?f2(c.valorFacturadoReal):f2(c.valorCobrado)}</td><td style="text-align:right;font-weight:700;color:${scol}">${(c.margenReal||0).toFixed(1)}%</td></tr>`;
+  }).join('');
+}
+function exportarReporte(){
+  const cots=filtrarCotsPeriodo();if(!cots.length){alert('No hay datos.');return;}
+  const h='Cotización,Cliente,Fecha,Tipo,Estado,Cotizado,Cobrado,Facturado Real,Margen%,Utilidad\n';
+  const r=cots.map(c=>[c.numCot,c.cliente,c.fecha,c.tipo,c.estado,(c.valorCotizado||0).toFixed(2),(c.valorCobrado||0).toFixed(2),(c.valorFacturadoReal||''),((c.margenReal)||0).toFixed(1),(c.utilidad||0).toFixed(2)].join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+h+r],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Reporte_Agrovip_'+getMes()+'.csv';a.click();
+}
+
+// IA
+async function enviarIA(){
+  const inp=document.getElementById('aiInput'),btn=document.getElementById('btnSend'),msgs=document.getElementById('aiMsgs');
+  const q=inp.value.trim();if(!q)return;
+  msgs.innerHTML+=`<div class="ai-mu"><strong>TÚ</strong>${q}</div>`;
+  inp.value='';btn.disabled=true;btn.innerHTML='<span class="spin"></span>';msgs.scrollTop=msgs.scrollHeight;
+  let ctx='No hay operación calculada.';
+  if(ultimoCalculo){const c=ultimoCalculo;ctx=`Cliente: ${c.cliente}. Fruta: $${c.pFrutaProm.toFixed(3)}/kg. Costo CIF/caja: $${c.costoTotalCaja.toFixed(2)}. Precio prom: $${c.pvProm.toFixed(2)}/caja. Margen: ${c.margenReal.toFixed(1)}%. Objetivo: ${c.margenObj}%. Utilidad: $${c.utilidad.toFixed(2)}. Precio mínimo: $${c.precioMin.toFixed(2)}/caja.`;}
+  const sys=`Eres el asesor de precio y margen de Daniel Polit (Ventas) y Pablo Moysam (Gerente General) de Agrovip S.A., exportadora ecuatoriana de pitahaya. Directo, conciso, español. Margen objetivo 14-16%. Máximo 4 líneas con recomendación concreta. Operación: ${ctx}`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:sys,messages:[{role:'user',content:q}]})});
+    const d=await r.json();
+    msgs.innerHTML+=`<div class="ai-mb"><strong>CLAUDE · AGROVIP</strong>${d.content?.[0]?.text||'Sin respuesta.'}</div>`;
+  }catch(e){msgs.innerHTML+=`<div class="ai-mb"><strong>ERROR</strong>Sin conexión.</div>`;}
+  btn.disabled=false;btn.innerHTML='Enviar';msgs.scrollTop=msgs.scrollHeight;
+}
+
+// Init check aprobacion sin login
+const _p=new URLSearchParams(window.location.search);
+if(_p.get('aprobar')){procesarAprobacion(_p.get('aprobar'),_p.get('rol'),_p.get('token'));}
 </script>
 </body>
 </html>
