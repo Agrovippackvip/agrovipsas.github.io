@@ -1277,7 +1277,7 @@ function logout(){
   });
 }
 
-function init(){
+async function init(){
   const now=new Date();
   document.getElementById('hd').textContent=now.toLocaleDateString('es-EC',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
   const sy=new Date(now.getFullYear(),0,1);
@@ -1392,7 +1392,7 @@ function gP(){
   alert(`✓ Pedido guardado — ${n} · ${kg}kg · $${pr.toFixed(3)}/kg\nFecha pago: ${fp.fechaPago}`);
 }
 
-function waP(){
+async function waP(){
   const n=document.getElementById('pp').value||document.getElementById('ppn').value;
   const pr=parseFloat(document.getElementById('ppr').value)||0;
   const kg=parseFloat(document.getElementById('pkg').value)||0;
