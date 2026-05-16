@@ -809,8 +809,8 @@ async function renderBorradores(){
     return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">'+
       '<div><b>'+(b.documento||'Sin documento')+'</b> · '+(b.cliente||'—')+'<br><span style="font-size:11px;color:var(--gris)">'+(b.fecha||'—')+' · '+(b.total_cajas||0)+' cajas · S'+(b.semana||'—')+'</span></div>'+
       '<div style="display:flex;gap:6px">'+
-      '<button class="bs" style="font-size:11px" onclick="cargarBorrador(''+b.id+'')">Continuar</button>'+
-      '<button class="bsm" onclick="eliminarDesp(''+b.id+'')">🗑</button>'+
+      '<button class="bs" style="font-size:11px" onclick="cargarBorrador(\"'+b.id+'\");">Continuar</button>'+
+      '<button class="bsm" onclick="eliminarDesp(\"'+b.id+'\");">🗑</button>'+
       '</div></div>';
   }).join('');
 }
