@@ -1748,6 +1748,7 @@ function getCalibreResumen(){
 }
 
 
+async function waFotos(){
   const nombre=document.getElementById('rnom').value;
   const prodMan=document.getElementById('rprodman').value;
   const pedId=document.getElementById('rprod').value;
@@ -1755,20 +1756,19 @@ function getCalibreResumen(){
   const ped=allPedsCache.find(p=>p.id===pedId);
   const productor=ped?ped.productor:prodMan||'—';
   const semana=ped?`S${ped.semana}`:'';
-  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:'(% no especificado)');});
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{
+    const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;
+    return b.dataset.prob+(pct?` (${pct}%)`:' (% no especificado)');
+  });
   const kg=document.getElementById('rkg').value;
   const fecha=new Date().toLocaleDateString('es-EC');
   const hora=document.getElementById('rhora').value;
-
   const fotosNecesarias=problemas.map(p=>`📷 ${p}:\n   ${fotosGuia[p]||'Foto del problema'}`).join('\n\n');
-
   const calibreResumenWa=getCalibreResumen();
   const msg=`*FOTOS REPORTE DE RECHAZO — AGROVIP*\n\n👤 ${nombre}\n📅 ${fecha}${hora?' · '+hora:''}\n🌿 Productor: ${productor} ${semana}\n⚖️ Kilos afectados: ${kg||'—'} kg\n📦 Calibres: ${calibreResumenWa}\n\n*Fotos adjuntas a este mensaje:*\n\n${fotosNecesarias}\n\n_Por favor adjunta las fotos correspondientes a este mensaje._\n\n*Agrovip S.A. · PackVip*`;
-
   const waNum='593995938213';
   window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`,'_blank');
 }
-
 
 function rProd(){
   const f=document.getElementById('ftp').value;
