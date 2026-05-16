@@ -101,6 +101,7 @@ input,select,textarea,button{font-family:inherit}
     <button class="nb" onclick="gt('reporte')" id="nb-reporte">📷 Reporte</button>
     <button class="nb" onclick="gt('productores')" id="nb-productores">🌿 Productores</button>
     <button class="nb" onclick="gt('historico')" id="nb-historico">📊 Histórico</button>
+    <button class="nb" onclick="gt('histReportes')" id="nb-histReportes">📋 Reportes</button>
   </div>
   <div class="main">
 
@@ -484,6 +485,30 @@ input,select,textarea,button{font-family:inherit}
       </div>
     </div>
   </div>
+
+    <!-- HISTORIAL REPORTES -->
+    <div class="tab" id="tab-histReportes">
+      <div class="sl">Historial de reportes de rechazo</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <input type="text" id="filtProd" placeholder="Filtrar por productor..." oninput="renderHistReportes()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;flex:1">
+        <select id="filtProb" onchange="renderHistReportes()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white">
+          <option value="">Todos los problemas</option>
+          <option value="calidad">Calidad</option>
+          <option value="calibre">Calibre</option>
+          <option value="moho">Moho</option>
+          <option value="transporte">Transporte</option>
+          <option value="sobremadurez">Sobremadurez</option>
+        </select>
+      </div>
+      <div class="g4" style="margin-bottom:14px">
+        <div class="sc"><div class="et">Total reportes</div><div class="nm hl" id="hr_total">0</div></div>
+        <div class="sc"><div class="et">Kg afectados</div><div class="nm hl" id="hr_kg">0</div></div>
+        <div class="sc"><div class="et">Productores con reporte</div><div class="nm hl" id="hr_prods">0</div></div>
+        <div class="sc"><div class="et">Último reporte</div><div class="nm" id="hr_ultimo" style="font-size:14px">—</div></div>
+      </div>
+      <div id="histReportesList"><div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">Cargando reportes...</div></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -550,7 +575,7 @@ function gt(id){
   const nb=document.getElementById('nb-'+id);if(nb)nb.classList.add('active');
   if(id==='semana')rSem();if(id==='recepcion')poblarSelectsProduccion();
   if(id==='reporte')poblarSelectsProduccion();
-  if(id==='productores')rProd();if(id==='historico')rH();
+  if(id==='productores')rProd();if(id==='historico')rH();if(id==='histReportes')renderHistReportes();
 }
 
 function calcFechaPago(){
@@ -874,7 +899,13 @@ async function generarMailReporte(){
     for(const email of [MAIL_LILI,MAIL_DANIEL,MAIL_PABLO]){
       await fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service_id:'service_lptgrd5',template_id:'template_i4iu7bd',user_id:'ZvrnAlzPIyQhSUzWj',template_params:{...params,to_email:email}})}); 
     }
-    alert('✅ Reporte enviado a Lili, Daniel y Pablo.\n\n📷 Usa el botón de WhatsApp para enviar las fotos.');
+    // Guardar reporte en Supabase
+    await guardarReporte({
+      recepcionId:recId,productor,semana:rec?.semana||0,
+      nombre,problemas:problemas.join(', '),kg,
+      destino:dest,descripcion:desc,hora,calibres:calibreRes
+    });
+    alert('Reporte enviado a Lili, Daniel y Pablo. Usa el boton de copiar para enviar las fotos por WhatsApp.');
   }catch(e){alert('Error al enviar. Verifica la conexión.');}
   if(btnEl){btnEl.textContent='📧 Enviar reporte por email a Lili, Daniel y Pablo';btnEl.disabled=false;}
 }
@@ -909,6 +940,63 @@ async function waFotos(){
     document.execCommand("copy");document.body.removeChild(ta);
     alert("Mensaje copiado. Pega en WhatsApp y adjunta las fotos.");
   }
+}
+
+
+// HISTORIAL REPORTES
+var _reportes=null;
+async function loadReportes(){
+  if(_reportes===null){var d=await supaFetch("GET","reportes?select=*&order=created_at.desc");_reportes=d||[];}
+  return _reportes;
+}
+
+async function guardarReporte(data){
+  var rep={
+    id:"rep"+Date.now(),
+    recepcion_id:data.recepcionId||null,
+    productor:data.productor,
+    semana:data.semana||0,
+    fecha:new Date().toLocaleDateString("es-EC"),
+    reportado_por:data.nombre,
+    problemas:data.problemas,
+    kg_afectados:parseFloat(data.kg)||0,
+    destino:data.destino,
+    descripcion:data.descripcion,
+    hora:data.hora,
+    calibres:data.calibres
+  };
+  await supaFetch("POST","reportes",rep);
+  _reportes=null;
+}
+
+async function renderHistReportes(){
+  var reps=await loadReportes();
+  var filtP=document.getElementById("filtProd").value.toLowerCase();
+  var filtPr=document.getElementById("filtProb").value.toLowerCase();
+  var list=reps;
+  if(filtP)list=list.filter(function(r){return(r.productor||"").toLowerCase().includes(filtP);});
+  if(filtPr)list=list.filter(function(r){return(r.problemas||"").toLowerCase().includes(filtPr);});
+  document.getElementById("hr_total").textContent=list.length;
+  document.getElementById("hr_kg").textContent=list.reduce(function(s,r){return s+(r.kg_afectados||0);},0).toFixed(1)+" kg";
+  var prods=new Set(list.map(function(r){return r.productor;}));
+  document.getElementById("hr_prods").textContent=prods.size;
+  document.getElementById("hr_ultimo").textContent=list.length?list[0].fecha+" · "+list[0].productor:"—";
+  if(!list.length){
+    document.getElementById("histReportesList").innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">Sin reportes registrados aun.</div>';
+    return;
+  }
+  document.getElementById("histReportesList").innerHTML=list.map(function(r){
+    var probs=(r.problemas||"").split(",").map(function(p){return p.trim();});
+    return '<div class="card" style="margin-bottom:10px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'+
+      '<div><div style="font-size:14px;font-weight:700">'+r.productor+'</div>'+
+      '<div style="font-size:11px;color:var(--gris);margin-top:2px">'+r.fecha+(r.hora?" · "+r.hora:"")+" · S"+(r.semana||"—")+" · Reportado por: "+(r.reportado_por||"—")+'</div></div>'+
+      '<span class="badge br">'+r.kg_afectados+' kg afectados</span></div>'+
+      '<div style="font-size:12px;color:var(--rd);margin-bottom:6px">'+probs.join(" · ")+'</div>'+
+      (r.descripcion?'<div style="font-size:12px;color:var(--gris);background:var(--cr);padding:8px 10px;border-radius:6px">'+r.descripcion+'</div>':"")+
+      (r.calibres?'<div style="font-size:11px;color:var(--gris);margin-top:6px">Calibres: '+r.calibres+'</div>':"")+
+      '</div>';
+  }).join("");
 }
 
 function rProd(){
