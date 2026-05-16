@@ -395,8 +395,18 @@ input,select,textarea,button{font-family:inherit}
         <div class="fld"><label>Tu nombre</label>
           <select id="rnom"><option value="Samary">Samary</option><option value="David">David</option><option value="Alejandro">Alejandro</option></select>
         </div>
-        <div class="fld"><label>Pedido / productor</label><select id="rprod"><option value="">— Seleccionar —</option></select></div>
-        <div class="fld"><label>O escribe el productor</label><input type="text" id="rprodman" placeholder="Nombre del productor"></div>
+        <div class="fld"><label>Recepción con rechazo</label>
+          <select id="rprod" onchange="cargarDatosRecepcion()"><option value="">— Seleccionar recepción —</option></select>
+        </div>
+        <div id="recepcionInfo" style="display:none;background:var(--cr);border-radius:8px;padding:12px;margin-bottom:10px;font-size:12px">
+          <div style="font-weight:600;color:var(--g);margin-bottom:6px" id="ri_nombre">—</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div><span style="color:var(--gris)">Kg recibidos</span><br><b id="ri_kg_rec">—</b></div>
+            <div><span style="color:var(--gris)">Kg rechazo</span><br><b id="ri_kg_rej" style="color:var(--rd)">—</b></div>
+            <div><span style="color:var(--gris)">% rechazo</span><br><b id="ri_pct" style="color:var(--rd)">—</b></div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--gris)" id="ri_calibres">—</div>
+        </div>
         <div class="fld"><label>Tipo de problema</label>
           <div style="margin-top:6px">
             <button class="prob-chip" data-prob="Rechazo por calidad" onclick="toggleChip(this)">🍎 Calidad</button>
@@ -701,8 +711,34 @@ async function poblarSelectsProduccion(){
   const allPeds=await lc.peds();
   const sel=document.getElementById('recp');
   if(sel)sel.innerHTML='<option value="">— Seleccionar pedido pendiente —</option>'+allPeds.filter(p=>p.estado!=='Recibido').map(p=>`<option value="${p.id}">${p.productor} · S${p.semana} · ${p.kilos}kg</option>`).join('');
+  // Reporte: cargar recepciones con rechazo > 0
+  const allRecs=await lc.recs();
   const selR=document.getElementById('rprod');
-  if(selR)selR.innerHTML='<option value="">— Seleccionar —</option>'+allPeds.map(p=>`<option value="${p.id}">${p.productor} · S${p.semana}</option>`).join('');
+  if(selR){
+    const recsConRechazo=allRecs.filter(r=>(r.rechazo||0)>0);
+    selR.innerHTML='<option value="">— Seleccionar recepción —</option>'+
+      recsConRechazo.map(r=>`<option value="${r.id}">${r.productor} · S${r.semana} · ${(r.pct_rec*100).toFixed(1)}% rechazo</option>`).join('');
+    if(!recsConRechazo.length)selR.innerHTML='<option value="">Sin recepciones con rechazo registradas</option>';
+  }
+}
+
+function cargarDatosRecepcion(){
+  const id=document.getElementById('rprod').value;
+  if(!id){document.getElementById('recepcionInfo').style.display='none';return;}
+  lc.recs().then(recs=>{
+    const r=recs.find(x=>x.id===id);
+    if(!r)return;
+    document.getElementById('recepcionInfo').style.display='block';
+    document.getElementById('ri_nombre').textContent=r.productor+' · Semana '+r.semana+' · '+r.fecha;
+    document.getElementById('ri_kg_rec').textContent=(r.k_rec||0).toFixed(1)+' kg';
+    document.getElementById('ri_kg_rej').textContent=(r.rechazo||0).toFixed(1)+' kg';
+    document.getElementById('ri_pct').textContent=((r.pct_rec||0)*100).toFixed(1)+'%';
+    // Calibres
+    const cals=[6,7,8,9,10,11,12,13,14].map(c=>r['cal_'+c]>0?`Cal${c}:${r['cal_'+c]}`:'').filter(Boolean).join(' · ');
+    document.getElementById('ri_calibres').textContent='Calibres: '+(cals||'No especificado');
+    // Pre-fill kg afectados
+    document.getElementById('rkg').value=(r.rechazo||0).toFixed(1);
+  });
 }
 
 let PA=null;
@@ -815,13 +851,12 @@ function actualizarPctFields(){
 
 async function generarMailReporte(){
   const nombre=document.getElementById('rnom').value;
-  const pedId=document.getElementById('rprod').value;
-  const prodMan=document.getElementById('rprodman').value;
-  const allPeds=await lc.peds();
-  const ped=allPeds.find(p=>p.id===pedId);
-  const productor=ped?ped.productor:prodMan||'—';
-  const semana=ped?`S${ped.semana}`:'';
-  const kg=document.getElementById('rkg').value;
+  const recId=document.getElementById('rprod').value;
+  const allRecs=await lc.recs();
+  const rec=allRecs.find(r=>r.id===recId);
+  const productor=rec?rec.productor:'—';
+  const semana=rec?`S${rec.semana}`:'';
+  const kg=document.getElementById('rkg').value||rec?.rechazo||0;
   const dest=document.getElementById('rdest').value;
   const desc=document.getElementById('rdesc').value;
   const hora=document.getElementById('rhora').value;
@@ -846,14 +881,14 @@ async function generarMailReporte(){
 
 async function waFotos(){
   const nombre=document.getElementById('rnom').value;
-  const pedId=document.getElementById('rprod').value;
-  const prodMan=document.getElementById('rprodman').value;
-  const allPeds=_peds||[];
-  const ped=allPeds.find(p=>p.id===pedId);
-  const productor=ped?ped.productor:prodMan||'—';
-  const semana=ped?`S${ped.semana}`:'';
-  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:' (% no especificado)');  });
-  const kg=document.getElementById('rkg').value;
+  const recId=document.getElementById('rprod').value;
+  const allRecs=_recs||[];
+  const rec=allRecs.find(r=>r.id===recId);
+  const productor=rec?rec.productor:'—';
+  const semana=rec?`S${rec.semana}`:'';
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:'(% no especificado)');});
+  const kg=document.getElementById('rkg').value||rec?.rechazo||0;
+  const hora=document.getElementById('rhora').value;
   const hora=document.getElementById('rhora').value;
   const fecha=new Date().toLocaleDateString('es-EC');
   const calibreRes=getCalibreResumen();
