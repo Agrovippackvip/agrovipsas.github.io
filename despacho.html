@@ -434,59 +434,10 @@ function renderPallets(){
       </div>
       <div class="pallet-body" id="pbody_${pi}">
         <div class="fld" style="margin-bottom:8px">
-          <label>Productor</label>
+          <label>Productor (de las recepciones cargadas)</label>
           <select onchange="updatePalletProd(${pi},this.value)" style="padding:6px 10px;font-size:12px;border:1px solid var(--bd);border-radius:6px">
             <option value="">— Seleccionar —</option>
-              <option value="Agrilosbajos">Agrilosbajos</option>
-              <option value="Agroecuasol">Agroecuasol</option>
-              <option value="Alfonso Quirola/Emconis">Alfonso Quirola/Emconis</option>
-              <option value="Angie Santander">Angie Santander</option>
-              <option value="Avifruit">Avifruit</option>
-              <option value="Belgica Garcia">Belgica Garcia</option>
-              <option value="Carlos Jhair Andrade">Carlos Jhair Andrade</option>
-              <option value="Ceusky/Edmundo">Ceusky/Edmundo</option>
-              <option value="Danny Zambrano">Danny Zambrano</option>
-              <option value="Darwin Alcivar">Darwin Alcivar</option>
-              <option value="Drasur">Drasur</option>
-              <option value="Emilio Chonglon/Zuely Trelles">Emilio Chonglon/Zuely Trelles</option>
-              <option value="Enrique Loayza/Edmundo">Enrique Loayza/Edmundo</option>
-              <option value="Ernesto Villamarin">Ernesto Villamarin</option>
-              <option value="Ferdinand Santana">Ferdinand Santana</option>
-              <option value="Ferdinand Santana #3">Ferdinand Santana #3</option>
-              <option value="Ferdinand Santana#1">Ferdinand Santana#1</option>
-              <option value="Ferdinand Santana#2">Ferdinand Santana#2</option>
-              <option value="Ferdinand Santana#4">Ferdinand Santana#4</option>
-              <option value="Fernando Pin La Fortuna">Fernando Pin La Fortuna</option>
-              <option value="Finca Esther/Edmundo">Finca Esther/Edmundo</option>
-              <option value="Fruexur">Fruexur</option>
-              <option value="Geovanni Zambrano">Geovanni Zambrano</option>
-              <option value="Gusalri/Edmundo">Gusalri/Edmundo</option>
-              <option value="Hernan Macias">Hernan Macias</option>
-              <option value="Jaime Naranjo/Sofarelsa">Jaime Naranjo/Sofarelsa</option>
-              <option value="Jakubowsky/Wated Alberto">Jakubowsky/Wated Alberto</option>
-              <option value="Javier Alban">Javier Alban</option>
-              <option value="Jhonny Zambrano/Zamuagro">Jhonny Zambrano/Zamuagro</option>
-              <option value="Jorge Bailon/Alexandra Bailon">Jorge Bailon/Alexandra Bailon</option>
-              <option value="Jorge Miño/MCFruits">Jorge Miño/MCFruits</option>
-              <option value="Juan Romero/Ecubiogeni">Juan Romero/Ecubiogeni</option>
-              <option value="Junior Gigler">Junior Gigler</option>
-              <option value="Kerly Mendoza/Terranovafruit">Kerly Mendoza/Terranovafruit</option>
-              <option value="Leticia Reyes/Agroindustrial La Felipa">Leticia Reyes/Agroindustrial La Felipa</option>
-              <option value="Luber Valencia">Luber Valencia</option>
-              <option value="Lukfruit">Lukfruit</option>
-              <option value="Manafruit">Manafruit</option>
-              <option value="Mao Lam">Mao Lam</option>
-              <option value="Marcos Intriago">Marcos Intriago</option>
-              <option value="Maria Augusta">Maria Augusta</option>
-              <option value="Mario Castro">Mario Castro</option>
-              <option value="Mario Salvador">Mario Salvador</option>
-              <option value="Mario Salvador Agroriobravo">Mario Salvador Agroriobravo</option>
-              <option value="Nixon Nagua">Nixon Nagua</option>
-              <option value="Nobis Company">Nobis Company</option>
-              <option value="Pacific Dragon Fruit">Pacific Dragon Fruit</option>
-              <option value="Ricardo Barcia">Ricardo Barcia</option>
-              <option value="Tierra Santa">Tierra Santa</option>
-              <option value="Tomas Sabol">Tomas Sabol</option>
+            ${recepciones_cargadas.map(r=>`<option value="${r.productor}" ${p.productor===r.productor?'selected':''}>${r.productor} (${r.k_neto||r.k_rec||0} kg)</option>`).join('')}
           </select>
         </div>
         <div class="pallet-head-row">
@@ -583,56 +534,7 @@ function renderAereoRows(){
     <div class="pallet-row">
       <select onchange="updateAereoP(${ri},this.value)" style="padding:5px;font-size:11px;border:1px solid var(--bd);border-radius:5px;width:100%">
         <option value="">— Productor —</option>
-              <option value="Agrilosbajos">Agrilosbajos</option>
-              <option value="Agroecuasol">Agroecuasol</option>
-              <option value="Alfonso Quirola/Emconis">Alfonso Quirola/Emconis</option>
-              <option value="Angie Santander">Angie Santander</option>
-              <option value="Avifruit">Avifruit</option>
-              <option value="Belgica Garcia">Belgica Garcia</option>
-              <option value="Carlos Jhair Andrade">Carlos Jhair Andrade</option>
-              <option value="Ceusky/Edmundo">Ceusky/Edmundo</option>
-              <option value="Danny Zambrano">Danny Zambrano</option>
-              <option value="Darwin Alcivar">Darwin Alcivar</option>
-              <option value="Drasur">Drasur</option>
-              <option value="Emilio Chonglon/Zuely Trelles">Emilio Chonglon/Zuely Trelles</option>
-              <option value="Enrique Loayza/Edmundo">Enrique Loayza/Edmundo</option>
-              <option value="Ernesto Villamarin">Ernesto Villamarin</option>
-              <option value="Ferdinand Santana">Ferdinand Santana</option>
-              <option value="Ferdinand Santana #3">Ferdinand Santana #3</option>
-              <option value="Ferdinand Santana#1">Ferdinand Santana#1</option>
-              <option value="Ferdinand Santana#2">Ferdinand Santana#2</option>
-              <option value="Ferdinand Santana#4">Ferdinand Santana#4</option>
-              <option value="Fernando Pin La Fortuna">Fernando Pin La Fortuna</option>
-              <option value="Finca Esther/Edmundo">Finca Esther/Edmundo</option>
-              <option value="Fruexur">Fruexur</option>
-              <option value="Geovanni Zambrano">Geovanni Zambrano</option>
-              <option value="Gusalri/Edmundo">Gusalri/Edmundo</option>
-              <option value="Hernan Macias">Hernan Macias</option>
-              <option value="Jaime Naranjo/Sofarelsa">Jaime Naranjo/Sofarelsa</option>
-              <option value="Jakubowsky/Wated Alberto">Jakubowsky/Wated Alberto</option>
-              <option value="Javier Alban">Javier Alban</option>
-              <option value="Jhonny Zambrano/Zamuagro">Jhonny Zambrano/Zamuagro</option>
-              <option value="Jorge Bailon/Alexandra Bailon">Jorge Bailon/Alexandra Bailon</option>
-              <option value="Jorge Miño/MCFruits">Jorge Miño/MCFruits</option>
-              <option value="Juan Romero/Ecubiogeni">Juan Romero/Ecubiogeni</option>
-              <option value="Junior Gigler">Junior Gigler</option>
-              <option value="Kerly Mendoza/Terranovafruit">Kerly Mendoza/Terranovafruit</option>
-              <option value="Leticia Reyes/Agroindustrial La Felipa">Leticia Reyes/Agroindustrial La Felipa</option>
-              <option value="Luber Valencia">Luber Valencia</option>
-              <option value="Lukfruit">Lukfruit</option>
-              <option value="Manafruit">Manafruit</option>
-              <option value="Mao Lam">Mao Lam</option>
-              <option value="Marcos Intriago">Marcos Intriago</option>
-              <option value="Maria Augusta">Maria Augusta</option>
-              <option value="Mario Castro">Mario Castro</option>
-              <option value="Mario Salvador">Mario Salvador</option>
-              <option value="Mario Salvador Agroriobravo">Mario Salvador Agroriobravo</option>
-              <option value="Nixon Nagua">Nixon Nagua</option>
-              <option value="Nobis Company">Nobis Company</option>
-              <option value="Pacific Dragon Fruit">Pacific Dragon Fruit</option>
-              <option value="Ricardo Barcia">Ricardo Barcia</option>
-              <option value="Tierra Santa">Tierra Santa</option>
-              <option value="Tomas Sabol">Tomas Sabol</option>
+        ${recepciones_cargadas.map(r=>`<option value="${r.productor}">${r.productor}</option>`).join("")}
       </select>
       ${CALS.map(c=>`<input type="number" min="0" step="1" placeholder="0" value="${r.cals[c]||''}" oninput="updateAereoC(${ri},${c},this.value)">`).join('')}
       <div style="font-weight:700;color:var(--g);text-align:center">${CALS.reduce((s,c)=>s+(r.cals[c]||0),0)}</div>
