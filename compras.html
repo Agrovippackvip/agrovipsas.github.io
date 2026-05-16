@@ -1755,7 +1755,7 @@ function getCalibreResumen(){
   const ped=allPedsCache.find(p=>p.id===pedId);
   const productor=ped?ped.productor:prodMan||'—';
   const semana=ped?`S${ped.semana}`:'';
-  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:' (% no especificado)');});
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:'(% no especificado)');});
   const kg=document.getElementById('rkg').value;
   const fecha=new Date().toLocaleDateString('es-EC');
   const hora=document.getElementById('rhora').value;
