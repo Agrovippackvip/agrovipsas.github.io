@@ -791,9 +791,21 @@ async function calcular(){
     supa_id:null,
     creado_por:USUARIO_ACTUAL?.nombre||'—'
   };
-  // Local UI copy with camelCase for display
-  ultimoCalculo={...cot,numCot,clienteNombre,valorFacturado,valorCobrado,costoTotal,margenReal,
-    precioMin,costoTotalCaja,pvProm,pFrutaProm,kgTotal,cajasTotal,utilidad,ncMonto,ncMotivo,margenObj};
+  // Local UI copy with both snake_case and camelCase for compatibility
+  ultimoCalculo={...cot,
+    numCot,clienteNombre,
+    valorCotizado:valorFacturado,valorCobrado,costoTotal,margenReal,
+    precioMin,costoTotalCaja,pvProm,pFrutaProm,kgTotal,cajasTotal,utilidad,
+    ncMonto,ncMotivo,margenObj,
+    // Also ensure snake_case matches
+    valor_cotizado:valorFacturado,
+    valor_cobrado:valorCobrado,
+    margen_real:margenReal,
+    cajas_total:cajasTotal,
+    pv_prom:pvProm,
+    kg_total:kgTotal,
+    pf_fruta_prom:pFrutaProm
+  };
 
   await lc.saveCots(cot);
   _cots=null;
@@ -1101,29 +1113,45 @@ async function renderCots(){
 
 function cotCard(c){
   const ecls={'Borrador':'bk','Enviada':'bb','Aprobada':'bg','Facturada':'bp','Rechazado':'br'}[c.estado]||'bk';
-  const scol=(c.margen_real||c.margenReal)>=(c.margen_obj||c.margenObj||15)?'#1A6B3C':(c.margen_real||c.margenReal)>=(c.margen_obj||c.margenObj||15)-4?'#D4A017':'#C0392B';
+  const mr=c.margen_real||c.margenReal||0;
+  const mobj=c.margen_obj||c.margenObj||15;
+  const scol=mr>=mobj?'#1A6B3C':mr>=mobj-4?'#D4A017':'#C0392B';
+  const numCot=c.num_cot||c.numCot||'—';
+  const cajasT=c.cajas_total||c.cajasTotal||0;
+  const valCot=c.valor_cotizado||c.valorCotizado||0;
+  const valCob=c.valor_cobrado||c.valorCobrado||0;
+  const costCaja=c.costo_total_caja||c.costoTotalCaja||0;
+  const util=c.utilidad||0;
+  const valFactR=c.valor_facturado_real||c.valorFacturadoReal||0;
+  const numFact=c.num_factura||c.numFactura||'—';
+  const cajasF=c.cajas_facturadas||c.cajasFacturadas||0;
+  const valCajaF=c.valor_por_caja_fact||c.valorPorCajaFact||0;
+  const ncTipo=c.nc_factura_tipo||c.ncFacturaTipo||'';
+  const ncMonto=c.nc_factura_monto||c.ncFacturaMonto||0;
+  const ncDet=c.nc_factura_detalle||c.ncFacturaDetalle||'';
+  const tipoPit=c.tipo_pitahaya||'';
   return`<div class="cot-card">
     <div class="cot-head">
       <div>
-        <div class="cot-title">${c.cliente} <span style="color:var(--gris);font-weight:400;font-size:12px">· ${c.numCot}</span></div>
-        <div class="cot-sub">${c.fecha} · ${c.tipo} · ${(c.cajas_total||c.cajasTotal||0).toLocaleString()} cajas · <span style="color:var(--g)">por ${c.creado_por||'—'}</span></div>
+        <div class="cot-title">${c.cliente} <span style="color:var(--gris);font-weight:400;font-size:12px">· ${numCot}</span></div>
+        <div class="cot-sub">${c.fecha} · ${c.tipo}${tipoPit?' · '+tipoPit:''} · ${cajasT.toLocaleString()} cajas · <span style="color:var(--g)">por ${c.creado_por||'—'}</span></div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <span class="badge ${ecls}">${c.estado}</span>
-        <span style="font-size:13px;font-weight:700;color:${scol}">${(c.margen_real||c.margenReal||0).toFixed(1)}%</span>
+        <span style="font-size:13px;font-weight:700;color:${scol}">${mr.toFixed(1)}%</span>
       </div>
     </div>
     <div class="cot-metrics">
-      <div class="cot-m"><div class="et">Valor cotizado</div><div class="nm hl">${f2(c.valor_cotizado||c.valorCotizado)}</div></div>
-      <div class="cot-m"><div class="et">Valor cobrado</div><div class="nm">${f2(c.valor_cobrado||c.valorCobrado)}</div></div>
-      <div class="cot-m"><div class="et">Costo CIF/caja</div><div class="nm">${f2(c.costo_total_caja||c.costoTotalCaja)}</div></div>
-      <div class="cot-m"><div class="et">Utilidad bruta</div><div class="nm hl">${f2(c.utilidad||0)}</div></div>
-      ${c.estado==='Facturada'&&c.valorFacturadoReal?`
-        <div class="cot-m"><div class="et">Facturado real</div><div class="nm hl">${f2(c.valorFacturadoReal)}</div></div>
-        <div class="cot-m"><div class="et">Cajas facturadas</div><div class="nm">${(c.cajasFacturadas||c.cajasTotal||0).toLocaleString()}</div></div>
-        <div class="cot-m"><div class="et">Valor/caja real</div><div class="nm hl">${c.valorPorCajaFact?'$'+c.valorPorCajaFact.toFixed(2):'—'}</div></div>
-        ${c.ncFacturaMonto>0?`<div class="cot-m" style="border-left:3px solid var(--am)"><div class="et">N/C ${c.ncFacturaTipo||''}</div><div class="nm" style="color:var(--rd)">-${f2(c.ncFacturaMonto)}</div>${c.ncFacturaDetalle?`<div style="font-size:10px;color:var(--gris)">${c.ncFacturaDetalle}</div>`:''}</div>`:''}
-        <div class="cot-m"><div class="et">N° Factura</div><div class="nm" style="font-size:12px">${c.numFactura||'—'}</div></div>
+      <div class="cot-m"><div class="et">Valor cotizado</div><div class="nm hl">${f2(valCot)}</div></div>
+      <div class="cot-m"><div class="et">Valor cobrado</div><div class="nm">${f2(valCob)}</div></div>
+      <div class="cot-m"><div class="et">Costo CIF/caja</div><div class="nm">${f2(costCaja)}</div></div>
+      <div class="cot-m"><div class="et">Utilidad bruta</div><div class="nm hl">${f2(util)}</div></div>
+      ${c.estado==='Facturada'&&valFactR?`
+        <div class="cot-m"><div class="et">Facturado real</div><div class="nm hl">${f2(valFactR)}</div></div>
+        <div class="cot-m"><div class="et">Cajas facturadas</div><div class="nm">${cajasF.toLocaleString()}</div></div>
+        <div class="cot-m"><div class="et">Valor/caja real</div><div class="nm hl">${valCajaF?'$'+valCajaF.toFixed(2):'—'}</div></div>
+        ${ncMonto>0?`<div class="cot-m" style="border-left:3px solid var(--am)"><div class="et">N/C ${ncTipo}</div><div class="nm" style="color:var(--rd)">-${f2(ncMonto)}</div>${ncDet?`<div style="font-size:10px;color:var(--gris)">${ncDet}</div>`:''}</div>`:''}
+        <div class="cot-m"><div class="et">N° Factura</div><div class="nm" style="font-size:12px">${numFact}</div></div>
       `:''}
     </div>
     ${c.notas?`<div style="font-size:12px;color:var(--gris);margin-bottom:10px;padding:8px 10px;background:var(--cr);border-radius:7px">${c.notas}</div>`:''}
