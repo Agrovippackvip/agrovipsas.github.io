@@ -325,7 +325,7 @@ async function autoGuardarBorrador(){
   const calTotals={};let totalCajas=0;
   CALS.forEach(c=>calTotals[c]=0);
   const asignacion=tipo==='aereo'?aereoRows:pallets;
-  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});});
+  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});};
   const datos={
     id:_borradorId||('borr'+Date.now()),
     tipo,documento:doc,
@@ -889,7 +889,7 @@ async function guardarDespacho(){
   const calTotals={};let totalCajas=0;
   CALS.forEach(c=>calTotals[c]=0);
   const asignacion=tipo==='aereo'?aereoRows:pallets;
-  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});});
+  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});};
   const desp={
     id:'d'+Date.now(),tipo,documento:doc,fecha,
     semana:parseInt(document.getElementById('dsemana').value)||0,
@@ -930,7 +930,12 @@ function waDespacho(){
   const tipoLabel={maritimo:'Maritimo',aereo:'Aereo',local:'Local'}[tipo]||tipo;
   let totalCajas=0;
   const asignacion=tipo==='aereo'?aereoRows:pallets;
-  const resumen=tipo==='aereo'?asignacion.map(function(r){let pc=0;CALS.forEach(function(c){pc+=(r.cals[c]||0);});totalCajas+=pc;return'- '+(r.productor||'Sin productor')+': '+pc+' cajas';}).join('\n');
+  var resumen;
+  if(tipo==='aereo'){
+    resumen=asignacion.map(function(r){let pc=0;CALS.forEach(function(c){pc+=(r.cals[c]||0);});totalCajas+=pc;return'- '+(r.productor||'Sin productor')+': '+pc+' cajas';}).join('\n');
+  } else {
+    resumen=pallets.map(function(p){let pc=0;p.rows.forEach(function(r){CALS.forEach(function(c){pc+=(r.cals[c]||0);});});totalCajas+=pc;return'Pallet '+p.num+' ('+p.rows.map(function(r){return r.productor||'—';}).join('+')+'):'+pc+' cajas';}).join('\n');
+  }
   const lineas=['*DESPACHO AGROVIP S.A.*','',tipoLabel,'Doc: '+doc,'Salida: '+fecha,'Cliente: '+cliente,'Ruta: '+naviera+' a '+destino,'','Total: '+totalCajas+' cajas '+(totalCajas*4.5).toFixed(1)+' kg','',resumen,'','Agrovip S.A.'];
   const msg=lineas.join('\n');
   window.open('https://wa.me/?text='+encodeURIComponent(msg));
