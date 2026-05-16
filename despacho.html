@@ -307,7 +307,7 @@ async function autoGuardarBorrador(){
   const calTotals={};let totalCajas=0;
   CALS.forEach(c=>calTotals[c]=0);
   const asignacion=tipo==='aereo'?aereoRows:pallets;
-  asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});
+  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});});
   const datos={
     id:_borradorId||('borr'+Date.now()),
     tipo,documento:doc,
@@ -515,23 +515,27 @@ function agregarRecepcionAPallet(recId){
 // PALLETS
 function agregarPallet(){
   const n=pallets.length+1;
-  pallets.push({id:'pal'+Date.now(),num:n,productor:'',cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}});
+  pallets.push({id:'pal'+Date.now(),num:n,rows:[{productor:'',cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}}]});
   renderPallets();
 }
 
 function renderPallets(){
   const cont=document.getElementById('palletsList');
   const gt=document.getElementById('grandTotals');
-  if(!pallets.length){cont.innerHTML='<div style="padding:20px;text-align:center;font-size:13px;color:var(--gris)">Agrega pallets o carga recepciones.</div>';gt.style.display='none';return;}
+  if(!pallets.length){
+    cont.innerHTML='<div style="padding:20px;text-align:center;font-size:13px;color:var(--gris)">Agrega pallets o carga recepciones.</div>';
+    gt.style.display='none';return;
+  }
   gt.style.display='';
   const cajasXPallet=parseFloat(document.getElementById('dcajas_pallet').value)||160;
   cont.innerHTML=pallets.map((p,pi)=>{
-    const totalCajas=CALS.reduce((s,c)=>s+(p.cals[c]||0),0);
+    const totalCajas=p.rows.reduce((s,r)=>s+CALS.reduce((ss,c)=>ss+(r.cals[c]||0),0),0);
     const pct=cajasXPallet>0?Math.round(totalCajas/cajasXPallet*100):0;
     const barColor=pct>=100?'#1A6B3C':pct>=80?'#D4A017':'#C0392B';
+    const prodNames=p.rows.filter(r=>r.productor).map(r=>r.productor).join(' + ')||'Sin productor';
     return`<div class="pallet-card">
       <div class="pallet-header" onclick="togglePallet(${pi})">
-        <span>Pallet ${String(p.num).padStart(2,'0')} · ${p.productor||'Sin productor'}</span>
+        <span>Pallet ${String(p.num).padStart(2,'0')} · ${prodNames}</span>
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:80px;height:8px;background:rgba(255,255,255,.3);border-radius:4px;overflow:hidden">
             <div style="height:100%;width:${Math.min(pct,100)}%;background:${barColor};border-radius:4px"></div>
@@ -541,83 +545,99 @@ function renderPallets(){
         </div>
       </div>
       <div class="pallet-body" id="pbody_${pi}">
-        <div class="fld" style="margin-bottom:8px">
-          <label>Productor (de las recepciones cargadas)</label>
-          <select id="psel_${pi}" onchange="updatePalletProd(${pi},this.value)" style="padding:6px 10px;font-size:12px;border:1px solid var(--bd);border-radius:6px">
-            <option value="">— Seleccionar —</option>
-          </select>
-        </div>
         <div class="pallet-head-row">
           <div style="text-align:left">PRODUCTOR</div>
           <div>C6</div><div>C7</div><div>C8</div><div>C9</div><div>C10</div><div>C11</div><div>C12</div><div>C13</div><div>C14</div>
           <div>CAJAS</div><div>KG</div><div></div>
         </div>
-        ${(()=>{const rec=recepciones_cargadas.find(r=>r.productor===p.productor);const stock=rec?CALS.map(c=>'<div style="font-size:9px;color:var(--am);text-align:center">/'+(rec["cal_"+c]||0)+'</div>').join(''):'';return rec?`<div class="pallet-row" style="opacity:.6"><div style="font-size:10px;color:var(--gris)">Stock</div>${stock}<div></div><div></div><div></div></div>`:'';})()}
-        <div class="pallet-row">
-          <div style="font-size:12px;font-weight:500;color:var(--ink)">${p.productor||'—'}</div>
-          ${CALS.map(c=>`<input type="number" min="0" step="1" placeholder="0" value="${p.cals[c]||''}" oninput="updatePalletCal(${pi},${c},this.value)">`).join('')}
-          <div style="font-weight:700;color:var(--g);text-align:center">${totalCajas}</div>
-          <div style="font-weight:700;color:var(--g);text-align:center">${(totalCajas*4.5).toFixed(1)}</div>
-          <div></div>
+        ${p.rows.map((row,ri)=>{
+          const rowCajas=CALS.reduce((s,c)=>s+(row.cals[c]||0),0);
+          const rec=recepciones_cargadas.find(r=>r.productor===row.productor);
+          return`<div class="pallet-row">
+            <select id="psel_${pi}_${ri}" onchange="updatePalletProd(${pi},${ri},this.value)" style="padding:4px 6px;font-size:11px;border:1px solid var(--bd);border-radius:5px;width:100%">
+              <option value="">— Productor —</option>
+            </select>
+            ${CALS.map(c=>{
+              const stock=rec?rec['cal_'+c]||0:999;
+              const yaOtros=pallets.reduce((s,pp,ppi)=>s+pp.rows.reduce((ss,rr,rri)=>ppi===pi&&rri===ri?ss:ss+(rr.cals[c]||0),0),0);
+              const max=Math.max(0,stock-yaOtros);
+              return`<input type="number" min="0" max="${rec?max:999}" step="1" placeholder="0" value="${row.cals[c]||''}" 
+                title="Stock: ${stock} · Disponible: ${max}"
+                oninput="updatePalletCal(${pi},${ri},${c},this.value)" 
+                style="padding:4px;font-size:11px;border:1px solid ${rec&&(row.cals[c]||0)>(max+(row.cals[c]||0))?'var(--rd)':'var(--bd)'};border-radius:4px;text-align:center">`;
+            }).join('')}
+            <div style="font-weight:700;color:var(--g);text-align:center;font-size:12px">${rowCajas}</div>
+            <div style="font-weight:700;color:var(--g);text-align:center;font-size:12px">${(rowCajas*4.5).toFixed(1)}</div>
+            <button class="bsm" onclick="eliminarFilaPallet(${pi},${ri})" style="font-size:10px">🗑</button>
+          </div>`;
+        }).join('')}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <button class="bs" style="font-size:11px" onclick="agregarFilaPallet(${pi})">+ Agregar productor</button>
+          ${pct>100?`<div style="font-size:12px;color:var(--rd);font-weight:600">⚠ Excede ${totalCajas-cajasXPallet} cajas</div>`:''}
+          ${cajasXPallet-totalCajas>0&&totalCajas>0?`<div style="font-size:12px;color:var(--am)">Faltan ${cajasXPallet-totalCajas} cajas</div>`:''}
         </div>
-        ${pct>100?`<div class="al rd" style="margin-top:6px">⚠ Excede el límite por ${totalCajas-cajasXPallet} cajas</div>`:''}
-        ${pct<100&&totalCajas>0?`<div class="al" style="margin-top:6px">⚠ Faltan ${cajasXPallet-totalCajas} cajas para completar el pallet</div>`:''}
       </div>
     </div>`;
   }).join('');
-  calcGrandTotals();
-  programarAutoGuardado();
-  // Populate producer selects with recepciones only
+  // Populate selects
   pallets.forEach((p,pi)=>{
-    const sel=document.getElementById('psel_'+pi);
-    if(!sel)return;
-    sel.innerHTML='<option value="">— Seleccionar —</option>'+
-      recepciones_cargadas.map(r=>`<option value="${r.productor}" ${p.productor===r.productor?'selected':''}>${r.productor} (${Math.round(r.k_neto||r.k_rec||0)} kg)</option>`).join('');
+    p.rows.forEach((row,ri)=>{
+      const sel=document.getElementById('psel_'+pi+'_'+ri);
+      if(!sel)return;
+      sel.innerHTML='<option value="">— Productor —</option>'+
+        recepciones_cargadas.map(r=>`<option value="${r.productor}" ${row.productor===r.productor?'selected':''}>${r.productor} (${Math.round(r.k_neto||r.k_rec||0)} kg)</option>`).join('');
+    });
   });
+  calcGrandTotals();
+}
+
+function agregarFilaPallet(pi){
+  pallets[pi].rows.push({productor:'',cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}});
+  renderPallets();
+}
+function eliminarFilaPallet(pi,ri){
+  if(pallets[pi].rows.length<=1){alert('El pallet necesita al menos un productor.');return;}
+  pallets[pi].rows.splice(ri,1);renderPallets();
 }
 
 function togglePallet(pi){
   const body=document.getElementById('pbody_'+pi);
   if(body)body.style.display=body.style.display==='none'?'block':'none';
 }
-function updatePalletProd(pi,val){pallets[pi].productor=val;renderPallets();}
-function updatePalletCal(pi,cal,val){
+function updatePalletProd(pi,ri,val){pallets[pi].rows[ri].productor=val;renderPallets();}
+function updatePalletCal(pi,ri,cal,val){
   const v=parseInt(val)||0;
-  // Validate against recepcion stock for this producer
-  const prod=pallets[pi].productor;
-  if(prod&&recepciones_cargadas.length){
-    const rec=recepciones_cargadas.find(r=>r.productor===prod);
-    if(rec){
-      const disponible=rec['cal_'+cal]||0;
-      // Sum already assigned in OTHER pallets
-      const yaAsignado=pallets.reduce(function(s,p,idx){return idx!==pi?s+(p.cals[cal]||0):s;},0);
-      const maxAsignable=disponible-yaAsignado;
-      if(v>maxAsignable){
-        const inp=document.querySelector('#pbody_'+pi+' input[oninput*="updatePalletCal('+pi+','+cal+'"]');
-        // Find input by searching
-        const allInps=document.querySelectorAll('#pbody_'+pi+' input[type=number]');
-        const calIdx=CALS.indexOf(cal);
-        if(allInps[calIdx])allInps[calIdx].value=maxAsignable;
-        pallets[pi].cals[cal]=maxAsignable;
-        if(v>0)alert('Solo hay '+disponible+' cajas Cal '+cal+' de '+prod+'. Ya asignadas en otros pallets: '+yaAsignado+'. Máximo disponible: '+maxAsignable);
-        calcGrandTotals();return;
-      }
+  const cajasXPallet=parseFloat(document.getElementById('dcajas_pallet').value)||160;
+  // Check stock from recepcion
+  const prod=pallets[pi].rows[ri].productor;
+  const rec=prod?recepciones_cargadas.find(r=>r.productor===prod):null;
+  if(rec){
+    const stock=rec['cal_'+cal]||0;
+    const yaOtros=pallets.reduce((s,pp,ppi)=>s+pp.rows.reduce((ss,rr,rri)=>
+      (ppi===pi&&rri===ri)?ss:ss+(rr.cals[cal]||0),0),0);
+    const maxDisp=Math.max(0,stock-yaOtros);
+    if(v>maxDisp){
+      alert('Stock insuficiente Cal '+cal+'. Disponible: '+maxDisp+' cajas de '+prod);
+      const inp=document.querySelectorAll('#pbody_'+pi+' .pallet-row')[ri]?.querySelectorAll('input')[CALS.indexOf(cal)];
+      if(inp)inp.value=maxDisp;
+      pallets[pi].rows[ri].cals[cal]=maxDisp;
+      calcGrandTotals();return;
     }
   }
-  pallets[pi].cals[cal]=v;
-  // Validate pallet total vs max
-  const cajasXPallet=parseFloat(document.getElementById('dcajas_pallet').value)||160;
-  const total=CALS.reduce(function(s,c){return s+(pallets[pi].cals[c]||0);},0);
+  pallets[pi].rows[ri].cals[cal]=v;
+  // Check pallet total
+  const total=pallets[pi].rows.reduce((s,r)=>s+CALS.reduce((ss,c)=>ss+(r.cals[c]||0),0),0);
   if(total>cajasXPallet){
-    pallets[pi].cals[cal]=v-(total-cajasXPallet);
-    const allInps=document.querySelectorAll('#pbody_'+pi+' input[type=number]');
-    const calIdx=CALS.indexOf(cal);
-    if(allInps[calIdx])allInps[calIdx].value=pallets[pi].cals[cal];
-    alert('Pallet completo. Máximo '+cajasXPallet+' cajas por pallet.');
+    const exceso=total-cajasXPallet;
+    pallets[pi].rows[ri].cals[cal]=Math.max(0,v-exceso);
+    const inp=document.querySelectorAll('#pbody_'+pi+' .pallet-row')[ri]?.querySelectorAll('input')[CALS.indexOf(cal)];
+    if(inp)inp.value=pallets[pi].rows[ri].cals[cal];
+    alert('Pallet lleno. Máximo '+cajasXPallet+' cajas. Exceso de '+exceso+' cajas.');
   }
   calcGrandTotals();
 }
-function eliminarPallet(pi){pallets.splice(pi,1);pallets.forEach((p,i)=>p.num=i+1);renderPallets();}
+
+function eliminarPallet(pi){if(!confirm('Eliminar pallet?'))return;pallets.splice(pi,1);pallets.forEach((p,i)=>p.num=i+1);renderPallets();}
 
 function calcGrandTotals(){
   const tipo=document.getElementById('dtipo').value;
@@ -629,7 +649,7 @@ function calcGrandTotals(){
     const att=document.getElementById('attotal');if(att)att.textContent=totalCajas;
     const atkg=document.getElementById('atkg');if(atkg)atkg.textContent=(totalCajas*4.5).toFixed(1);
   } else {
-    pallets.forEach(p=>{CALS.forEach(c=>{calTotals[c]+=(p.cals[c]||0);totalCajas+=(p.cals[c]||0);});});
+    pallets.forEach(p=>{p.rows.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});
     CALS.forEach(c=>{const el=document.getElementById('gt'+c);if(el)el.textContent=calTotals[c]||0;});
     const gtt=document.getElementById('gttotal');if(gtt)gtt.textContent=totalCajas.toLocaleString();
     const gtk=document.getElementById('gtkg');if(gtk)gtk.textContent=(totalCajas*4.5).toFixed(1);
@@ -661,12 +681,12 @@ function autoDistribuir(){
       while(cajasPendientes>0){
         if(!palletActual||cajasEnPallet>=cajasXPallet){
           if(pallets.length>=Math.ceil(cajasObj/cajasXPallet))return;
-          palletActual={id:'pal'+Date.now()+Math.random(),num:pallets.length+1,productor:rec.productor,cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}};
+          palletActual={id:'pal'+Date.now()+Math.random(),num:pallets.length+1,rows:[{productor:rec.productor,cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}}]};
           pallets.push(palletActual);cajasEnPallet=0;
         }
         const disponible=cajasXPallet-cajasEnPallet;
         const asignar=Math.min(cajasPendientes,disponible);
-        palletActual.cals[c]=(palletActual.cals[c]||0)+asignar;
+        palletActual.rows[0].cals[c]=(palletActual.rows[0].cals[c]||0)+asignar;
         cajasEnPallet+=asignar;cajasPendientes-=asignar;
       }
     });
@@ -782,7 +802,7 @@ async function guardarDespacho(){
   const calTotals={};let totalCajas=0;
   CALS.forEach(c=>calTotals[c]=0);
   const asignacion=tipo==='aereo'?aereoRows:pallets;
-  asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});
+  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});});
   const desp={
     id:'d'+Date.now(),tipo,documento:doc,fecha,
     semana:parseInt(document.getElementById('dsemana').value)||0,
@@ -823,7 +843,7 @@ function waDespacho(){
   const tipoLabel={maritimo:'Maritimo',aereo:'Aereo',local:'Local'}[tipo]||tipo;
   let totalCajas=0;
   const asignacion=tipo==='aereo'?aereoRows:pallets;
-  const resumen=asignacion.map(function(r){let pc=0;CALS.forEach(function(c){pc+=(r.cals[c]||0);});totalCajas+=pc;return'- '+(r.productor||'Sin productor')+': '+pc+' cajas';}).join('\n');
+  const resumen=tipo==='aereo'?asignacion.map(function(r){let pc=0;CALS.forEach(function(c){pc+=(r.cals[c]||0);});totalCajas+=pc;return'- '+(r.productor||'Sin productor')+': '+pc+' cajas';}).join('\n');
   const lineas=['*DESPACHO AGROVIP S.A.*','',tipoLabel,'Doc: '+doc,'Salida: '+fecha,'Cliente: '+cliente,'Ruta: '+naviera+' a '+destino,'','Total: '+totalCajas+' cajas '+(totalCajas*4.5).toFixed(1)+' kg','',resumen,'','Agrovip S.A.'];
   const msg=lineas.join('\n');
   window.open('https://wa.me/?text='+encodeURIComponent(msg));
