@@ -912,7 +912,10 @@ async function generarMailReporte(){
       destino:dest,descripcion:desc,hora,calibres:calibreRes
     });
     // Marcar recepcion como reportada
-    if(recId)await supaFetch('PATCH','recepciones?id=eq.'+recId,{reportado:true});
+    if(recId){
+      const patchResult=await supaFetch('PATCH','recepciones?id=eq.'+recId,{reportado:true});
+      _recs=null; // Reset cache so list updates
+    }
     _recs=null;
     await poblarSelectsProduccion();
     alert('Reporte enviado y guardado. Usa el boton de copiar para enviar las fotos por WhatsApp.');
