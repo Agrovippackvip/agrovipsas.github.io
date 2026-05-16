@@ -223,6 +223,12 @@ input,select,textarea,button{font-family:inherit}
       <div class="g2" style="margin-bottom:14px">
         <div class="card">
           <div class="card-t">Fruta — proveedores</div>
+          <div class="fld" style="margin-bottom:8px">
+            <label>Cargar productor del histórico</label>
+            <select id="prodHistSel" onchange="cargarProdHist()">
+              <option value="">— Seleccionar productor —</option>
+            </select>
+          </div>
           <div id="frutaRows">
             <div class="fr-row">
               <div><label>Proveedor</label><input type="text" class="fp" placeholder="Nombre"></div>
@@ -488,6 +494,7 @@ const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const BASE_URL='https://app.agrovipsas.com/cotizaciones.html';
 const WA_AGROVIP='+593995938213';
 let USUARIO_ACTUAL=null;
+const HIST_PRODS=["Agrilosbajos", "Agroecuasol", "Alfonso Quirola/Emconis", "Angie Santander", "Avifruit", "Belgica Garcia", "Carlos Jhair Andrade", "Ceusky/Edmundo", "Danny Zambrano", "Darwin Alcivar", "Drasur", "Emilio Chonglon/Zuely Trelles", "Enrique Loayza/Edmundo", "Ernesto Villamarin", "Ferdinand Santana", "Ferdinand Santana #3", "Ferdinand Santana#1", "Ferdinand Santana#2", "Ferdinand Santana#4", "Fernando Pin La Fortuna", "Finca Esther/Edmundo", "Fruexur", "Geovanni Zambrano", "Gusalri/Edmundo", "Hernan Macias", "Jaime Naranjo/Sofarelsa", "Jakubowsky/Wated Alberto", "Javier Alban", "Jhonny Zambrano/Zamuagro", "Jorge Bailon/Alexandra Bailon", "Jorge Mi\u00f1o/MCFruits", "Juan Romero/Ecubiogeni", "Junior Gigler", "Kerly Mendoza/Terranovafruit", "Leticia Reyes/Agroindustrial La Felipa", "Luber Valencia", "Lukfruit", "Manafruit", "Mao Lam", "Marcos Intriago", "Maria Augusta", "Mario Castro", "Mario Salvador", "Mario Salvador Agroriobravo", "Nixon Nagua", "Nobis Company", "Pacific Dragon Fruit", "Ricardo Barcia", "Tierra Santa", "Tomas Sabol"];
 
 // AUTH
 async function login(){
@@ -518,7 +525,7 @@ function logout(){
 function init(){
   const now=new Date();
   document.getElementById('hdrDate').textContent=now.toLocaleDateString('es-EC',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
-  poblClienteSel();updateStats();
+  poblClienteSel();updateStats();poblarProdHistSel();
   // Check if aprobacion page
   const params=new URLSearchParams(window.location.search);
   if(params.get('aprobar')){procesarAprobacion(params.get('aprobar'),params.get('rol'),params.get('token'));}
@@ -604,6 +611,30 @@ function actualizarUI(){
 }
 
 // FRUTA
+function poblarProdHistSel(){
+  const sel=document.getElementById('prodHistSel');
+  if(!sel||sel.options.length>1)return;
+  // HIST is available from compras - use same data if available, otherwise skip
+  HIST_PRODS.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
+}
+
+function cargarProdHist(){
+  const sel=document.getElementById('prodHistSel');
+  const nombre=sel.value;
+  if(!nombre)return;
+  // Find empty fp field or last one
+  const fps=document.querySelectorAll('#frutaRows .fp');
+  const lastFp=fps[fps.length-1];
+  if(lastFp&&!lastFp.value){lastFp.value=nombre;}
+  else{
+    // Add new row with this producer
+    addFruta();
+    const newFps=document.querySelectorAll('#frutaRows .fp');
+    newFps[newFps.length-1].value=nombre;
+  }
+  sel.value='';
+}
+
 function addFruta(){
   const d=document.createElement('div');d.className='fr-row';
   d.innerHTML='<div><label>Proveedor</label><input type="text" class="fp" placeholder="Nombre"></div><div><label>$/kg</label><input type="number" class="fpr" step="0.05" placeholder="0.00"></div><div><label>Kg</label><input type="number" class="fkg" step="0.5" placeholder="0"></div><div><label>Tipo</label><select class=\"ftp\" style=\"padding:6px 6px;font-size:11px;border:1px solid var(--bd);border-radius:7px;width:100%\"><option value=\"PB\">Pulpa Blanca</option><option value=\"PR\">Pulpa Roja</option><option value=\"GY\">Golden Yellow</option><option value=\"AM\">Amarilla</option></select></div><div><button class="btn-del" onclick="delFruta(this)">×</button></div>';
@@ -720,11 +751,43 @@ async function calcular(){
   document.getElementById('cotResNota').textContent=gap>=0?`Margen de maniobra de ${f2(gap)}/caja sobre el precio mínimo.`:`Necesitas subir ${f2(Math.abs(gap))}/caja para alcanzar el ${margenObj}% objetivo.`;
 
   const tipoPitahaya=document.getElementById('tipoPitahaya')?.value||'Pitahaya Roja Pulpa Blanca';
-  const cot={id:'cot_'+Date.now(),numCot,fecha,cliente:clienteNombre,tipo:tipoActual,tipo_pitahaya:tipoPitahaya,estado:'Borrador',
-    valorCotizado:valorFacturado,valorCobrado,costoTotal,margenReal,precioMin,costoTotalCaja,
-    pvProm,pFrutaProm,kgTotal,cajasTotal,utilidad,ncMonto,ncMotivo,notas,proveedores,
-    valor_facturado_real:null,num_factura:null,fecha_factura:null,margen_obj:margenObj,
-    semana:getSemana(),mes:getMes(),supa_id:null,creado_por:USUARIO_ACTUAL?.nombre||'—'};
+  const cot={
+    id:'cot_'+Date.now(),
+    num_cot:numCot,
+    fecha,
+    cliente:clienteNombre,
+    tipo:tipoActual,
+    tipo_pitahaya:tipoPitahaya,
+    estado:'Borrador',
+    valor_cotizado:valorFacturado,
+    valor_cobrado:valorCobrado,
+    costo_total:costoTotal,
+    margen_real:margenReal,
+    precio_min:precioMin,
+    costo_total_caja:costoTotalCaja,
+    pv_prom:pvProm,
+    pf_fruta_prom:pFrutaProm,
+    kg_total:kgTotal,
+    cajas_total:cajasTotal,
+    utilidad,
+    nc_monto:ncMonto,
+    nc_motivo:ncMotivo,
+    notas,
+    proveedores:JSON.stringify(proveedores),
+    valor_facturado_real:null,
+    num_factura:null,
+    fecha_factura:null,
+    margen_obj:margenObj,
+    semana:getSemana(),
+    mes:getMes(),
+    supa_id:null,
+    creado_por:USUARIO_ACTUAL?.nombre||'—',
+    // Keep local copies for UI
+    numCot,clienteNombre,valorFacturado,valorCobrado,costoTotal,margenReal,
+    precioMin,costoTotalCaja,pvProm,pFrutaProm,kgTotal,cajasTotal,utilidad,
+    ncMonto,ncMotivo,margenObj
+  };
+
   await lc.saveCots(cot);
   _cots=null;
   const allCots=await lc.cots();
