@@ -552,6 +552,7 @@ function renderPallets(){
           <div>C6</div><div>C7</div><div>C8</div><div>C9</div><div>C10</div><div>C11</div><div>C12</div><div>C13</div><div>C14</div>
           <div>CAJAS</div><div>KG</div><div></div>
         </div>
+        ${(()=>{const rec=recepciones_cargadas.find(r=>r.productor===p.productor);const stock=rec?CALS.map(c=>'<div style="font-size:9px;color:var(--am);text-align:center">/'+(rec["cal_"+c]||0)+'</div>').join(''):'';return rec?`<div class="pallet-row" style="opacity:.6"><div style="font-size:10px;color:var(--gris)">Stock</div>${stock}<div></div><div></div><div></div></div>`:'';})()}
         <div class="pallet-row">
           <div style="font-size:12px;font-weight:500;color:var(--ink)">${p.productor||'—'}</div>
           ${CALS.map(c=>`<input type="number" min="0" step="1" placeholder="0" value="${p.cals[c]||''}" oninput="updatePalletCal(${pi},${c},this.value)">`).join('')}
@@ -580,7 +581,42 @@ function togglePallet(pi){
   if(body)body.style.display=body.style.display==='none'?'block':'none';
 }
 function updatePalletProd(pi,val){pallets[pi].productor=val;renderPallets();}
-function updatePalletCal(pi,cal,val){pallets[pi].cals[cal]=parseInt(val)||0;calcGrandTotals();}
+function updatePalletCal(pi,cal,val){
+  const v=parseInt(val)||0;
+  // Validate against recepcion stock for this producer
+  const prod=pallets[pi].productor;
+  if(prod&&recepciones_cargadas.length){
+    const rec=recepciones_cargadas.find(r=>r.productor===prod);
+    if(rec){
+      const disponible=rec['cal_'+cal]||0;
+      // Sum already assigned in OTHER pallets
+      const yaAsignado=pallets.reduce(function(s,p,idx){return idx!==pi?s+(p.cals[cal]||0):s;},0);
+      const maxAsignable=disponible-yaAsignado;
+      if(v>maxAsignable){
+        const inp=document.querySelector('#pbody_'+pi+' input[oninput*="updatePalletCal('+pi+','+cal+'"]');
+        // Find input by searching
+        const allInps=document.querySelectorAll('#pbody_'+pi+' input[type=number]');
+        const calIdx=CALS.indexOf(cal);
+        if(allInps[calIdx])allInps[calIdx].value=maxAsignable;
+        pallets[pi].cals[cal]=maxAsignable;
+        if(v>0)alert('Solo hay '+disponible+' cajas Cal '+cal+' de '+prod+'. Ya asignadas en otros pallets: '+yaAsignado+'. Máximo disponible: '+maxAsignable);
+        calcGrandTotals();return;
+      }
+    }
+  }
+  pallets[pi].cals[cal]=v;
+  // Validate pallet total vs max
+  const cajasXPallet=parseFloat(document.getElementById('dcajas_pallet').value)||160;
+  const total=CALS.reduce(function(s,c){return s+(pallets[pi].cals[c]||0);},0);
+  if(total>cajasXPallet){
+    pallets[pi].cals[cal]=v-(total-cajasXPallet);
+    const allInps=document.querySelectorAll('#pbody_'+pi+' input[type=number]');
+    const calIdx=CALS.indexOf(cal);
+    if(allInps[calIdx])allInps[calIdx].value=pallets[pi].cals[cal];
+    alert('Pallet completo. Máximo '+cajasXPallet+' cajas por pallet.');
+  }
+  calcGrandTotals();
+}
 function eliminarPallet(pi){pallets.splice(pi,1);pallets.forEach((p,i)=>p.num=i+1);renderPallets();}
 
 function calcGrandTotals(){
