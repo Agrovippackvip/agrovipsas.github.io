@@ -781,17 +781,16 @@ async function calcular(){
     semana:getSemana(),
     mes:getMes(),
     supa_id:null,
-    creado_por:USUARIO_ACTUAL?.nombre||'—',
-    // Keep local copies for UI
-    numCot,clienteNombre,valorFacturado,valorCobrado,costoTotal,margenReal,
-    precioMin,costoTotalCaja,pvProm,pFrutaProm,kgTotal,cajasTotal,utilidad,
-    ncMonto,ncMotivo,margenObj
+    creado_por:USUARIO_ACTUAL?.nombre||'—'
   };
+  // Local UI copy with camelCase for display
+  ultimoCalculo={...cot,numCot,clienteNombre,valorFacturado,valorCobrado,costoTotal,margenReal,
+    precioMin,costoTotalCaja,pvProm,pFrutaProm,kgTotal,cajasTotal,utilidad,ncMonto,ncMotivo,margenObj};
 
   await lc.saveCots(cot);
   _cots=null;
   const allCots=await lc.cots();
-  ultimoCalculo=cot;cotCount++;
+  cotCount++;
   const nb=document.getElementById('cotBadgeNav');nb.style.display='';nb.textContent=allCots.length;
   document.getElementById('btnEnviarAprov').style.display='flex';
   document.getElementById('aprovPanel').style.display='none';
