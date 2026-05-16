@@ -684,25 +684,13 @@ function waDespacho(){
   const cliente=document.getElementById('dcliente').value||'—';
   const naviera=document.getElementById('dnaviera').value||'—';
   const destino=document.getElementById('ddestino').value||'—';
-  const tipoLabel={maritimo:'🚢 Marítimo',aereo:'✈️ Aéreo',local:'🚛 Local'}[tipo];
+  const tipoLabel={maritimo:'Maritimo',aereo:'Aereo',local:'Local'}[tipo]||tipo;
   let totalCajas=0;
   const asignacion=tipo==='aereo'?aereoRows:pallets;
-  const resumen=asignacion.map(r=>{let pc=0;CALS.forEach(c=>pc+=(r.cals[c]||0));totalCajas+=pc;return`• ${r.productor||'—'}: ${pc} cajas`;}).join('
-');
-  const msg=`*DESPACHO AGROVIP S.A.*
-
-${tipoLabel}
-📄 ${doc}
-📅 Salida: ${fecha}
-👤 Cliente: ${cliente}
-🚢 ${naviera} → ${destino}
-
-📦 *Total: ${totalCajas} cajas · ${(totalCajas*4.5).toFixed(1)} kg*
-
-${resumen}
-
-*Agrovip S.A. · PackVip*`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+  const resumen=asignacion.map(function(r){let pc=0;CALS.forEach(function(c){pc+=(r.cals[c]||0);});totalCajas+=pc;return'- '+(r.productor||'Sin productor')+': '+pc+' cajas';}).join('\n');
+  const lineas=['*DESPACHO AGROVIP S.A.*','',tipoLabel,'Doc: '+doc,'Salida: '+fecha,'Cliente: '+cliente,'Ruta: '+naviera+' a '+destino,'','Total: '+totalCajas+' cajas '+(totalCajas*4.5).toFixed(1)+' kg','',resumen,'','Agrovip S.A.'];
+  const msg=lineas.join('\n');
+  window.open('https://wa.me/?text='+encodeURIComponent(msg));
 }
 
 async function loadDesps(){
