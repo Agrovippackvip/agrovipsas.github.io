@@ -194,6 +194,10 @@ input,select,textarea,button{font-family:inherit}
             <div class="fld"><label>Margen objetivo (%)</label><input type="number" id="margenObj" value="15" step="0.5"></div>
             <div class="fld"><label>Gtos. Adm. prorrateo</label><input type="number" id="gastosAdm" value="0" step="100"></div>
           </div>
+          <div class="fr2">
+            <div class="fld"><label>Fecha estimada de despacho</label><input type="date" id="fechaDespacho"></div>
+            <div class="fld"><label>Semana de despacho</label><input type="number" id="semanaDespacho" placeholder="Ej: 21"></div>
+          </div>
           <div class="fld"><label>Notas</label><textarea id="cotNotas" placeholder="Condiciones especiales..."></textarea></div>
         </div>
         <div class="card">
@@ -541,6 +545,7 @@ const lc={
   saveCots: async (cot)=>{
     // Solo enviar columnas snake_case válidas de Supabase
     const allowed=['id','num_cot','fecha','cliente','tipo','tipo_pitahaya','estado',
+      'fecha_despacho','semana_despacho',
       'valor_cotizado','valor_cobrado','costo_total','margen_real','precio_min',
       'costo_total_caja','pv_prom','pf_fruta_prom','kg_total','cajas_total','utilidad',
       'nc_monto','nc_motivo','notas','proveedores','margen_obj','valor_facturado_real',
@@ -759,6 +764,8 @@ async function calcular(){
   document.getElementById('cotResNota').textContent=gap>=0?`Margen de maniobra de ${f2(gap)}/caja sobre el precio mínimo.`:`Necesitas subir ${f2(Math.abs(gap))}/caja para alcanzar el ${margenObj}% objetivo.`;
 
   const tipoPitahaya=document.getElementById('tipoPitahaya')?.value||'Pitahaya Roja Pulpa Blanca';
+  const fechaDespacho=document.getElementById('fechaDespacho')?.value||null;
+  const semanaDespacho=document.getElementById('semanaDespacho')?.value||null;
   const cot={
     id:'cot_'+Date.now(),
     num_cot:numCot,
@@ -766,6 +773,8 @@ async function calcular(){
     cliente:clienteNombre,
     tipo:tipoActual,
     tipo_pitahaya:tipoPitahaya,
+    fecha_despacho:fechaDespacho,
+    semana_despacho:semanaDespacho,
     estado:'Borrador',
     valor_cotizado:valorFacturado,
     valor_cobrado:valorCobrado,
@@ -941,8 +950,9 @@ async function procesarAprobacion(supaId,rol,token){
         <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Valor total</span><br><b style="color:#1A6B3C;font-size:16px">$${parseFloat(r.valor||0).toFixed(2)}</b></div>
         <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Tipo de fruta</span><br><b>${r.tipo_pitahaya||'Pitahaya'}</b></div>
         <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Cajas</span><br><b>${parseFloat(r.cajas_total||0).toLocaleString()}</b></div>
-        <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Margen</span><br><b>${parseFloat(r.margen_real||0).toFixed(1)}%</b></div>
         <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Precio prom./caja</span><br><b>$${parseFloat(r.pv_prom||0).toFixed(2)}</b></div>
+        ${r.fecha_despacho?`<div style="grid-column:1/-1"><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Fecha estimada de despacho</span><br><b style="color:#1A6B3C">📅 ${r.fecha_despacho}</b></div>`:''}
+
       </div>
     </div>`;
 
