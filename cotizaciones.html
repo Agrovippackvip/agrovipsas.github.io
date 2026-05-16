@@ -539,7 +539,15 @@ const lc={
     return _cots;
   },
   saveCots: async (cot)=>{
-    await supaFetch('POST','cotizaciones',cot);_cots=null;
+    // Solo enviar columnas snake_case válidas de Supabase
+    const allowed=['id','num_cot','fecha','cliente','tipo','tipo_pitahaya','estado',
+      'valor_cotizado','valor_cobrado','costo_total','margen_real','precio_min',
+      'costo_total_caja','pv_prom','pf_fruta_prom','kg_total','cajas_total','utilidad',
+      'nc_monto','nc_motivo','notas','proveedores','margen_obj','valor_facturado_real',
+      'num_factura','fecha_factura','cajas_facturadas','valor_por_caja_fact',
+      'nc_factura_tipo','nc_factura_monto','nc_factura_detalle','supa_id','semana','mes','creado_por'];
+    const clean=Object.fromEntries(Object.entries(cot).filter(([k])=>allowed.includes(k)));
+    await supaFetch('POST','cotizaciones',clean);_cots=null;
   },
   updateCot: async (id,data)=>{
     await supaFetch('PATCH',`cotizaciones?id=eq.${id}`,data);_cots=null;
