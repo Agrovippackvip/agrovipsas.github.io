@@ -889,7 +889,6 @@ async function waFotos(){
   const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:'(% no especificado)');});
   const kg=document.getElementById('rkg').value||rec?.rechazo||0;
   const hora=document.getElementById('rhora').value;
-  const hora=document.getElementById('rhora').value;
   const fecha=new Date().toLocaleDateString('es-EC');
   const calibreRes=getCalibreResumen();
   const fotosNecesarias=problemas.map(p=>`📷 ${p}:\n   ${fotosGuia[p]||'Foto del problema'}`).join('\n\n');
