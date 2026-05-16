@@ -18,7 +18,6 @@ input,select,textarea,button{font-family:inherit}
 .lb input:focus{border-color:var(--g)}
 .lbtn{width:100%;padding:12px;background:var(--g);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
 .lerr{color:var(--rd);font-size:12px;margin-top:8px;display:none}
-.urole{background:var(--cr);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:var(--gris);display:none}
 .app{display:none}
 .hdr{background:var(--g);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .hl{display:flex;align-items:center;gap:12px}
@@ -42,8 +41,8 @@ input,select,textarea,button{font-family:inherit}
 .fld{margin-bottom:10px}
 .fld label{display:block;font-size:11px;color:var(--gris);margin-bottom:4px}
 .fld input,.fld select,.fld textarea{width:100%;padding:8px 11px;font-size:13px;border:1px solid var(--bd);border-radius:7px;background:white;color:var(--ink);outline:none}
-.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--g)}
-.fld textarea{resize:vertical;min-height:60px}
+.fld input:focus,.fld select:focus{border-color:var(--g)}
+.fld textarea{resize:vertical;min-height:52px}
 .fr2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .bp{width:100%;padding:11px;background:var(--g);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px}
@@ -52,12 +51,12 @@ input,select,textarea,button{font-family:inherit}
 .bsm{padding:5px 10px;background:none;border:1px solid var(--bd);color:var(--gris);border-radius:6px;font-size:11px;cursor:pointer}
 .bsm:hover{border-color:var(--g);color:var(--g)}
 .bwa{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#25D366;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
-.bmail{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#1A6B3C;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;width:100%;justify-content:center}
+.bmail{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#1A6B3C;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;width:100%;justify-content:center}
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.bg{background:#D1FAE5;color:#065F46}.ba{background:#FEF3C7;color:#92400E}.br{background:#FEE2E2;color:#991B1B}.bb{background:#EFF6FF;color:#1E40AF}.bp2{background:#F3E8FF;color:#6B21A8}
+.bg{background:#D1FAE5;color:#065F46}.ba{background:#FEF3C7;color:#92400E}.br{background:#FEE2E2;color:#991B1B}.bb{background:#EFF6FF;color:#1E40AF}
 .sc{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
 .sc .et{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gris);margin-bottom:6px}
-.sc .nm{font-size:24px;font-weight:700;color:var(--ink)}.sc .nm.hl{color:var(--g)}.sc .nm.rd{color:var(--rd)}.sc .nm.am{color:var(--am)}
+.sc .nm{font-size:24px;font-weight:700;color:var(--ink)}.sc .nm.hl{color:var(--g)}.sc .nm.rd{color:var(--rd)}
 .pr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 1fr 80px;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--bd);font-size:12px}
 .pr:hover{background:var(--cr)}
 .pr.hdr2{background:var(--g);color:white;border-radius:8px 8px 0 0;font-weight:600;font-size:11px;padding:8px 12px}
@@ -83,14 +82,12 @@ input,select,textarea,button{font-family:inherit}
   <div class="lb">
     <div class="ll">AV</div>
     <div class="lt">Agrovip · Compras</div>
-    <div class="ls">Forecast, Producción & Transportistas</div>
-    <div class="urole" id="urole"></div>
+    <div class="ls">Forecast & Gestión de Proveedores</div>
     <input type="password" id="lp" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
     <button class="lbtn" onclick="login()">Ingresar</button>
     <div class="lerr" id="le">Contraseña incorrecta</div>
   </div>
 </div>
-
 <div class="app" id="aw">
   <div class="hdr">
     <div class="hl"><div class="hlogo">AV</div><div class="htitle">COMPRAS & FORECAST <span id="roleLabel">Agrovip · Ciclo jueves → miércoles</span></div></div>
@@ -114,9 +111,70 @@ input,select,textarea,button{font-family:inherit}
         <div>
           <div class="card">
             <div class="ct">🌿 Datos del pedido</div>
-            <div class="fld"><label>Productor (histórico)</label><select id="pp" onchange="chProd()"><option value="">— Seleccionar —</option></select></div>
+            <div class="fld"><label>Productor (histórico)</label>
+              <select id="pp" onchange="chProd()">
+                <option value="">— Seleccionar —</option>
+              <option value="Agrilosbajos">Agrilosbajos</option>
+              <option value="Agroecuasol">Agroecuasol</option>
+              <option value="Alfonso Quirola/Emconis">Alfonso Quirola/Emconis</option>
+              <option value="Angie Santander">Angie Santander</option>
+              <option value="Avifruit">Avifruit</option>
+              <option value="Belgica Garcia">Belgica Garcia</option>
+              <option value="Carlos Jhair Andrade">Carlos Jhair Andrade</option>
+              <option value="Ceusky/Edmundo">Ceusky/Edmundo</option>
+              <option value="Danny Zambrano">Danny Zambrano</option>
+              <option value="Darwin Alcivar">Darwin Alcivar</option>
+              <option value="Drasur">Drasur</option>
+              <option value="Emilio Chonglon/Zuely Trelles">Emilio Chonglon/Zuely Trelles</option>
+              <option value="Enrique Loayza/Edmundo">Enrique Loayza/Edmundo</option>
+              <option value="Ernesto Villamarin">Ernesto Villamarin</option>
+              <option value="Ferdinand Santana">Ferdinand Santana</option>
+              <option value="Ferdinand Santana #3">Ferdinand Santana #3</option>
+              <option value="Ferdinand Santana#1">Ferdinand Santana#1</option>
+              <option value="Ferdinand Santana#2">Ferdinand Santana#2</option>
+              <option value="Ferdinand Santana#4">Ferdinand Santana#4</option>
+              <option value="Fernando Pin La Fortuna">Fernando Pin La Fortuna</option>
+              <option value="Finca Esther/Edmundo">Finca Esther/Edmundo</option>
+              <option value="Fruexur">Fruexur</option>
+              <option value="Geovanni Zambrano">Geovanni Zambrano</option>
+              <option value="Gusalri/Edmundo">Gusalri/Edmundo</option>
+              <option value="Hernan Macias">Hernan Macias</option>
+              <option value="Jaime Naranjo/Sofarelsa">Jaime Naranjo/Sofarelsa</option>
+              <option value="Jakubowsky/Wated Alberto">Jakubowsky/Wated Alberto</option>
+              <option value="Javier Alban">Javier Alban</option>
+              <option value="Jhonny Zambrano/Zamuagro">Jhonny Zambrano/Zamuagro</option>
+              <option value="Jorge Bailon/Alexandra Bailon">Jorge Bailon/Alexandra Bailon</option>
+              <option value="Jorge Miño/MCFruits">Jorge Miño/MCFruits</option>
+              <option value="Juan Romero/Ecubiogeni">Juan Romero/Ecubiogeni</option>
+              <option value="Junior Gigler">Junior Gigler</option>
+              <option value="Kerly Mendoza/Terranovafruit">Kerly Mendoza/Terranovafruit</option>
+              <option value="Leticia Reyes/Agroindustrial La Felipa">Leticia Reyes/Agroindustrial La Felipa</option>
+              <option value="Luber Valencia">Luber Valencia</option>
+              <option value="Lukfruit">Lukfruit</option>
+              <option value="Manafruit">Manafruit</option>
+              <option value="Mao Lam">Mao Lam</option>
+              <option value="Marcos Intriago">Marcos Intriago</option>
+              <option value="Maria Augusta">Maria Augusta</option>
+              <option value="Mario Castro">Mario Castro</option>
+              <option value="Mario Salvador">Mario Salvador</option>
+              <option value="Mario Salvador Agroriobravo">Mario Salvador Agroriobravo</option>
+              <option value="Nixon Nagua">Nixon Nagua</option>
+              <option value="Nobis Company">Nobis Company</option>
+              <option value="Pacific Dragon Fruit">Pacific Dragon Fruit</option>
+              <option value="Ricardo Barcia">Ricardo Barcia</option>
+              <option value="Tierra Santa">Tierra Santa</option>
+              <option value="Tomas Sabol">Tomas Sabol</option>
+              </select>
+            </div>
             <div class="fld"><label>O nuevo productor</label><input type="text" id="ppn" placeholder="Nombre del productor"></div>
-            <div class="fld"><label>Tipo de fruta</label><select id="ptipofruta"><option value="Pitahaya Roja Pulpa Blanca">Pitahaya Roja Pulpa Blanca</option><option value="Pitahaya Roja Pulpa Roja">Pitahaya Roja Pulpa Roja</option><option value="Pitahaya Golden Yellow">Pitahaya Golden Yellow</option><option value="Pitahaya Amarilla">Pitahaya Amarilla</option></select></div>
+            <div class="fld"><label>Tipo de fruta</label>
+              <select id="ptipofruta">
+                <option value="Pitahaya Roja Pulpa Blanca">Pitahaya Roja Pulpa Blanca</option>
+                <option value="Pitahaya Roja Pulpa Roja">Pitahaya Roja Pulpa Roja</option>
+                <option value="Pitahaya Golden Yellow">Pitahaya Golden Yellow</option>
+                <option value="Pitahaya Amarilla">Pitahaya Amarilla</option>
+              </select>
+            </div>
             <div class="fr2">
               <div class="fld"><label>Semana #</label><input type="number" id="psem" placeholder="Ej: 20"></div>
               <div class="fld"><label>Precio pactado ($/kg)</label><input type="number" id="ppr" step="0.05" placeholder="0.00" oninput="calcP()"></div>
@@ -222,32 +280,28 @@ input,select,textarea,button{font-family:inherit}
         <div class="ct">🚛 Generar programación</div>
         <div class="fr2">
           <div class="fld"><label>Semana #</label><input type="number" id="tsem" onchange="cargarPedidosTransp()"></div>
-          <div class="fld"><label>Transportista principal</label>
+          <div class="fld"><label>Transportista</label>
             <select id="ttr">
+              <option value="Todos">Todos los transportistas</option>
               <option value="Transpemazato">Transpemazato</option>
               <option value="Alex Moran">Alex Moran</option>
               <option value="Darwin Transpemazato">Darwin Transpemazato</option>
-              <option value="Todos">Todos los transportistas</option>
+              <option value="Propio">Propio</option>
             </select>
           </div>
         </div>
         <button class="bp" style="margin-top:0" onclick="cargarPedidosTransp()">Cargar pedidos</button>
       </div>
       <div id="transpPanel" style="display:none">
-        <div class="card">
-          <div class="ct">📋 Ruta de la semana</div>
-          <div id="transpLista"></div>
-        </div>
+        <div class="card"><div class="ct">📋 Ruta de la semana</div><div id="transpLista"></div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
           <button class="bwa" onclick="waTransp()">📱 Enviar programación al transportista</button>
           <button class="bmail" onclick="mailTransp()" style="flex:1">📧 Enviar por email</button>
         </div>
       </div>
-
-      <!-- CONFIRMACIONES -->
       <div class="card" style="margin-top:14px">
         <div class="ct">✅ Links de confirmación</div>
-        <div style="font-size:12px;color:var(--gris);margin-bottom:12px">Genera links para que el transportista confirme retiro y la empacadora confirme llegada</div>
+        <div style="font-size:12px;color:var(--gris);margin-bottom:12px">Genera links para confirmar retiro y llegada</div>
         <div id="linksConfirmacion"><div style="font-size:13px;color:var(--gris)">Carga una semana primero.</div></div>
       </div>
     </div>
@@ -284,37 +338,66 @@ input,select,textarea,button{font-family:inherit}
             </div>
           </div>
           <div class="fld"><label>Observaciones generales</label><textarea id="recobs" placeholder="Calidad, color, estado de gavetas..."></textarea></div>
-
-          <!-- CALIBRES -->
           <div class="fld">
-            <label>Distribución por calibre (cajas por calibre)</label>
-            <div style="background:var(--cr);border-radius:8px;padding:12px;margin-top:4px">
-             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px">
-  <div style="text-align:center"><div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL 6</div><input type="number" id="cal_6" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center"></div>
-  <div style="text-align:center"><div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL 7</div><input type="number" id="cal_7" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center"></div>
-  <div style="text-align:center"><div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL 8</div><input type="number" id="cal_8" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center"></div>
-  <div style="text-align:center"><div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL 9</div><input type="number" id="cal_9" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center"></div>
-  <div style="text-align:center"><div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL 10</div><input type="number" id="cal_10" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center"></div>
-  <div style="text-align:center"><div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL 11</div><input type="number" id="cal_11" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center"></div>
-  <div style="text-align:center"><div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL 12</div><input type="number" id="cal_12" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center"></div>
-  <div style="text-align:center"><div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL 13</div><input type="number" id="cal_13" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center"></div>
-  <div style="text-align:center"><div style="font-size:10px;color:var(--gris);margin-bottom:3px;font-weight:600">CAL 14</div><input type="number" id="cal_14" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:100%;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:center"></div>
-</div>
-    <!-- REPORTE DE RECHAZO (Producción) -->
+            <label>Distribución por calibre (cajas)</label>
+            <div style="overflow-x:auto;margin-top:4px">
+              <table style="border-collapse:collapse;font-size:12px;width:100%">
+                <tr style="background:var(--g);color:white;text-align:center">
+                  <td style="padding:6px 8px">Cal 6</td><td style="padding:6px 8px">Cal 7</td><td style="padding:6px 8px">Cal 8</td><td style="padding:6px 8px">Cal 9</td><td style="padding:6px 8px">Cal 10</td><td style="padding:6px 8px">Cal 11</td><td style="padding:6px 8px">Cal 12</td><td style="padding:6px 8px">Cal 13</td><td style="padding:6px 8px">Cal 14</td><td style="padding:6px 8px;background:#065F46">Total</td><td style="padding:6px 8px;background:#065F46">Kg</td>
+                </tr>
+                <tr style="text-align:center;background:var(--cr)">
+                  <td style="padding:4px"><input type="number" id="cal_6" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:52px;padding:5px 3px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center"></td>
+                  <td style="padding:4px"><input type="number" id="cal_7" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:52px;padding:5px 3px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center"></td>
+                  <td style="padding:4px"><input type="number" id="cal_8" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:52px;padding:5px 3px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center"></td>
+                  <td style="padding:4px"><input type="number" id="cal_9" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:52px;padding:5px 3px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center"></td>
+                  <td style="padding:4px"><input type="number" id="cal_10" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:52px;padding:5px 3px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center"></td>
+                  <td style="padding:4px"><input type="number" id="cal_11" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:52px;padding:5px 3px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center"></td>
+                  <td style="padding:4px"><input type="number" id="cal_12" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:52px;padding:5px 3px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center"></td>
+                  <td style="padding:4px"><input type="number" id="cal_13" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:52px;padding:5px 3px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center"></td>
+                  <td style="padding:4px"><input type="number" id="cal_14" min="0" step="1" placeholder="0" oninput="calcCalibreTotales()" style="width:52px;padding:5px 3px;font-size:12px;border:1px solid var(--bd);border-radius:5px;text-align:center"></td>
+                  <td style="padding:4px;font-weight:700;color:var(--g)" id="cal_total_cajas">0</td>
+                  <td style="padding:4px;font-weight:700;color:var(--g)" id="cal_total_peso">0 kg</td>
+                </tr>
+              </table>
+              <div id="cal_diff_alert" style="display:none;margin-top:6px;font-size:12px;color:#C0392B;font-weight:600"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="bp" style="margin-top:0;flex:1" onclick="gRec()">💾 Registrar</button>
+            <button class="bwa" style="flex:1" onclick="waRec()">📱 Notificar productor</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct">📊 Resultado recepción</div>
+          <div class="rr"><span class="lb">Productor</span><span id="rrd">—</span></div>
+          <div class="rr"><span class="lb">Kilos negociados</span><span id="rrn">—</span></div>
+          <div class="rr"><span class="lb">Kilos recibidos</span><span id="rrr">—</span></div>
+          <div class="rr"><span class="lb">Diferencia</span><span id="rrdiff" style="font-weight:700">—</span></div>
+          <div class="rr"><span class="lb">% Rechazo</span><span id="rrprc">—</span></div>
+          <div class="rr"><span class="lb">% Fruta pequeña</span><span id="rrprp">—</span></div>
+          <div class="rr"><span class="lb">Valor neto a pagar</span><span id="rrval" style="font-weight:700;color:var(--g)">—</span></div>
+          <div class="rr"><span class="lb">Fecha tentativa pago</span><span id="rrfp" style="font-weight:600;color:var(--g)">—</span></div>
+          <div id="rrmul" style="display:none">
+            <div class="rr" style="color:var(--rd)"><span class="lb">Multa faltante</span><span id="rrm1">—</span></div>
+            <div class="rr" style="color:var(--rd)"><span class="lb">Multa rechazo exc.</span><span id="rrm2">—</span></div>
+          </div>
+          <div id="rral"></div>
+          <div id="alerta_rechazo_alto" style="display:none;margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTE -->
     <div class="tab" id="tab-reporte">
       <div class="sl">Reporte de rechazo — Producción</div>
       <div class="card">
         <div class="ct">📷 Reporte de problema</div>
         <div class="fld"><label>Tu nombre</label>
-          <select id="rnom">
-            <option value="Samary">Samary</option>
-            <option value="David">David</option>
-            <option value="Alejandro">Alejandro</option>
-          </select>
+          <select id="rnom"><option value="Samary">Samary</option><option value="David">David</option><option value="Alejandro">Alejandro</option></select>
         </div>
-        <div class="fld"><label>Productor / pedido</label><select id="rprod"><option value="">— Seleccionar —</option></select></div>
+        <div class="fld"><label>Pedido / productor</label><select id="rprod"><option value="">— Seleccionar —</option></select></div>
         <div class="fld"><label>O escribe el productor</label><input type="text" id="rprodman" placeholder="Nombre del productor"></div>
-        <div class="fld"><label>Tipo de problema (selecciona todos los que aplican)</label>
+        <div class="fld"><label>Tipo de problema</label>
           <div style="margin-top:6px">
             <button class="prob-chip" data-prob="Rechazo por calidad" onclick="toggleChip(this)">🍎 Calidad</button>
             <button class="prob-chip" data-prob="Rechazo por calibre" onclick="toggleChip(this)">📏 Calibre</button>
@@ -341,23 +424,18 @@ input,select,textarea,button{font-family:inherit}
             </select>
           </div>
         </div>
-        <div class="fld"><label>Descripción detallada del problema</label><textarea id="rdesc" placeholder="Describe el problema con detalle: color, textura, olor, porcentaje afectado..."></textarea></div>
+        <div class="fld"><label>Descripción detallada</label><textarea id="rdesc" placeholder="Color, textura, olor, porcentaje afectado..."></textarea></div>
         <div class="fld"><label>Hora del reporte</label><input type="time" id="rhora"></div>
       </div>
-
       <div class="card">
-        <div class="ct">📧 Generar email con reporte</div>
-        <div class="al b" style="margin-bottom:12px">
-          Al hacer clic se abrirá tu app de correo con el reporte pre-llenado. 
-          <b>Solo adjunta las fotos del problema y envía.</b>
-        </div>
+        <div class="ct">📧 Enviar reporte</div>
+        <div class="al b" style="margin-bottom:12px">Al hacer clic se envía el email automáticamente y se abre WhatsApp para las fotos.</div>
         <div style="background:var(--cr);border-radius:8px;padding:12px;font-size:12px;color:var(--gris);margin-bottom:12px">
-          <b>Fotos que debes adjuntar:</b><br>
-          <span id="fotosGuia">Selecciona los problemas arriba para ver qué fotos necesitas.</span>
+          <b>Fotos a adjuntar por WhatsApp:</b><br>
+          <span id="fotosGuiaText">Selecciona los problemas arriba para ver qué fotos necesitas.</span>
         </div>
         <button class="bmail" onclick="generarMailReporte()">📧 Enviar reporte por email a Lili, Daniel y Pablo</button>
         <button class="bwa" style="margin-top:8px;width:100%;justify-content:center" onclick="waFotos()">📱 Enviar fotos por WhatsApp</button>
-        <div style="margin-top:8px;font-size:11px;color:var(--gris);text-align:center">Email = reporte formal · WhatsApp = fotos de evidencia</div>
       </div>
     </div>
 
@@ -395,884 +473,54 @@ input,select,textarea,button{font-family:inherit}
         </table></div>
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
 const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0';
-let USUARIO_ACTUAL = null;
-const HIST={
-  "productores": [
-    {
-      "Productores": "Jorge Bailon/Alexandra Bailon",
-      "KilosTotales": 280593.52,
-      "KilosNetos": 243346.58,
-      "Entregas": 228,
-      "PrecioPromedio": 1.6092543859649124,
-      "PrecioMin": 0.2,
-      "PrecioMax": 5.2,
-      "RechazoKg": 38277.44,
-      "KilosParaPct": 280593.52,
-      "PctRechazoReal": 0.13641597995563118,
-      "Rendimiento": 0.867256592383174
-    },
-    {
-      "Productores": "Geovanni Zambrano",
-      "KilosTotales": 216691.74,
-      "KilosNetos": 187593.4,
-      "Entregas": 182,
-      "PrecioPromedio": 1.826813186813187,
-      "PrecioMin": 0.15,
-      "PrecioMax": 5.2,
-      "RechazoKg": 29098.34,
-      "KilosParaPct": 216691.74,
-      "PctRechazoReal": 0.13428449095475445,
-      "Rendimiento": 0.8657155090452455
-    },
-    {
-      "Productores": "Mao Lam",
-      "KilosTotales": 168524.9,
-      "KilosNetos": 168831.0,
-      "Entregas": 112,
-      "PrecioPromedio": 12.911339285714286,
-      "PrecioMin": 0.9,
-      "PrecioMax": 29.7,
-      "RechazoKg": -306.1,
-      "KilosParaPct": 168524.9,
-      "PctRechazoReal": -0.0018163488006816798,
-      "Rendimiento": 1.0018163488006817
-    },
-    {
-      "Productores": "Darwin Alcivar",
-      "KilosTotales": 146488.05,
-      "KilosNetos": 101176.05,
-      "Entregas": 293,
-      "PrecioPromedio": 2.4627303754266214,
-      "PrecioMin": 0.15,
-      "PrecioMax": 5.5,
-      "RechazoKg": 45312.0,
-      "KilosParaPct": 146488.05,
-      "PctRechazoReal": 0.30932215972565685,
-      "Rendimiento": 0.6906778402743433
-    },
-    {
-      "Productores": "Jorge Miño/MCFruits",
-      "KilosTotales": 130178.2,
-      "KilosNetos": 127485.0,
-      "Entregas": 48,
-      "PrecioPromedio": 7.634583333333333,
-      "PrecioMin": 0.3,
-      "PrecioMax": 23.85,
-      "RechazoKg": 2693.2,
-      "KilosParaPct": 130178.2,
-      "PctRechazoReal": 0.02068856383019584,
-      "Rendimiento": 0.9793114361698042
-    },
-    {
-      "Productores": "Manafruit",
-      "KilosTotales": 121047.23,
-      "KilosNetos": 103167.0,
-      "Entregas": 114,
-      "PrecioPromedio": 2.0396491228070177,
-      "PrecioMin": 0.2,
-      "PrecioMax": 5.1,
-      "RechazoKg": 17880.23,
-      "KilosParaPct": 121047.23,
-      "PctRechazoReal": 0.14771283902985635,
-      "Rendimiento": 0.8522871609701437
-    },
-    {
-      "Productores": "Emilio Chonglon/Zuely Trelles",
-      "KilosTotales": 114284.93,
-      "KilosNetos": 89687.43,
-      "Entregas": 84,
-      "PrecioPromedio": 1.4010714285714285,
-      "PrecioMin": 0.2,
-      "PrecioMax": 3.25,
-      "RechazoKg": 24597.5,
-      "KilosParaPct": 114284.93,
-      "PctRechazoReal": 0.21522960201314384,
-      "Rendimiento": 0.7847703979868562
-    },
-    {
-      "Productores": "Tomas Sabol",
-      "KilosTotales": 97596.2,
-      "KilosNetos": 83155.5,
-      "Entregas": 135,
-      "PrecioPromedio": 1.683037037037037,
-      "PrecioMin": 0.15,
-      "PrecioMax": 5.1,
-      "RechazoKg": 14440.7,
-      "KilosParaPct": 97596.2,
-      "PctRechazoReal": 0.14796375268709233,
-      "Rendimiento": 0.8520362473129077
-    },
-    {
-      "Productores": "Ferdinand Santana",
-      "KilosTotales": 87306.11,
-      "KilosNetos": 61717.5,
-      "Entregas": 49,
-      "PrecioPromedio": 2.2181632653061225,
-      "PrecioMin": 0.15,
-      "PrecioMax": 5.4,
-      "RechazoKg": 25588.61,
-      "KilosParaPct": 87306.11,
-      "PctRechazoReal": 0.29309071266604364,
-      "Rendimiento": 0.7069092873339563
-    },
-    {
-      "Productores": "Nixon Nagua",
-      "KilosTotales": 76504.95,
-      "KilosNetos": 57384.0,
-      "Entregas": 44,
-      "PrecioPromedio": 1.420909090909091,
-      "PrecioMin": 0.15,
-      "PrecioMax": 2.8,
-      "RechazoKg": 19120.95,
-      "KilosParaPct": 76504.95,
-      "PctRechazoReal": 0.24993088682497017,
-      "Rendimiento": 0.7500691131750299
-    },
-    {
-      "Productores": "Ricardo Barcia",
-      "KilosTotales": 72712.38,
-      "KilosNetos": 54689.05,
-      "Entregas": 165,
-      "PrecioPromedio": 2.127818181818182,
-      "PrecioMin": 0.2,
-      "PrecioMax": 5.3,
-      "RechazoKg": 18023.329999999998,
-      "KilosParaPct": 72712.38,
-      "PctRechazoReal": 0.24787154539570835,
-      "Rendimiento": 0.7521284546042916
-    },
-    {
-      "Productores": "Kerly Mendoza/Terranovafruit",
-      "KilosTotales": 58943.159999999996,
-      "KilosNetos": 48895.05,
-      "Entregas": 91,
-      "PrecioPromedio": 2.0615384615384613,
-      "PrecioMin": 0.3,
-      "PrecioMax": 5.1,
-      "RechazoKg": 10048.11,
-      "KilosParaPct": 58943.159999999996,
-      "PctRechazoReal": 0.17047117935312597,
-      "Rendimiento": 0.8295288206468742
-    },
-    {
-      "Productores": "Avifruit",
-      "KilosTotales": 57394.2,
-      "KilosNetos": 52083.0,
-      "Entregas": 90,
-      "PrecioPromedio": 2.461666666666667,
-      "PrecioMin": 0.2,
-      "PrecioMax": 5.3,
-      "RechazoKg": 5311.2,
-      "KilosParaPct": 57394.2,
-      "PctRechazoReal": 0.09253896735210178,
-      "Rendimiento": 0.9074610326478982
-    },
-    {
-      "Productores": "Maria Augusta",
-      "KilosTotales": 56279.99,
-      "KilosNetos": 47821.5,
-      "Entregas": 141,
-      "PrecioPromedio": 2.1395744680851063,
-      "PrecioMin": 0.15,
-      "PrecioMax": 5.1,
-      "RechazoKg": 8458.49,
-      "KilosParaPct": 56279.99,
-      "PctRechazoReal": 0.15029302599378572,
-      "Rendimiento": 0.8497069740062143
-    },
-    {
-      "Productores": "Ferdinand Santana#1",
-      "KilosTotales": 48416.2,
-      "KilosNetos": 37264.5,
-      "Entregas": 35,
-      "PrecioPromedio": 1.108,
-      "PrecioMin": 0.15,
-      "PrecioMax": 5.4,
-      "RechazoKg": 11151.7,
-      "KilosParaPct": 48416.2,
-      "PctRechazoReal": 0.23032993089090018,
-      "Rendimiento": 0.7696700691090999
-    },
-    {
-      "Productores": "Juan Romero/Ecubiogeni",
-      "KilosTotales": 44519.64,
-      "KilosNetos": 36759.28,
-      "Entregas": 27,
-      "PrecioPromedio": 1.0666666666666667,
-      "PrecioMin": 0.3,
-      "PrecioMax": 4.0,
-      "RechazoKg": 7760.360000000001,
-      "KilosParaPct": 44519.64,
-      "PctRechazoReal": 0.1743131795315506,
-      "Rendimiento": 0.8256868204684494
-    },
-    {
-      "Productores": "Jaime Naranjo/Sofarelsa",
-      "KilosTotales": 39175.63,
-      "KilosNetos": 34758.0,
-      "Entregas": 29,
-      "PrecioPromedio": 1.0517241379310345,
-      "PrecioMin": 0.5,
-      "PrecioMax": 1.8,
-      "RechazoKg": 4417.63,
-      "KilosParaPct": 39175.63,
-      "PctRechazoReal": 0.11276474685920815,
-      "Rendimiento": 0.8872352531407919
-    },
-    {
-      "Productores": "Angie Santander",
-      "KilosTotales": 36286.51,
-      "KilosNetos": 28233.0,
-      "Entregas": 75,
-      "PrecioPromedio": 1.2821333333333333,
-      "PrecioMin": 0.15,
-      "PrecioMax": 5.1,
-      "RechazoKg": 8053.51,
-      "KilosParaPct": 36286.51,
-      "PctRechazoReal": 0.22194225898274592,
-      "Rendimiento": 0.778057741017254
-    },
-    {
-      "Productores": "Ferdinand Santana#2",
-      "KilosTotales": 35986.8,
-      "KilosNetos": 24097.5,
-      "Entregas": 33,
-      "PrecioPromedio": 1.286060606060606,
-      "PrecioMin": 0.15,
-      "PrecioMax": 5.4,
-      "RechazoKg": 11889.3,
-      "KilosParaPct": 35986.8,
-      "PctRechazoReal": 0.3303794724732401,
-      "Rendimiento": 0.6696205275267597
-    },
-    {
-      "Productores": "Jakubowsky/Wated Alberto",
-      "KilosTotales": 34858.31,
-      "KilosNetos": 24640.38,
-      "Entregas": 74,
-      "PrecioPromedio": 1.227027027027027,
-      "PrecioMin": 0.2,
-      "PrecioMax": 5.2,
-      "RechazoKg": 10217.93,
-      "KilosParaPct": 34858.31,
-      "PctRechazoReal": 0.29312752109898615,
-      "Rendimiento": 0.7068724789010139
-    },
-    {
-      "Productores": "Agrilosbajos",
-      "KilosTotales": 34559.0,
-      "KilosNetos": 24718.5,
-      "Entregas": 10,
-      "PrecioPromedio": 1.4,
-      "PrecioMin": 0.8,
-      "PrecioMax": 1.9,
-      "RechazoKg": 9840.5,
-      "KilosParaPct": 34559.0,
-      "PctRechazoReal": 0.2847449289620649,
-      "Rendimiento": 0.7152550710379352
-    },
-    {
-      "Productores": "Jhonny Zambrano/Zamuagro",
-      "KilosTotales": 33279.36,
-      "KilosNetos": 25092.0,
-      "Entregas": 34,
-      "PrecioPromedio": 1.0999999999999999,
-      "PrecioMin": 0.15,
-      "PrecioMax": 2.8,
-      "RechazoKg": 8187.360000000001,
-      "KilosParaPct": 33279.36,
-      "PctRechazoReal": 0.24601915421450413,
-      "Rendimiento": 0.7539808457854958
-    },
-    {
-      "Productores": "Fernando Pin La Fortuna",
-      "KilosTotales": 31212.78,
-      "KilosNetos": 26644.5,
-      "Entregas": 38,
-      "PrecioPromedio": 2.3368421052631576,
-      "PrecioMin": 0.82,
-      "PrecioMax": 5.1,
-      "RechazoKg": 4568.28,
-      "KilosParaPct": 31212.78,
-      "PctRechazoReal": 0.14635927975656124,
-      "Rendimiento": 0.8536407202434387
-    },
-    {
-      "Productores": "Agroecuasol",
-      "KilosTotales": 26797.77,
-      "KilosNetos": 20872.3,
-      "Entregas": 32,
-      "PrecioPromedio": 2.159375,
-      "PrecioMin": 0.2,
-      "PrecioMax": 5.1,
-      "RechazoKg": 5925.47,
-      "KilosParaPct": 26797.77,
-      "PctRechazoReal": 0.2211180258655851,
-      "Rendimiento": 0.7788819741344148
-    },
-    {
-      "Productores": "Hernan Macias",
-      "KilosTotales": 25798.0,
-      "KilosNetos": 20628.0,
-      "Entregas": 30,
-      "PrecioPromedio": 1.5283333333333333,
-      "PrecioMin": 0.15,
-      "PrecioMax": 2.5,
-      "RechazoKg": 5170.0,
-      "KilosParaPct": 25798.0,
-      "PctRechazoReal": 0.20040313202573842,
-      "Rendimiento": 0.7995968679742615
-    },
-    {
-      "Productores": "Carlos Jhair Andrade",
-      "KilosTotales": 25235.82,
-      "KilosNetos": 17801.9,
-      "Entregas": 23,
-      "PrecioPromedio": 0.7630434782608696,
-      "PrecioMin": 0.15,
-      "PrecioMax": 3.0,
-      "RechazoKg": 7433.92,
-      "KilosParaPct": 25235.82,
-      "PctRechazoReal": 0.29457810366376047,
-      "Rendimiento": 0.7054218963362396
-    },
-    {
-      "Productores": "Finca Esther/Edmundo",
-      "KilosTotales": 25206.31,
-      "KilosNetos": 15437.65,
-      "Entregas": 25,
-      "PrecioPromedio": 0.8416,
-      "PrecioMin": 0.2,
-      "PrecioMax": 3.5,
-      "RechazoKg": 9768.66,
-      "KilosParaPct": 25206.31,
-      "PctRechazoReal": 0.38754819725695666,
-      "Rendimiento": 0.6124518027430432
-    },
-    {
-      "Productores": "Pacific Dragon Fruit",
-      "KilosTotales": 23775.98,
-      "KilosNetos": 10428.0,
-      "Entregas": 34,
-      "PrecioPromedio": 2.072058823529412,
-      "PrecioMin": 0.15,
-      "PrecioMax": 3.5,
-      "RechazoKg": 13347.98,
-      "KilosParaPct": 23775.98,
-      "PctRechazoReal": 0.5614060913577484,
-      "Rendimiento": 0.43859390864225156
-    },
-    {
-      "Productores": "Drasur",
-      "KilosTotales": 23625.63,
-      "KilosNetos": 12097.9,
-      "Entregas": 28,
-      "PrecioPromedio": 1.4414285714285715,
-      "PrecioMin": 0.3,
-      "PrecioMax": 5.2,
-      "RechazoKg": 11527.73,
-      "KilosParaPct": 23625.63,
-      "PctRechazoReal": 0.48793323183339443,
-      "Rendimiento": 0.5120667681666055
-    },
-    {
-      "Productores": "Belgica Garcia",
-      "KilosTotales": 22764.04,
-      "KilosNetos": 14520.5,
-      "Entregas": 114,
-      "PrecioPromedio": 3.1276315789473683,
-      "PrecioMin": 0.72,
-      "PrecioMax": 5.8,
-      "RechazoKg": 8243.54,
-      "KilosParaPct": 22764.04,
-      "PctRechazoReal": 0.36212992069948924,
-      "Rendimiento": 0.6378700793005108
-    },
-    {
-      "Productores": "Junior Gigler",
-      "KilosTotales": 22685.14,
-      "KilosNetos": 21244.5,
-      "Entregas": 40,
-      "PrecioPromedio": 2.228,
-      "PrecioMin": 0.6,
-      "PrecioMax": 5.5,
-      "RechazoKg": 1440.64,
-      "KilosParaPct": 22685.14,
-      "PctRechazoReal": 0.06350588975867022,
-      "Rendimiento": 0.9364941102413298
-    },
-    {
-      "Productores": "Mario Castro",
-      "KilosTotales": 22491.57,
-      "KilosNetos": 13878.0,
-      "Entregas": 28,
-      "PrecioPromedio": 1.1517857142857142,
-      "PrecioMin": 0.15,
-      "PrecioMax": 4.9,
-      "RechazoKg": 8613.57,
-      "KilosParaPct": 22491.57,
-      "PctRechazoReal": 0.3829688189841794,
-      "Rendimiento": 0.6170311810158206
-    },
-    {
-      "Productores": "Ernesto Villamarin",
-      "KilosTotales": 20554.05,
-      "KilosNetos": 13480.5,
-      "Entregas": 28,
-      "PrecioPromedio": 1.395,
-      "PrecioMin": 0.2,
-      "PrecioMax": 5.5,
-      "RechazoKg": 7073.55,
-      "KilosParaPct": 20554.05,
-      "PctRechazoReal": 0.3441438548607209,
-      "Rendimiento": 0.6558561451392791
-    },
-    {
-      "Productores": "Luber Valencia",
-      "KilosTotales": 19054.1,
-      "KilosNetos": 14197.5,
-      "Entregas": 13,
-      "PrecioPromedio": 1.3461538461538463,
-      "PrecioMin": 1.0,
-      "PrecioMax": 1.5,
-      "RechazoKg": 4856.599999999999,
-      "KilosParaPct": 19054.1,
-      "PctRechazoReal": 0.25488477545515137,
-      "Rendimiento": 0.7451152245448487
-    },
-    {
-      "Productores": "Mario Salvador",
-      "KilosTotales": 18249.0,
-      "KilosNetos": 15448.5,
-      "Entregas": 9,
-      "PrecioPromedio": 5.017888888888889,
-      "PrecioMin": 0.2,
-      "PrecioMax": 29.011,
-      "RechazoKg": 2800.5,
-      "KilosParaPct": 18249.0,
-      "PctRechazoReal": 0.15346046358704588,
-      "Rendimiento": 0.8465395364129541
-    },
-    {
-      "Productores": "Gusalri/Edmundo",
-      "KilosTotales": 18097.88,
-      "KilosNetos": 14202.0,
-      "Entregas": 5,
-      "PrecioPromedio": 0.48,
-      "PrecioMin": 0.45,
-      "PrecioMax": 0.5,
-      "RechazoKg": 3895.88,
-      "KilosParaPct": 18097.88,
-      "PctRechazoReal": 0.21526720256737253,
-      "Rendimiento": 0.7847327974326275
-    },
-    {
-      "Productores": "Ferdinand Santana #3",
-      "KilosTotales": 17837.2,
-      "KilosNetos": 13473.0,
-      "Entregas": 13,
-      "PrecioPromedio": 0.9846153846153847,
-      "PrecioMin": 0.15,
-      "PrecioMax": 2.2,
-      "RechazoKg": 4364.2,
-      "KilosParaPct": 17837.2,
-      "PctRechazoReal": 0.2446684457201803,
-      "Rendimiento": 0.7553315542798197
-    },
-    {
-      "Productores": "Fruexur",
-      "KilosTotales": 17354.2,
-      "KilosNetos": 11312.3,
-      "Entregas": 17,
-      "PrecioPromedio": 1.1458823529411766,
-      "PrecioMin": 0.3,
-      "PrecioMax": 5.1,
-      "RechazoKg": 6041.9,
-      "KilosParaPct": 17354.2,
-      "PctRechazoReal": 0.34815203236104225,
-      "Rendimiento": 0.6518479676389577
-    },
-    {
-      "Productores": "Mario Salvador Agroriobravo",
-      "KilosTotales": 17314.01,
-      "KilosNetos": 13905.0,
-      "Entregas": 33,
-      "PrecioPromedio": 4.981818181818182,
-      "PrecioMin": 1.3,
-      "PrecioMax": 5.8,
-      "RechazoKg": 3409.0099999999998,
-      "KilosParaPct": 17314.01,
-      "PctRechazoReal": 0.19689315184639491,
-      "Rendimiento": 0.8031068481536051
-    },
-    {
-      "Productores": "Enrique Loayza/Edmundo",
-      "KilosTotales": 17171.34,
-      "KilosNetos": 12258.0,
-      "Entregas": 25,
-      "PrecioPromedio": 1.99,
-      "PrecioMin": 0.45,
-      "PrecioMax": 3.5,
-      "RechazoKg": 4913.34,
-      "KilosParaPct": 17171.34,
-      "PctRechazoReal": 0.2861360848949471,
-      "Rendimiento": 0.713863915105053
-    },
-    {
-      "Productores": "Nobis Company",
-      "KilosTotales": 16515.3,
-      "KilosNetos": 10674.0,
-      "Entregas": 9,
-      "PrecioPromedio": 6.0055555555555555,
-      "PrecioMin": 0.7,
-      "PrecioMax": 16.5,
-      "RechazoKg": 5841.3,
-      "KilosParaPct": 16515.3,
-      "PctRechazoReal": 0.3536902145283465,
-      "Rendimiento": 0.6463097854716536
-    },
-    {
-      "Productores": "Lukfruit",
-      "KilosTotales": 16272.51,
-      "KilosNetos": 12184.56,
-      "Entregas": 25,
-      "PrecioPromedio": 0.408,
-      "PrecioMin": 0.2,
-      "PrecioMax": 0.8,
-      "RechazoKg": 4087.95,
-      "KilosParaPct": 16272.51,
-      "PctRechazoReal": 0.2512181587229014,
-      "Rendimiento": 0.7487818412770986
-    },
-    {
-      "Productores": "Alfonso Quirola/Emconis",
-      "KilosTotales": 15931.5,
-      "KilosNetos": 10520.0,
-      "Entregas": 16,
-      "PrecioPromedio": 1.34375,
-      "PrecioMin": 0.2,
-      "PrecioMax": 2.0,
-      "RechazoKg": 5411.5,
-      "KilosParaPct": 15931.5,
-      "PctRechazoReal": 0.3396729749238929,
-      "Rendimiento": 0.6603270250761071
-    },
-    {
-      "Productores": "Ceusky/Edmundo",
-      "KilosTotales": 15710.5,
-      "KilosNetos": 12739.5,
-      "Entregas": 6,
-      "PrecioPromedio": 0.20000000000000004,
-      "PrecioMin": 0.2,
-      "PrecioMax": 0.2,
-      "RechazoKg": 2971.0,
-      "KilosParaPct": 15710.5,
-      "PctRechazoReal": 0.18910919448776295,
-      "Rendimiento": 0.810890805512237
-    },
-    {
-      "Productores": "Ferdinand Santana#4",
-      "KilosTotales": 15352.5,
-      "KilosNetos": 12892.5,
-      "Entregas": 14,
-      "PrecioPromedio": 1.1857142857142857,
-      "PrecioMin": 0.15,
-      "PrecioMax": 2.2,
-      "RechazoKg": 2460.0,
-      "KilosParaPct": 15352.5,
-      "PctRechazoReal": 0.16023448949682462,
-      "Rendimiento": 0.8397655105031754
-    },
-    {
-      "Productores": "Danny Zambrano",
-      "KilosTotales": 14803.22,
-      "KilosNetos": 12285.0,
-      "Entregas": 77,
-      "PrecioPromedio": 1.3235064935064935,
-      "PrecioMin": 0.15,
-      "PrecioMax": 5.1,
-      "RechazoKg": 2518.2200000000003,
-      "KilosParaPct": 14803.22,
-      "PctRechazoReal": 0.17011298893078672,
-      "Rendimiento": 0.8298870110692134
-    },
-    {
-      "Productores": "Javier Alban",
-      "KilosTotales": 14338.26,
-      "KilosNetos": 13106.15,
-      "Entregas": 7,
-      "PrecioPromedio": 1.4285714285714286,
-      "PrecioMin": 0.4,
-      "PrecioMax": 4.0,
-      "RechazoKg": 1232.11,
-      "KilosParaPct": 14338.26,
-      "PctRechazoReal": 0.08593162629217213,
-      "Rendimiento": 0.9140683737078278
-    },
-    {
-      "Productores": "Leticia Reyes/Agroindustrial La Felipa",
-      "KilosTotales": 13242.5,
-      "KilosNetos": 12091.5,
-      "Entregas": 6,
-      "PrecioPromedio": 1.7583333333333335,
-      "PrecioMin": 1.6,
-      "PrecioMax": 1.85,
-      "RechazoKg": 1151.0,
-      "KilosParaPct": 13242.5,
-      "PctRechazoReal": 0.08691712289975458,
-      "Rendimiento": 0.9130828771002454
-    },
-    {
-      "Productores": "Tierra Santa",
-      "KilosTotales": 12798.14,
-      "KilosNetos": 11248.4,
-      "Entregas": 10,
-      "PrecioPromedio": 0.4,
-      "PrecioMin": 0.4,
-      "PrecioMax": 0.4,
-      "RechazoKg": 1549.74,
-      "KilosParaPct": 12798.14,
-      "PctRechazoReal": 0.12109103354081141,
-      "Rendimiento": 0.8789089664591886
-    },
-    {
-      "Productores": "Marcos Intriago",
-      "KilosTotales": 12772.45,
-      "KilosNetos": 10944.0,
-      "Entregas": 11,
-      "PrecioPromedio": 1.018181818181818,
-      "PrecioMin": 0.5,
-      "PrecioMax": 1.3,
-      "RechazoKg": 1828.45,
-      "KilosParaPct": 12772.45,
-      "PctRechazoReal": 0.14315577669123777,
-      "Rendimiento": 0.8568442233087622
-    }
-  ],
-  "semanas": [
-    {
-      "Semana": 1.0,
-      "PrecioPromedio": 1.268181818181818,
-      "KilosTotales": 11877.5,
-      "Entregas": 11
-    },
-    {
-      "Semana": 2.0,
-      "PrecioPromedio": 1.05625,
-      "KilosTotales": 10262.5,
-      "Entregas": 8
-    },
-    {
-      "Semana": 3.0,
-      "PrecioPromedio": 1.4375,
-      "KilosTotales": 18277.5,
-      "Entregas": 16
-    },
-    {
-      "Semana": 4.0,
-      "PrecioPromedio": 1.6041666666666667,
-      "KilosTotales": 15070.0,
-      "Entregas": 24
-    },
-    {
-      "Semana": 5.0,
-      "PrecioPromedio": 1.548360655737705,
-      "KilosTotales": 51687.5,
-      "Entregas": 61
-    },
-    {
-      "Semana": 6.0,
-      "PrecioPromedio": 2.068421052631579,
-      "KilosTotales": 20406.5,
-      "Entregas": 19
-    },
-    {
-      "Semana": 7.0,
-      "PrecioPromedio": 3.808333333333333,
-      "KilosTotales": 12054.0,
-      "Entregas": 12
-    },
-    {
-      "Semana": 8.0,
-      "PrecioPromedio": 1.8708333333333333,
-      "KilosTotales": 32547.5,
-      "Entregas": 24
-    },
-    {
-      "Semana": 9.0,
-      "PrecioPromedio": 2.4925925925925925,
-      "KilosTotales": 43255.0,
-      "Entregas": 27
-    },
-    {
-      "Semana": 10.0,
-      "PrecioPromedio": 1.7947368421052632,
-      "KilosTotales": 28164.5,
-      "Entregas": 38
-    },
-    {
-      "Semana": 11.0,
-      "PrecioPromedio": 2.1,
-      "KilosTotales": 1627.0,
-      "Entregas": 4
-    },
-    {
-      "Semana": 12.0,
-      "PrecioPromedio": 1.2,
-      "KilosTotales": 78.5,
-      "Entregas": 2
-    },
-    {
-      "Semana": 13.0,
-      "PrecioPromedio": 1.64,
-      "KilosTotales": 20581.5,
-      "Entregas": 35
-    },
-    {
-      "Semana": 14.0,
-      "PrecioPromedio": 2.1500000000000004,
-      "KilosTotales": 1775.5,
-      "Entregas": 4
-    },
-    {
-      "Semana": 15.0,
-      "PrecioPromedio": 2.492857142857143,
-      "KilosTotales": 7983.0,
-      "Entregas": 14
-    },
-    {
-      "Semana": 16.0,
-      "PrecioPromedio": 2.8428571428571425,
-      "KilosTotales": 1619.0,
-      "Entregas": 7
-    },
-    {
-      "Semana": 17.0,
-      "PrecioPromedio": 2.23265306122449,
-      "KilosTotales": 27909.0,
-      "Entregas": 49
-    },
-    {
-      "Semana": 18.0,
-      "PrecioPromedio": 2.525,
-      "KilosTotales": 1559.3,
-      "Entregas": 8
-    },
-    {
-      "Semana": 19.0,
-      "PrecioPromedio": 2.3333333333333335,
-      "KilosTotales": 419.0,
-      "Entregas": 3
-    },
-    {
-      "Semana": 53.0,
-      "PrecioPromedio": 0.5,
-      "KilosTotales": 4248.5,
-      "Entregas": 2
-    }
-  ]
-};
 const MAIL_LILI='lilibeth@agrovipsa.com';
 const MAIL_DANIEL='gerencia@agrovipsa.com';
 const MAIL_PABLO='gerencia@packvipsas.com';
+const MAIL_ALEJANDRO='gerencia@agrovipsa.com';
+const HIST={"productores": [{"Productores": "Jorge Bailon/Alexandra Bailon", "KilosTotales": 280593.52, "KilosNetos": 243346.58, "Entregas": 228, "PrecioPromedio": 1.6092543859649124, "PrecioMin": 0.2, "PrecioMax": 5.2, "RechazoKg": 38277.44, "KilosParaPct": 280593.52, "PctRechazoReal": 0.13641597995563118, "Rendimiento": 0.867256592383174}, {"Productores": "Geovanni Zambrano", "KilosTotales": 216691.74, "KilosNetos": 187593.4, "Entregas": 182, "PrecioPromedio": 1.826813186813187, "PrecioMin": 0.15, "PrecioMax": 5.2, "RechazoKg": 29098.34, "KilosParaPct": 216691.74, "PctRechazoReal": 0.13428449095475445, "Rendimiento": 0.8657155090452455}, {"Productores": "Mao Lam", "KilosTotales": 168524.9, "KilosNetos": 168831.0, "Entregas": 112, "PrecioPromedio": 12.911339285714286, "PrecioMin": 0.9, "PrecioMax": 29.7, "RechazoKg": -306.1, "KilosParaPct": 168524.9, "PctRechazoReal": -0.0018163488006816798, "Rendimiento": 1.0018163488006817}, {"Productores": "Darwin Alcivar", "KilosTotales": 146488.05, "KilosNetos": 101176.05, "Entregas": 293, "PrecioPromedio": 2.4627303754266214, "PrecioMin": 0.15, "PrecioMax": 5.5, "RechazoKg": 45312.0, "KilosParaPct": 146488.05, "PctRechazoReal": 0.30932215972565685, "Rendimiento": 0.6906778402743433}, {"Productores": "Jorge Mi\u00f1o/MCFruits", "KilosTotales": 130178.2, "KilosNetos": 127485.0, "Entregas": 48, "PrecioPromedio": 7.634583333333333, "PrecioMin": 0.3, "PrecioMax": 23.85, "RechazoKg": 2693.2, "KilosParaPct": 130178.2, "PctRechazoReal": 0.02068856383019584, "Rendimiento": 0.9793114361698042}, {"Productores": "Manafruit", "KilosTotales": 121047.23, "KilosNetos": 103167.0, "Entregas": 114, "PrecioPromedio": 2.0396491228070177, "PrecioMin": 0.2, "PrecioMax": 5.1, "RechazoKg": 17880.23, "KilosParaPct": 121047.23, "PctRechazoReal": 0.14771283902985635, "Rendimiento": 0.8522871609701437}, {"Productores": "Emilio Chonglon/Zuely Trelles", "KilosTotales": 114284.93, "KilosNetos": 89687.43, "Entregas": 84, "PrecioPromedio": 1.4010714285714285, "PrecioMin": 0.2, "PrecioMax": 3.25, "RechazoKg": 24597.5, "KilosParaPct": 114284.93, "PctRechazoReal": 0.21522960201314384, "Rendimiento": 0.7847703979868562}, {"Productores": "Tomas Sabol", "KilosTotales": 97596.2, "KilosNetos": 83155.5, "Entregas": 135, "PrecioPromedio": 1.683037037037037, "PrecioMin": 0.15, "PrecioMax": 5.1, "RechazoKg": 14440.7, "KilosParaPct": 97596.2, "PctRechazoReal": 0.14796375268709233, "Rendimiento": 0.8520362473129077}, {"Productores": "Ferdinand Santana", "KilosTotales": 87306.11, "KilosNetos": 61717.5, "Entregas": 49, "PrecioPromedio": 2.2181632653061225, "PrecioMin": 0.15, "PrecioMax": 5.4, "RechazoKg": 25588.61, "KilosParaPct": 87306.11, "PctRechazoReal": 0.29309071266604364, "Rendimiento": 0.7069092873339563}, {"Productores": "Nixon Nagua", "KilosTotales": 76504.95, "KilosNetos": 57384.0, "Entregas": 44, "PrecioPromedio": 1.420909090909091, "PrecioMin": 0.15, "PrecioMax": 2.8, "RechazoKg": 19120.95, "KilosParaPct": 76504.95, "PctRechazoReal": 0.24993088682497017, "Rendimiento": 0.7500691131750299}, {"Productores": "Ricardo Barcia", "KilosTotales": 72712.38, "KilosNetos": 54689.05, "Entregas": 165, "PrecioPromedio": 2.127818181818182, "PrecioMin": 0.2, "PrecioMax": 5.3, "RechazoKg": 18023.329999999998, "KilosParaPct": 72712.38, "PctRechazoReal": 0.24787154539570835, "Rendimiento": 0.7521284546042916}, {"Productores": "Kerly Mendoza/Terranovafruit", "KilosTotales": 58943.159999999996, "KilosNetos": 48895.05, "Entregas": 91, "PrecioPromedio": 2.0615384615384613, "PrecioMin": 0.3, "PrecioMax": 5.1, "RechazoKg": 10048.11, "KilosParaPct": 58943.159999999996, "PctRechazoReal": 0.17047117935312597, "Rendimiento": 0.8295288206468742}, {"Productores": "Avifruit", "KilosTotales": 57394.2, "KilosNetos": 52083.0, "Entregas": 90, "PrecioPromedio": 2.461666666666667, "PrecioMin": 0.2, "PrecioMax": 5.3, "RechazoKg": 5311.2, "KilosParaPct": 57394.2, "PctRechazoReal": 0.09253896735210178, "Rendimiento": 0.9074610326478982}, {"Productores": "Maria Augusta", "KilosTotales": 56279.99, "KilosNetos": 47821.5, "Entregas": 141, "PrecioPromedio": 2.1395744680851063, "PrecioMin": 0.15, "PrecioMax": 5.1, "RechazoKg": 8458.49, "KilosParaPct": 56279.99, "PctRechazoReal": 0.15029302599378572, "Rendimiento": 0.8497069740062143}, {"Productores": "Ferdinand Santana#1", "KilosTotales": 48416.2, "KilosNetos": 37264.5, "Entregas": 35, "PrecioPromedio": 1.108, "PrecioMin": 0.15, "PrecioMax": 5.4, "RechazoKg": 11151.7, "KilosParaPct": 48416.2, "PctRechazoReal": 0.23032993089090018, "Rendimiento": 0.7696700691090999}, {"Productores": "Juan Romero/Ecubiogeni", "KilosTotales": 44519.64, "KilosNetos": 36759.28, "Entregas": 27, "PrecioPromedio": 1.0666666666666667, "PrecioMin": 0.3, "PrecioMax": 4.0, "RechazoKg": 7760.360000000001, "KilosParaPct": 44519.64, "PctRechazoReal": 0.1743131795315506, "Rendimiento": 0.8256868204684494}, {"Productores": "Jaime Naranjo/Sofarelsa", "KilosTotales": 39175.63, "KilosNetos": 34758.0, "Entregas": 29, "PrecioPromedio": 1.0517241379310345, "PrecioMin": 0.5, "PrecioMax": 1.8, "RechazoKg": 4417.63, "KilosParaPct": 39175.63, "PctRechazoReal": 0.11276474685920815, "Rendimiento": 0.8872352531407919}, {"Productores": "Angie Santander", "KilosTotales": 36286.51, "KilosNetos": 28233.0, "Entregas": 75, "PrecioPromedio": 1.2821333333333333, "PrecioMin": 0.15, "PrecioMax": 5.1, "RechazoKg": 8053.51, "KilosParaPct": 36286.51, "PctRechazoReal": 0.22194225898274592, "Rendimiento": 0.778057741017254}, {"Productores": "Ferdinand Santana#2", "KilosTotales": 35986.8, "KilosNetos": 24097.5, "Entregas": 33, "PrecioPromedio": 1.286060606060606, "PrecioMin": 0.15, "PrecioMax": 5.4, "RechazoKg": 11889.3, "KilosParaPct": 35986.8, "PctRechazoReal": 0.3303794724732401, "Rendimiento": 0.6696205275267597}, {"Productores": "Jakubowsky/Wated Alberto", "KilosTotales": 34858.31, "KilosNetos": 24640.38, "Entregas": 74, "PrecioPromedio": 1.227027027027027, "PrecioMin": 0.2, "PrecioMax": 5.2, "RechazoKg": 10217.93, "KilosParaPct": 34858.31, "PctRechazoReal": 0.29312752109898615, "Rendimiento": 0.7068724789010139}, {"Productores": "Agrilosbajos", "KilosTotales": 34559.0, "KilosNetos": 24718.5, "Entregas": 10, "PrecioPromedio": 1.4, "PrecioMin": 0.8, "PrecioMax": 1.9, "RechazoKg": 9840.5, "KilosParaPct": 34559.0, "PctRechazoReal": 0.2847449289620649, "Rendimiento": 0.7152550710379352}, {"Productores": "Jhonny Zambrano/Zamuagro", "KilosTotales": 33279.36, "KilosNetos": 25092.0, "Entregas": 34, "PrecioPromedio": 1.0999999999999999, "PrecioMin": 0.15, "PrecioMax": 2.8, "RechazoKg": 8187.360000000001, "KilosParaPct": 33279.36, "PctRechazoReal": 0.24601915421450413, "Rendimiento": 0.7539808457854958}, {"Productores": "Fernando Pin La Fortuna", "KilosTotales": 31212.78, "KilosNetos": 26644.5, "Entregas": 38, "PrecioPromedio": 2.3368421052631576, "PrecioMin": 0.82, "PrecioMax": 5.1, "RechazoKg": 4568.28, "KilosParaPct": 31212.78, "PctRechazoReal": 0.14635927975656124, "Rendimiento": 0.8536407202434387}, {"Productores": "Agroecuasol", "KilosTotales": 26797.77, "KilosNetos": 20872.3, "Entregas": 32, "PrecioPromedio": 2.159375, "PrecioMin": 0.2, "PrecioMax": 5.1, "RechazoKg": 5925.47, "KilosParaPct": 26797.77, "PctRechazoReal": 0.2211180258655851, "Rendimiento": 0.7788819741344148}, {"Productores": "Hernan Macias", "KilosTotales": 25798.0, "KilosNetos": 20628.0, "Entregas": 30, "PrecioPromedio": 1.5283333333333333, "PrecioMin": 0.15, "PrecioMax": 2.5, "RechazoKg": 5170.0, "KilosParaPct": 25798.0, "PctRechazoReal": 0.20040313202573842, "Rendimiento": 0.7995968679742615}, {"Productores": "Carlos Jhair Andrade", "KilosTotales": 25235.82, "KilosNetos": 17801.9, "Entregas": 23, "PrecioPromedio": 0.7630434782608696, "PrecioMin": 0.15, "PrecioMax": 3.0, "RechazoKg": 7433.92, "KilosParaPct": 25235.82, "PctRechazoReal": 0.29457810366376047, "Rendimiento": 0.7054218963362396}, {"Productores": "Finca Esther/Edmundo", "KilosTotales": 25206.31, "KilosNetos": 15437.65, "Entregas": 25, "PrecioPromedio": 0.8416, "PrecioMin": 0.2, "PrecioMax": 3.5, "RechazoKg": 9768.66, "KilosParaPct": 25206.31, "PctRechazoReal": 0.38754819725695666, "Rendimiento": 0.6124518027430432}, {"Productores": "Pacific Dragon Fruit", "KilosTotales": 23775.98, "KilosNetos": 10428.0, "Entregas": 34, "PrecioPromedio": 2.072058823529412, "PrecioMin": 0.15, "PrecioMax": 3.5, "RechazoKg": 13347.98, "KilosParaPct": 23775.98, "PctRechazoReal": 0.5614060913577484, "Rendimiento": 0.43859390864225156}, {"Productores": "Drasur", "KilosTotales": 23625.63, "KilosNetos": 12097.9, "Entregas": 28, "PrecioPromedio": 1.4414285714285715, "PrecioMin": 0.3, "PrecioMax": 5.2, "RechazoKg": 11527.73, "KilosParaPct": 23625.63, "PctRechazoReal": 0.48793323183339443, "Rendimiento": 0.5120667681666055}, {"Productores": "Belgica Garcia", "KilosTotales": 22764.04, "KilosNetos": 14520.5, "Entregas": 114, "PrecioPromedio": 3.1276315789473683, "PrecioMin": 0.72, "PrecioMax": 5.8, "RechazoKg": 8243.54, "KilosParaPct": 22764.04, "PctRechazoReal": 0.36212992069948924, "Rendimiento": 0.6378700793005108}, {"Productores": "Junior Gigler", "KilosTotales": 22685.14, "KilosNetos": 21244.5, "Entregas": 40, "PrecioPromedio": 2.228, "PrecioMin": 0.6, "PrecioMax": 5.5, "RechazoKg": 1440.64, "KilosParaPct": 22685.14, "PctRechazoReal": 0.06350588975867022, "Rendimiento": 0.9364941102413298}, {"Productores": "Mario Castro", "KilosTotales": 22491.57, "KilosNetos": 13878.0, "Entregas": 28, "PrecioPromedio": 1.1517857142857142, "PrecioMin": 0.15, "PrecioMax": 4.9, "RechazoKg": 8613.57, "KilosParaPct": 22491.57, "PctRechazoReal": 0.3829688189841794, "Rendimiento": 0.6170311810158206}, {"Productores": "Ernesto Villamarin", "KilosTotales": 20554.05, "KilosNetos": 13480.5, "Entregas": 28, "PrecioPromedio": 1.395, "PrecioMin": 0.2, "PrecioMax": 5.5, "RechazoKg": 7073.55, "KilosParaPct": 20554.05, "PctRechazoReal": 0.3441438548607209, "Rendimiento": 0.6558561451392791}, {"Productores": "Luber Valencia", "KilosTotales": 19054.1, "KilosNetos": 14197.5, "Entregas": 13, "PrecioPromedio": 1.3461538461538463, "PrecioMin": 1.0, "PrecioMax": 1.5, "RechazoKg": 4856.599999999999, "KilosParaPct": 19054.1, "PctRechazoReal": 0.25488477545515137, "Rendimiento": 0.7451152245448487}, {"Productores": "Mario Salvador", "KilosTotales": 18249.0, "KilosNetos": 15448.5, "Entregas": 9, "PrecioPromedio": 5.017888888888889, "PrecioMin": 0.2, "PrecioMax": 29.011, "RechazoKg": 2800.5, "KilosParaPct": 18249.0, "PctRechazoReal": 0.15346046358704588, "Rendimiento": 0.8465395364129541}, {"Productores": "Gusalri/Edmundo", "KilosTotales": 18097.88, "KilosNetos": 14202.0, "Entregas": 5, "PrecioPromedio": 0.48, "PrecioMin": 0.45, "PrecioMax": 0.5, "RechazoKg": 3895.88, "KilosParaPct": 18097.88, "PctRechazoReal": 0.21526720256737253, "Rendimiento": 0.7847327974326275}, {"Productores": "Ferdinand Santana #3", "KilosTotales": 17837.2, "KilosNetos": 13473.0, "Entregas": 13, "PrecioPromedio": 0.9846153846153847, "PrecioMin": 0.15, "PrecioMax": 2.2, "RechazoKg": 4364.2, "KilosParaPct": 17837.2, "PctRechazoReal": 0.2446684457201803, "Rendimiento": 0.7553315542798197}, {"Productores": "Fruexur", "KilosTotales": 17354.2, "KilosNetos": 11312.3, "Entregas": 17, "PrecioPromedio": 1.1458823529411766, "PrecioMin": 0.3, "PrecioMax": 5.1, "RechazoKg": 6041.9, "KilosParaPct": 17354.2, "PctRechazoReal": 0.34815203236104225, "Rendimiento": 0.6518479676389577}, {"Productores": "Mario Salvador Agroriobravo", "KilosTotales": 17314.01, "KilosNetos": 13905.0, "Entregas": 33, "PrecioPromedio": 4.981818181818182, "PrecioMin": 1.3, "PrecioMax": 5.8, "RechazoKg": 3409.0099999999998, "KilosParaPct": 17314.01, "PctRechazoReal": 0.19689315184639491, "Rendimiento": 0.8031068481536051}, {"Productores": "Enrique Loayza/Edmundo", "KilosTotales": 17171.34, "KilosNetos": 12258.0, "Entregas": 25, "PrecioPromedio": 1.99, "PrecioMin": 0.45, "PrecioMax": 3.5, "RechazoKg": 4913.34, "KilosParaPct": 17171.34, "PctRechazoReal": 0.2861360848949471, "Rendimiento": 0.713863915105053}, {"Productores": "Nobis Company", "KilosTotales": 16515.3, "KilosNetos": 10674.0, "Entregas": 9, "PrecioPromedio": 6.0055555555555555, "PrecioMin": 0.7, "PrecioMax": 16.5, "RechazoKg": 5841.3, "KilosParaPct": 16515.3, "PctRechazoReal": 0.3536902145283465, "Rendimiento": 0.6463097854716536}, {"Productores": "Lukfruit", "KilosTotales": 16272.51, "KilosNetos": 12184.56, "Entregas": 25, "PrecioPromedio": 0.408, "PrecioMin": 0.2, "PrecioMax": 0.8, "RechazoKg": 4087.95, "KilosParaPct": 16272.51, "PctRechazoReal": 0.2512181587229014, "Rendimiento": 0.7487818412770986}, {"Productores": "Alfonso Quirola/Emconis", "KilosTotales": 15931.5, "KilosNetos": 10520.0, "Entregas": 16, "PrecioPromedio": 1.34375, "PrecioMin": 0.2, "PrecioMax": 2.0, "RechazoKg": 5411.5, "KilosParaPct": 15931.5, "PctRechazoReal": 0.3396729749238929, "Rendimiento": 0.6603270250761071}, {"Productores": "Ceusky/Edmundo", "KilosTotales": 15710.5, "KilosNetos": 12739.5, "Entregas": 6, "PrecioPromedio": 0.20000000000000004, "PrecioMin": 0.2, "PrecioMax": 0.2, "RechazoKg": 2971.0, "KilosParaPct": 15710.5, "PctRechazoReal": 0.18910919448776295, "Rendimiento": 0.810890805512237}, {"Productores": "Ferdinand Santana#4", "KilosTotales": 15352.5, "KilosNetos": 12892.5, "Entregas": 14, "PrecioPromedio": 1.1857142857142857, "PrecioMin": 0.15, "PrecioMax": 2.2, "RechazoKg": 2460.0, "KilosParaPct": 15352.5, "PctRechazoReal": 0.16023448949682462, "Rendimiento": 0.8397655105031754}, {"Productores": "Danny Zambrano", "KilosTotales": 14803.22, "KilosNetos": 12285.0, "Entregas": 77, "PrecioPromedio": 1.3235064935064935, "PrecioMin": 0.15, "PrecioMax": 5.1, "RechazoKg": 2518.2200000000003, "KilosParaPct": 14803.22, "PctRechazoReal": 0.17011298893078672, "Rendimiento": 0.8298870110692134}, {"Productores": "Javier Alban", "KilosTotales": 14338.26, "KilosNetos": 13106.15, "Entregas": 7, "PrecioPromedio": 1.4285714285714286, "PrecioMin": 0.4, "PrecioMax": 4.0, "RechazoKg": 1232.11, "KilosParaPct": 14338.26, "PctRechazoReal": 0.08593162629217213, "Rendimiento": 0.9140683737078278}, {"Productores": "Leticia Reyes/Agroindustrial La Felipa", "KilosTotales": 13242.5, "KilosNetos": 12091.5, "Entregas": 6, "PrecioPromedio": 1.7583333333333335, "PrecioMin": 1.6, "PrecioMax": 1.85, "RechazoKg": 1151.0, "KilosParaPct": 13242.5, "PctRechazoReal": 0.08691712289975458, "Rendimiento": 0.9130828771002454}, {"Productores": "Tierra Santa", "KilosTotales": 12798.14, "KilosNetos": 11248.4, "Entregas": 10, "PrecioPromedio": 0.4, "PrecioMin": 0.4, "PrecioMax": 0.4, "RechazoKg": 1549.74, "KilosParaPct": 12798.14, "PctRechazoReal": 0.12109103354081141, "Rendimiento": 0.8789089664591886}, {"Productores": "Marcos Intriago", "KilosTotales": 12772.45, "KilosNetos": 10944.0, "Entregas": 11, "PrecioPromedio": 1.018181818181818, "PrecioMin": 0.5, "PrecioMax": 1.3, "RechazoKg": 1828.45, "KilosParaPct": 12772.45, "PctRechazoReal": 0.14315577669123777, "Rendimiento": 0.8568442233087622}], "semanas": [{"Semana": 1.0, "PrecioPromedio": 1.268181818181818, "KilosTotales": 11877.5, "Entregas": 11}, {"Semana": 2.0, "PrecioPromedio": 1.05625, "KilosTotales": 10262.5, "Entregas": 8}, {"Semana": 3.0, "PrecioPromedio": 1.4375, "KilosTotales": 18277.5, "Entregas": 16}, {"Semana": 4.0, "PrecioPromedio": 1.6041666666666667, "KilosTotales": 15070.0, "Entregas": 24}, {"Semana": 5.0, "PrecioPromedio": 1.548360655737705, "KilosTotales": 51687.5, "Entregas": 61}, {"Semana": 6.0, "PrecioPromedio": 2.068421052631579, "KilosTotales": 20406.5, "Entregas": 19}, {"Semana": 7.0, "PrecioPromedio": 3.808333333333333, "KilosTotales": 12054.0, "Entregas": 12}, {"Semana": 8.0, "PrecioPromedio": 1.8708333333333333, "KilosTotales": 32547.5, "Entregas": 24}, {"Semana": 9.0, "PrecioPromedio": 2.4925925925925925, "KilosTotales": 43255.0, "Entregas": 27}, {"Semana": 10.0, "PrecioPromedio": 1.7947368421052632, "KilosTotales": 28164.5, "Entregas": 38}, {"Semana": 11.0, "PrecioPromedio": 2.1, "KilosTotales": 1627.0, "Entregas": 4}, {"Semana": 12.0, "PrecioPromedio": 1.2, "KilosTotales": 78.5, "Entregas": 2}, {"Semana": 13.0, "PrecioPromedio": 1.64, "KilosTotales": 20581.5, "Entregas": 35}, {"Semana": 14.0, "PrecioPromedio": 2.1500000000000004, "KilosTotales": 1775.5, "Entregas": 4}, {"Semana": 15.0, "PrecioPromedio": 2.492857142857143, "KilosTotales": 7983.0, "Entregas": 14}, {"Semana": 16.0, "PrecioPromedio": 2.8428571428571425, "KilosTotales": 1619.0, "Entregas": 7}, {"Semana": 17.0, "PrecioPromedio": 2.23265306122449, "KilosTotales": 27909.0, "Entregas": 49}, {"Semana": 18.0, "PrecioPromedio": 2.525, "KilosTotales": 1559.3, "Entregas": 8}, {"Semana": 19.0, "PrecioPromedio": 2.3333333333333335, "KilosTotales": 419.0, "Entregas": 3}, {"Semana": 53.0, "PrecioPromedio": 0.5, "KilosTotales": 4248.5, "Entregas": 2}]};
+let USUARIO_ACTUAL=null;
+let _peds=null,_recs=null;
 
 const f2=n=>{try{return'$'+parseFloat(n).toFixed(2);}catch{return'—';}};
 const fk=n=>{try{return'$'+Math.round(parseFloat(n)).toLocaleString();}catch{return'—';}};
 
-let ROLE='admin'; // admin | planta
+async function supaFetch(method,path,body){
+  const r=await fetch(SUPA_URL+'/rest/v1/'+path,{
+    method,headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':method==='POST'?'return=representation':''},
+    body:body?JSON.stringify(body):undefined
+  });
+  if(!r.ok){console.error('Supa:',await r.text());return null;}
+  return r.status===204?true:r.json();
+}
 
-// Cache local para sesión
-let _peds = null;
-let _recs = null;
-
-const lc = {
-  peds: async () => {
-    if(_peds === null){
-      const data = await supaFetch('GET', 'pedidos_compra?select=*&order=created_at.desc');
-      _peds = data || [];
-    }
-    return _peds;
-  },
-  sP: async (pedido) => {
-    // Upsert single pedido
-    const r = await supaFetch('POST', 'pedidos_compra', pedido);
-    _peds = null; // invalidate cache
-    return r;
-  },
-  delP: async (id) => {
-    await supaFetch('DELETE', `pedidos_compra?id=eq.${id}`);
-    _peds = null;
-  },
-  recs: async () => {
-    if(_recs === null){
-      const data = await supaFetch('GET', 'recepciones?select=*&order=created_at.desc');
-      _recs = data || [];
-    }
-    return _recs;
-  },
-  sR: async (rec) => {
-    await supaFetch('POST', 'recepciones', rec);
-    _recs = null;
-  },
+const lc={
+  peds:async()=>{if(_peds===null){const d=await supaFetch('GET','pedidos_compra?select=*&order=created_at.desc');_peds=d||[];}return _peds;},
+  sP:async(p)=>{await supaFetch('POST','pedidos_compra',p);_peds=null;},
+  delP:async(id)=>{await supaFetch('DELETE',`pedidos_compra?id=eq.${id}`);_peds=null;},
+  updP:async(id,data)=>{await supaFetch('PATCH',`pedidos_compra?id=eq.${id}`,data);_peds=null;},
+  recs:async()=>{if(_recs===null){const d=await supaFetch('GET','recepciones?select=*&order=created_at.desc');_recs=d||[];}return _recs;},
+  sR:async(r)=>{await supaFetch('POST','recepciones',r);_recs=null;},
 };
 
-async function supaFetch(method, path, body){
-  const r = await fetch(SUPA_URL+'/rest/v1/'+path, {
-    method,
-    headers:{
-      'Content-Type':'application/json',
-      'apikey':SUPA_KEY,
-      'Authorization':'Bearer '+SUPA_KEY,
-      'Prefer': method==='POST'?'return=representation':''
-    },
-    body: body ? JSON.stringify(body) : undefined
-  });
-  if(!r.ok){console.error('Supa error:', await r.text()); return null;}
-  return r.status===204 ? true : r.json();
-}
-
 async function login(){
-  const pw = document.getElementById('lp').value.trim();
-  if(!pw){document.getElementById('le').style.display='block';return;}
-  const data = await supaFetch('GET', `usuarios?clave=eq.${encodeURIComponent(pw)}&select=*`);
-  if(!data || !data.length){document.getElementById('le').style.display='block';document.getElementById('le').textContent='Contraseña incorrecta';return;}
-  USUARIO_ACTUAL = data[0];
-  ROLE = USUARIO_ACTUAL.rol === 'produccion' ? 'planta' : 'admin';
+  const pw=document.getElementById('lp').value.trim();
+  const data=await supaFetch('GET',`usuarios?clave=eq.${encodeURIComponent(pw)}&select=*`);
+  if(!data||!data.length){document.getElementById('le').style.display='block';return;}
+  USUARIO_ACTUAL=data[0];
+  const isPlanta=USUARIO_ACTUAL.rol==='produccion';
   document.getElementById('lw').style.display='none';
   document.getElementById('aw').style.display='block';
-  document.getElementById('roleLabel').textContent = USUARIO_ACTUAL.nombre + ' · ' + USUARIO_ACTUAL.rol;
-  configurarRol();
+  document.getElementById('roleLabel').textContent=USUARIO_ACTUAL.nombre+' · '+(isPlanta?'Producción':'Gerencia/Compras');
+  if(isPlanta){['pedido','semana','transportista','productores','historico'].forEach(t=>{const el=document.getElementById('nb-'+t);if(el)el.classList.add('hidden');});gt('recepcion');}
   init();
 }
-
-function configurarRol(){
-  if(ROLE==='planta'){
-    // Planta solo ve Recepción y Reporte
-    ['pedido','semana','transportista','productores','historico'].forEach(t=>{
-      document.getElementById('nb-'+t).classList.add('hidden');
-    });
-    document.getElementById('roleLabel').textContent='Producción PackVip';
-    gt('recepcion');
-  }
-}
-
-function logout(){
-  document.getElementById('lw').style.display='flex';
-  document.getElementById('aw').style.display='none';
-  document.getElementById('lp').value='';
-  ROLE='admin';
-  ['pedido','semana','transportista','productores','historico','recepcion','reporte'].forEach(t=>{
-    const el=document.getElementById('nb-'+t);
-    if(el)el.classList.remove('hidden');
-  });
-}
+function logout(){document.getElementById('lw').style.display='flex';document.getElementById('aw').style.display='none';document.getElementById('lp').value='';USUARIO_ACTUAL=null;_peds=null;_recs=null;}
 
 async function init(){
   const now=new Date();
@@ -1282,64 +530,36 @@ async function init(){
   if(document.getElementById('psem'))document.getElementById('psem').value=wk;
   if(document.getElementById('swn'))document.getElementById('swn').value=wk;
   if(document.getElementById('tsem'))document.getElementById('tsem').value=wk;
-  const sel=document.getElementById('pp');
-  if(sel)HIST.productores.map(p=>p.Productores).sort().forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
-  poblarSelectsProduccion();
-  rH();rProd();rSem();
+  rH();rProd();rSem();poblarSelectsProduccion();
 }
-
-async function poblarSelectsProduccion(){
-  const sel=document.getElementById('rprod');
-  if(!sel)return;
-  const peds=await lc.peds();
-  sel.innerHTML='<option value="">— Seleccionar pedido —</option>'+peds.map(p=>`<option value="${p.id}">${p.productor} · S${p.semana} · ${p.kilos}kg</option>`).join('');
-  const selRec=document.getElementById('recp');
-  if(selRec)selRec.innerHTML='<option value="">— Seleccionar pedido pendiente —</option>'+peds.filter(p=>p.estado!=='Recibido').map(p=>`<option value="${p.id}">${p.productor} · S${p.semana} · ${p.kilos}kg</option>`).join('');
-}
-
 
 function gt(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('show'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('show');
-  const nb=document.getElementById('nb-'+id);
-  if(nb)nb.classList.add('active');
-  if(id==='semana')rSem();
-  if(id==='recepcion')poblarSelectsProduccion();
+  const nb=document.getElementById('nb-'+id);if(nb)nb.classList.add('active');
+  if(id==='semana')rSem();if(id==='recepcion')poblarSelectsProduccion();
   if(id==='reporte')poblarSelectsProduccion();
-  if(id==='productores')rProd();
-  if(id==='historico')rH();
+  if(id==='productores')rProd();if(id==='historico')rH();
 }
 
-// FECHA DE PAGO
 function calcFechaPago(){
   const dia=document.getElementById('pdia').value;
   const tipo=document.getElementById('ptipoventa').value;
   const now=new Date();
-  const days={'Lunes':1,'Martes':2,'Miércoles':3,'Jueves':4,'Viernes':5,'Sábado':6,'Domingo':0};
+  const days={'Lunes':1,'Martes':2,'Miércoles':3,'Jueves':4,'Viernes':5};
   let fechaEntrega=new Date(now);
   const diaNum=days[dia]||3;
-  const hoy=now.getDay();
-  let diff=diaNum-hoy;
-  if(diff<0)diff+=7;
+  let diff=diaNum-now.getDay();if(diff<0)diff+=7;
   fechaEntrega.setDate(now.getDate()+diff);
-  let fechaPago=new Date(fechaEntrega);
-  let desc='';
+  let fechaPago=new Date(fechaEntrega),desc='';
   if(tipo==='maritimo'){
-    // 30 días desde el viernes siguiente
     let viernes=new Date(fechaEntrega);
-    let diasHastaViernes=5-viernes.getDay();
-    if(diasHastaViernes<0)diasHastaViernes+=7;
-    if(diasHastaViernes===0)diasHastaViernes=7;
-    viernes.setDate(viernes.getDate()+diasHastaViernes);
-    fechaPago=new Date(viernes);
-    fechaPago.setDate(viernes.getDate()+30);
+    let dfv=5-viernes.getDay();if(dfv<=0)dfv+=7;
+    viernes.setDate(viernes.getDate()+dfv);
+    fechaPago=new Date(viernes);fechaPago.setDate(viernes.getDate()+30);
     desc=`30 días desde el viernes ${viernes.toLocaleDateString('es-EC',{day:'2-digit',month:'short'})}`;
-  } else {
-    // Aéreo: 21 días desde 3 días después de entrega
-    fechaPago.setDate(fechaEntrega.getDate()+3+21);
-    desc=`21 días desde ${new Date(fechaEntrega.getTime()+3*86400000).toLocaleDateString('es-EC',{day:'2-digit',month:'short'})}`;
-  }
+  }else{fechaPago.setDate(fechaEntrega.getDate()+24);desc=`21 días desde ${new Date(fechaEntrega.getTime()+3*86400000).toLocaleDateString('es-EC',{day:'2-digit',month:'short'})}`; }
   const fpStr=fechaPago.toLocaleDateString('es-EC',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   document.getElementById('fpPanel').style.display='block';
   document.getElementById('fpVal').textContent=fpStr.charAt(0).toUpperCase()+fpStr.slice(1);
@@ -1354,9 +574,9 @@ function chProd(){
   if(!p){document.getElementById('hpPanel').style.display='none';return;}
   document.getElementById('hpPanel').style.display='block';
   document.getElementById('hpn').textContent=n;
-  const ms=HIST.semanas;const mx=Math.max(...ms.map(s=>s.PrecioPromedio));
+  const ms=HIST.semanas,mx=Math.max(...ms.map(s=>s.PrecioPromedio));
   document.getElementById('hpb').innerHTML=ms.map(s=>{const h=Math.max((s.PrecioPromedio/mx)*56,3);const c=s.PrecioPromedio>p.PrecioPromedio?'#C0392B':'#1A6B3C';return`<div style="flex:1;height:${h}px;background:${c};border-radius:3px 3px 0 0;min-height:3px" title="S${s.Semana}: $${s.PrecioPromedio.toFixed(3)}"></div>`;}).join('');
-  document.getElementById('hpl').textContent=`Histórico ${n}: $${p.PrecioPromedio.toFixed(3)}/kg · rojo=precio mercado sobre histórico`;
+  document.getElementById('hpl').textContent=`Histórico ${n}: $${p.PrecioPromedio.toFixed(3)}/kg`;
   calcP();
 }
 
@@ -1373,8 +593,8 @@ function calcP(){
   if(p){
     document.getElementById('rrh').innerHTML=`<span style="color:${p.PctRechazoReal>0.15?'var(--rd)':'var(--g)'}">${(p.PctRechazoReal*100).toFixed(1)}% hist.</span>`;
     document.getElementById('rph').textContent=`$${p.PrecioPromedio.toFixed(3)}/kg (min $${p.PrecioMin.toFixed(2)}-max $${p.PrecioMax.toFixed(2)})`;
-    if(pr>0){const d=((pr-p.PrecioPromedio)/p.PrecioPromedio)*100;if(d>10)al.innerHTML=`<div class="al rd">⚠ Precio ${d.toFixed(1)}% sobre histórico. Considera negociar.</div>`;else if(d<-10)al.innerHTML=`<div class="al g">✓ Precio ${Math.abs(d).toFixed(1)}% bajo histórico. Buen precio.</div>`;}
-  } else {document.getElementById('rrh').textContent='Nuevo productor';document.getElementById('rph').textContent='—';}
+    if(pr>0){const d=((pr-p.PrecioPromedio)/p.PrecioPromedio)*100;if(d>10)al.innerHTML=`<div class="al rd">⚠ Precio ${d.toFixed(1)}% sobre histórico.</div>`;else if(d<-10)al.innerHTML=`<div class="al g">✓ Precio ${Math.abs(d).toFixed(1)}% bajo histórico. Buen precio.</div>`;}
+  }else{document.getElementById('rrh').textContent='Nuevo productor';document.getElementById('rph').textContent='—';}
   calcFechaPago();
 }
 
@@ -1384,26 +604,7 @@ async function gP(){
   const kg=parseFloat(document.getElementById('pkg').value)||0;
   if(!n||!pr||!kg){alert('Completa productor, precio y kilos.');return;}
   const fp=calcFechaPago();
-  const p={
-    id:'p'+Date.now(),
-    semana:parseInt(document.getElementById('psem').value)||0,
-    productor:n,
-    tipo:document.getElementById('ptipofruta').value,
-    precio:pr,kilos:kg,
-    gavetas:parseFloat(document.getElementById('pgav').value)||0,
-    dia:document.getElementById('pdia').value,
-    tipoventa:document.getElementById('ptipoventa').value,
-    transporte:document.getElementById('ptr').value,
-    notas:document.getElementById('pnot').value.trim(),
-    maxp:parseFloat(document.getElementById('pmaxp').value)||10,
-    maxr:parseFloat(document.getElementById('pmaxr').value)||15,
-    mingav:parseFloat(document.getElementById('pmgav').value)||9,
-    valor:pr*kg,estado:'Pendiente',
-    fecha:new Date().toLocaleDateString('es-EC'),
-    fecha_pago:fp.fechaPago,
-    fecha_pago_desc:fp.desc,
-    creado_por:USUARIO_ACTUAL?.nombre||'—'
-  };
+  const p={id:'p'+Date.now(),semana:parseInt(document.getElementById('psem').value)||0,productor:n,tipo:document.getElementById('ptipofruta').value,precio:pr,kilos:kg,gavetas:parseFloat(document.getElementById('pgav').value)||0,dia:document.getElementById('pdia').value,tipoventa:document.getElementById('ptipoventa').value,transporte:document.getElementById('ptr').value,notas:document.getElementById('pnot').value.trim(),maxp:parseFloat(document.getElementById('pmaxp').value)||10,maxr:parseFloat(document.getElementById('pmaxr').value)||15,mingav:parseFloat(document.getElementById('pmgav').value)||9,valor:pr*kg,estado:'Pendiente',fecha:new Date().toLocaleDateString('es-EC'),fecha_pago:fp.fechaPago,fecha_pago_desc:fp.desc,creado_por:USUARIO_ACTUAL?.nombre||'—'};
   await lc.sP(p);
   alert(`✓ Pedido guardado — ${n} · ${kg}kg · $${pr.toFixed(3)}/kg\nFecha pago: ${fp.fechaPago}`);
 }
@@ -1419,75 +620,52 @@ async function waP(){
   const mxr=document.getElementById('pmaxr').value;
   const not=document.getElementById('pnot').value.trim();
   const fp=calcFechaPago();
-  const msg=`*CONFIRMACIÓN DE PEDIDO — AGROVIP S.A.*\n\n📅 Semana ${sem} · Entrega: ${dia}\n\n👤 Estimado ${n},\n\nConfirmamos el pedido de fruta:\n\n🌿 Tipo: ${document.getElementById('ptipofruta').value}\n⚖️ Kilos negociados: *${kg.toFixed(1)} kg*\n💰 Precio pactado: *$${pr.toFixed(3)}/kg*\n💵 Valor estimado: *${fk(pr*kg)}*\n\n📅 *Fecha tentativa de pago: ${fp.fechaPago}*\n(${fp.desc})\n\n📋 *Condiciones de calidad:*\n• Fruta pequeña (280-350g): máximo ${mxp}%\n• Rechazo máximo: ${mxr}%\n\n⚠️ *Multas por incumplimiento:*\n• Faltante → prorrateo costo de transporte\n• Rechazo mayor al límite → descuento en liquidación\n• Fruta pequeña fuera del límite → valor agregado o donación\n${not?'\n📝 Notas: '+not:''}\n\nConfirmar recepción de este mensaje.\n\n*Agrovip S.A. · PackVip*`;
+  const msg=`*CONFIRMACIÓN DE PEDIDO — AGROVIP S.A.*\n\n📅 Semana ${sem} · Entrega: ${dia}\n\n👤 Estimado ${n},\n\n🌿 Tipo: ${document.getElementById('ptipofruta').value}\n⚖️ Kilos negociados: *${kg.toFixed(1)} kg*\n💰 Precio pactado: *$${pr.toFixed(3)}/kg*\n💵 Valor estimado: *${fk(pr*kg)}*\n\n📅 *Fecha tentativa de pago: ${fp.fechaPago}*\n(${fp.desc})\n\n📋 *Condiciones:*\n• Fruta pequeña máximo ${mxp}%\n• Rechazo máximo ${mxr}%\n\n⚠️ *Multas:* Faltante → prorrateo flete · Rechazo mayor → descuento liquidación${not?'\n📝 '+not:''}\n\n*Agrovip S.A. · PackVip*`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
   await gP();
 }
 
-// SEMANA
 async function rSem(){
   const s=parseInt(document.getElementById('swn').value)||0;
   const allPeds=await lc.peds();
   const peds=allPeds.filter(p=>p.semana===s);
   document.getElementById('swp').textContent=peds.length;
-  const tk=peds.reduce((a,p)=>a+p.kilos,0);
-  const tv=peds.reduce((a,p)=>a+p.valor,0);
+  const tk=peds.reduce((a,p)=>a+(p.kilos||0),0);
+  const tv=peds.reduce((a,p)=>a+(p.valor||0),0);
   document.getElementById('swk').textContent=tk.toFixed(0)+' kg';
   document.getElementById('swv').textContent=fk(tv);
   document.getElementById('swc').textContent=(tk/17280).toFixed(1);
   document.getElementById('swna').value=tk.toFixed(0)+' kg';
   if(!peds.length){document.getElementById('swl').innerHTML=`<div style="padding:20px;text-align:center;font-size:13px;color:var(--gris)">Sin pedidos para semana ${s}.</div>`;}
-  else{document.getElementById('swl').innerHTML=peds.map(p=>`<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 60px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px"><div><b>${p.productor}</b><br><span style="font-size:11px;color:var(--gris)">${p.tipo} · ${p.dia} · ${p.transporte}</span></div><div>${p.kilos.toFixed(0)} kg</div><div>$${p.precio.toFixed(3)}/kg</div><div style="font-weight:600;color:var(--g)">${fk(p.valor)}</div><div style="font-size:11px;color:var(--g)">${p.fechaPago||'—'}</div><div><span class="badge ${p.estado==='Recibido'?'bg':'bb'}">${p.estado}</span></div><div><button class="bsm" onclick="dP('${p.id}')">🗑</button></div></div>`).join('');}
+  else{document.getElementById('swl').innerHTML=peds.map(p=>`<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 60px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px"><div><b>${p.productor}</b><br><span style="font-size:11px;color:var(--gris)">${p.tipo} · ${p.dia} · ${p.transporte}</span></div><div>${(p.kilos||0).toFixed(0)} kg</div><div>$${(p.precio||0).toFixed(3)}/kg</div><div style="font-weight:600;color:var(--g)">${fk(p.valor)}</div><div style="font-size:11px;color:var(--g)">${p.fecha_pago||'—'}</div><div><span class="badge ${p.estado==='Recibido'?'bg':'bb'}">${p.estado}</span></div><div><button class="bsm" onclick="dP('${p.id}')">🗑</button></div></div>`).join('');}
   rFC();
 }
 
-async function rFC(){
+function rFC(){
   const s=parseInt(document.getElementById('swn').value)||0;
-  const allPeds=await lc.peds();
-  const peds=allPeds.filter(p=>p.semana===s);
-  const tk=peds.reduce((a,p)=>a+p.kilos,0);
+  const peds=(_peds||[]).filter(p=>p.semana===s);
+  const tk=peds.reduce((a,p)=>a+(p.kilos||0),0);
   const fc=parseFloat(document.getElementById('swf').value)||0;
   const gap=tk-fc;
-  const ge=document.getElementById('swg');
-  ge.value=(gap>=0?'+':'')+gap.toFixed(0)+' kg';
-  ge.style.color=gap>=0?'#1A6B3C':gap>-2000?'#D4A017':'#C0392B';
+  const ge=document.getElementById('swg');ge.value=(gap>=0?'+':'')+gap.toFixed(0)+' kg';ge.style.color=gap>=0?'#1A6B3C':gap>-2000?'#D4A017':'#C0392B';
   if(fc>0){if(gap<-3000)document.getElementById('fca').innerHTML=`<div class="al rd">⚠ Faltante crítico de ${Math.abs(gap).toFixed(0)} kg.</div>`;else if(gap<0)document.getElementById('fca').innerHTML=`<div class="al">⚠ Faltante de ${Math.abs(gap).toFixed(0)} kg.</div>`;else document.getElementById('fca').innerHTML=`<div class="al g">✓ Forecast cubierto.</div>`;}
   else document.getElementById('fca').innerHTML='';
 }
 
 async function dP(id){if(!confirm('¿Eliminar pedido?'))return;await lc.delP(id);rSem();}
 
-// TRANSPORTISTA
 async function cargarPedidosTransp(){
   const s=parseInt(document.getElementById('tsem').value)||0;
   const tr=document.getElementById('ttr').value;
   const allPeds=await lc.peds();
   let peds=allPeds.filter(p=>p.semana===s);
-  if(tr!=='Todos')peds=peds.filter(p=>p.transporte===tr||tr==='Todos');
+  if(tr!=='Todos')peds=peds.filter(p=>p.transporte===tr);
   if(!peds.length){document.getElementById('transpPanel').style.display='none';alert('Sin pedidos para esta semana/transportista.');return;}
   document.getElementById('transpPanel').style.display='block';
-  // Agrupar por día
-  const porDia={};
-  peds.forEach(p=>{if(!porDia[p.dia])porDia[p.dia]=[];porDia[p.dia].push(p);});
+  const porDia={};peds.forEach(p=>{if(!porDia[p.dia])porDia[p.dia]=[];porDia[p.dia].push(p);});
   const diasOrden=['Lunes','Martes','Miércoles','Jueves','Viernes'];
-  document.getElementById('transpLista').innerHTML=diasOrden.filter(d=>porDia[d]).map(d=>`
-    <div style="margin-bottom:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--g);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;padding:4px 8px;background:var(--cr);border-radius:6px">${d}</div>
-      ${porDia[d].map(p=>`<div class="transp-card">
-        <div style="font-weight:600;font-size:14px">${p.productor}</div>
-        <div style="font-size:12px;color:var(--gris);margin-top:2px">${p.tipo} · ${p.kilos.toFixed(0)} kg · ${p.gavetas||'—'} gavetas · ${p.transporte}</div>
-        ${p.notas?`<div style="font-size:11px;color:var(--am);margin-top:4px">📝 ${p.notas}</div>`:''}
-      </div>`).join('')}
-    </div>`).join('');
-  // Links de confirmación
-  document.getElementById('linksConfirmacion').innerHTML=peds.map(p=>`
-    <div style="background:var(--cr);border-radius:8px;padding:10px 14px;margin-bottom:8px">
-      <div style="font-weight:600;font-size:13px">${p.productor} · ${p.dia}</div>
-      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-        <button class="bwa" style="flex:1;font-size:11px" onclick="waConfirmarRetiro('${p.id}')">📱 Link retiro → transportista</button>
-        <button class="bwa" style="flex:1;font-size:11px;background:#1A6B3C" onclick="waConfirmarLlegada('${p.id}')">📱 Link llegada → empacadora</button>
-      </div>
-    </div>`).join('');
+  document.getElementById('transpLista').innerHTML=diasOrden.filter(d=>porDia[d]).map(d=>`<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--g);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;padding:4px 8px;background:var(--cr);border-radius:6px">${d}</div>${porDia[d].map(p=>`<div class="transp-card"><div style="font-weight:600;font-size:14px">${p.productor}</div><div style="font-size:12px;color:var(--gris);margin-top:2px">${p.tipo} · ${(p.kilos||0).toFixed(0)} kg · ${p.gavetas||'—'} gavetas · ${p.transporte}</div>${p.notas?`<div style="font-size:11px;color:var(--am);margin-top:4px">📝 ${p.notas}</div>`:''}</div>`).join('')}</div>`).join('');
+  document.getElementById('linksConfirmacion').innerHTML=peds.map(p=>`<div style="background:var(--cr);border-radius:8px;padding:10px 14px;margin-bottom:8px"><div style="font-weight:600;font-size:13px">${p.productor} · ${p.dia}</div><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="bwa" style="flex:1;font-size:11px" onclick="waConfirmarRetiro('${p.id}')">📱 Retiro → transportista</button><button class="bwa" style="flex:1;font-size:11px;background:#1A6B3C" onclick="waConfirmarLlegada('${p.id}')">📱 Llegada → empacadora</button></div></div>`).join('');
 }
 
 async function waTransp(){
@@ -1495,12 +673,12 @@ async function waTransp(){
   const tr=document.getElementById('ttr').value;
   const allPeds=await lc.peds();
   let peds=allPeds.filter(p=>p.semana===s);
-  if(tr!=='Todos')peds=peds.filter(p=>p.transporte===tr||tr==='Todos');
+  if(tr!=='Todos')peds=peds.filter(p=>p.transporte===tr);
   if(!peds.length)return;
   const diasOrden=['Lunes','Martes','Miércoles','Jueves','Viernes'];
   const porDia={};peds.forEach(p=>{if(!porDia[p.dia])porDia[p.dia]=[];porDia[p.dia].push(p);});
-  let rutas=diasOrden.filter(d=>porDia[d]).map(d=>`\n📅 *${d}:*\n`+porDia[d].map(p=>`  • ${p.productor} — ${p.kilos.toFixed(0)} kg (${p.gavetas||'—'} gavetas)${p.notas?' — '+p.notas:''}`).join('\n')).join('\n');
-  const msg=`*PROGRAMACIÓN SEMANAL — AGROVIP S.A.*\nSemana ${s}\n${rutas}\n\nPor favor confirmar retiro de cada entrega con hora, gavetas cargadas y cualquier novedad.\n\n*Agrovip S.A. · PackVip*`;
+  let rutas=diasOrden.filter(d=>porDia[d]).map(d=>`\n📅 *${d}:*\n`+porDia[d].map(p=>`  • ${p.productor} — ${(p.kilos||0).toFixed(0)} kg (${p.gavetas||'—'} gavetas)${p.notas?' — '+p.notas:''}`).join('\n')).join('\n');
+  const msg=`*PROGRAMACIÓN SEMANAL — AGROVIP S.A.*\nSemana ${s}${rutas}\n\nConfirmar retiro con hora, gavetas y novedades.\n\n*Agrovip S.A. · PackVip*`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
 }
 
@@ -1511,27 +689,24 @@ async function mailTransp(){
   if(!peds.length)return;
   const diasOrden=['Lunes','Martes','Miércoles','Jueves','Viernes'];
   const porDia={};peds.forEach(p=>{if(!porDia[p.dia])porDia[p.dia]=[];porDia[p.dia].push(p);});
-  let rutas=diasOrden.filter(d=>porDia[d]).map(d=>`${d}:\n`+porDia[d].map(p=>`  - ${p.productor}: ${p.kilos.toFixed(0)} kg (${p.gavetas||'—'} gavetas) · ${p.transporte}${p.notas?' — '+p.notas:''}`).join('\n')).join('\n\n');
+  let rutas=diasOrden.filter(d=>porDia[d]).map(d=>`${d}:\n`+porDia[d].map(p=>`  - ${p.productor}: ${(p.kilos||0).toFixed(0)} kg · ${p.transporte}`).join('\n')).join('\n\n');
   const asunto=`Programación semanal S${s} — Agrovip`;
-  const cuerpo=`Programación de retiro de fruta\nSemana ${s}\n\n${rutas}\n\nConfirmar retiro con hora, gavetas y novedades.\n\nAgrovip S.A.`;
-  window.location.href=`mailto:${MAIL_LILI}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+  window.location.href=`mailto:${MAIL_LILI}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent('Semana '+s+'\n\n'+rutas+'\n\nAgrovip S.A.')}`;
 }
 
-async function waConfirmarRetiro(pedId){
-  const allP=await lc.peds();const p=allP.find(x=>x.id===pedId);if(!p)return;
-  const msg=`*CONFIRMAR RETIRO — AGROVIP*\n\n📦 Productor: ${p.productor}\nSemana ${p.semana} · ${p.dia}\nKilos estimados: ${p.kilos.toFixed(0)} kg\nGavetas: ${p.gavetas||'—'}\n\nPor favor responder con:\n1. ✅ Hora de retiro\n2. 📦 Gavetas cargadas realmente\n3. ⚠️ Cualquier novedad\n\n*Agrovip S.A.*`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+async function waConfirmarRetiro(pedId){const allP=await lc.peds();const p=allP.find(x=>x.id===pedId);if(!p)return;const msg=`*CONFIRMAR RETIRO — AGROVIP*\n\n📦 ${p.productor}\nSemana ${p.semana} · ${p.dia}\nKilos: ${(p.kilos||0).toFixed(0)} kg · Gavetas: ${p.gavetas||'—'}\n\nResponder con:\n1. ✅ Hora de retiro\n2. 📦 Gavetas cargadas\n3. ⚠️ Novedades\n\n*Agrovip S.A.*`;window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);}
+async function waConfirmarLlegada(pedId){const allP=await lc.peds();const p=allP.find(x=>x.id===pedId);if(!p)return;const msg=`*CONFIRMAR LLEGADA — AGROVIP*\n\n📦 ${p.productor} · Semana ${p.semana}\nKilos esperados: ${(p.kilos||0).toFixed(0)} kg\n\nConfirmar:\n1. ✅ Hora de llegada\n2. 📦 Gavetas recibidas\n3. ⚖️ Kilos reales\n4. ⚠️ Novedades\n\n*Agrovip S.A. · PackVip*`;window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);}
+
+async function poblarSelectsProduccion(){
+  const allPeds=await lc.peds();
+  const sel=document.getElementById('recp');
+  if(sel)sel.innerHTML='<option value="">— Seleccionar pedido pendiente —</option>'+allPeds.filter(p=>p.estado!=='Recibido').map(p=>`<option value="${p.id}">${p.productor} · S${p.semana} · ${p.kilos}kg</option>`).join('');
+  const selR=document.getElementById('rprod');
+  if(selR)selR.innerHTML='<option value="">— Seleccionar —</option>'+allPeds.map(p=>`<option value="${p.id}">${p.productor} · S${p.semana}</option>`).join('');
 }
 
-async function waConfirmarLlegada(pedId){
-  const allP=await lc.peds();const p=allP.find(x=>x.id===pedId);if(!p)return;
-  const msg=`*CONFIRMAR LLEGADA A PLANTA — AGROVIP*\n\n📦 ${p.productor} · Semana ${p.semana}\nKilos esperados: ${p.kilos.toFixed(0)} kg\n\nEmpacadora: por favor confirmar cuando llegue la carga:\n1. ✅ Hora de llegada\n2. 📦 Gavetas recibidas\n3. ⚖️ Kilos reales (si ya pesaron)\n4. ⚠️ Novedades de calidad\n\n*Agrovip S.A. · PackVip*`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
-}
-
-// RECEPCIÓN
 let PA=null;
-async function cPR(){const id=document.getElementById('recp').value;const peds=await lc.peds();PA=peds.find(p=>p.id===id)||null;if(PA){document.getElementById('recgav').value=PA.gavetas||PA.mingav||'';cRec();}}
+function cPR(){const id=document.getElementById('recp').value;PA=(_peds||[]).find(p=>p.id===id)||null;if(PA){document.getElementById('recgav').value=PA.gavetas||'';cRec();}}
 function cRec(){
   if(!PA)return;
   const kr=parseFloat(document.getElementById('reckg').value)||0;
@@ -1539,92 +714,103 @@ function cRec(){
   const peq=parseFloat(document.getElementById('recpeq').value)||0;
   const kn=kr-rej;const pr=kr>0?rej/kr*100:0;const pp2=kr>0?peq/kr*100:0;
   document.getElementById('rrd').textContent=PA.productor;
-  document.getElementById('rrn').textContent=PA.kilos.toFixed(1)+' kg';
+  document.getElementById('rrn').textContent=(PA.kilos||0).toFixed(1)+' kg';
   document.getElementById('rrr').textContent=kr.toFixed(1)+' kg';
-  const diff=kr-PA.kilos;
+  const diff=kr-(PA.kilos||0);
   document.getElementById('rrdiff').textContent=(diff>=0?'+':'')+diff.toFixed(1)+' kg';
   document.getElementById('rrdiff').style.color=diff>=0?'#1A6B3C':'#C0392B';
-  document.getElementById('rrprc').innerHTML=`<span style="color:${pr>PA.maxR?'var(--rd)':'var(--g)'}">${pr.toFixed(1)}%${pr>PA.maxR?' ⚠':''}</span>`;
-  document.getElementById('rrprp').innerHTML=`<span style="color:${pp2>PA.maxP?'var(--am)':'var(--g)'}">${pp2.toFixed(1)}%${pp2>PA.maxP?' ⚠':''}</span>`;
-  document.getElementById('rrval').textContent=f2(kn*PA.precio);
-  document.getElementById('rrfp').textContent=PA.fechaPago||'—';
+  document.getElementById('rrprc').innerHTML=`<span style="color:${pr>(PA.maxr||15)?'var(--rd)':'var(--g)'}">${pr.toFixed(1)}%${pr>(PA.maxr||15)?' ⚠':''}</span>`;
+  document.getElementById('rrprp').innerHTML=`<span style="color:${pp2>(PA.maxp||10)?'var(--am)':'var(--g)'}">${pp2.toFixed(1)}%${pp2>(PA.maxp||10)?' ⚠':''}</span>`;
+  document.getElementById('rrval').textContent=f2(kn*(PA.precio||0));
+  document.getElementById('rrfp').textContent=PA.fecha_pago||'—';
   let m1=0,m2=0,als=[];
   if(diff<0){m1=Math.abs(diff)*0.05;als.push(`<div class="al rd">⚠ Faltante ${Math.abs(diff).toFixed(1)} kg → multa: ${f2(m1)}</div>`);}
-  if(pr>PA.maxR){m2=(pr-PA.maxR)/100*kr*PA.precio;als.push(`<div class="al rd">⚠ Rechazo excede ${PA.maxR}% → descuento: ${f2(m2)}</div>`);}
-  if(pp2>PA.maxP)als.push(`<div class="al">⚠ Fruta pequeña excede ${PA.maxP}% → destino: ${document.getElementById('recdestp').value}</div>`);
+  if(pr>(PA.maxr||15)){m2=(pr-(PA.maxr||15))/100*kr*(PA.precio||0);als.push(`<div class="al rd">⚠ Rechazo excede ${PA.maxr||15}% → descuento: ${f2(m2)}</div>`);}
+  if(pp2>(PA.maxp||10))als.push(`<div class="al">⚠ Fruta pequeña excede ${PA.maxp||10}% → destino: ${document.getElementById('recdestp').value}</div>`);
   if(m1>0||m2>0){document.getElementById('rrmul').style.display='';document.getElementById('rrm1').textContent=f2(m1);document.getElementById('rrm2').textContent=f2(m2);}
   else document.getElementById('rrmul').style.display='none';
   document.getElementById('rral').innerHTML=als.join('');
+  // Alerta rechazo alto >30%
+  const alertaAlto=document.getElementById('alerta_rechazo_alto');
+  if(pr>30){alertaAlto.style.display='block';alertaAlto.innerHTML=`<div class="al rd" style="font-weight:700">🚨 RECHAZO CRÍTICO: ${pr.toFixed(1)}% — Se enviará alerta automática a Daniel y Alejandro al registrar.</div>`;}
+  else alertaAlto.style.display='none';
+  calcCalibreTotales();
 }
 
-function gRec(){
+function calcCalibreTotales(){
+  const cals=[6,7,8,9,10,11,12,13,14];
+  let total=0;
+  cals.forEach(c=>{total+=parseFloat(document.getElementById('cal_'+c)?.value)||0;});
+  const peso=total*4.5;
+  const tc=document.getElementById('cal_total_cajas');if(tc)tc.textContent=total.toLocaleString();
+  const tp=document.getElementById('cal_total_peso');if(tp)tp.textContent=peso.toFixed(1)+' kg';
+  const kgRec=parseFloat(document.getElementById('reckg')?.value)||0;
+  const da=document.getElementById('cal_diff_alert');
+  if(da&&kgRec>0&&total>0){const d=peso-kgRec;if(Math.abs(d)>50){da.style.display='';da.textContent=`⚠ Diferencia de ${Math.abs(d).toFixed(1)} kg vs kilos recibidos`;}else da.style.display='none';}
+}
+
+function getCalibreResumen(){
+  const cals=[6,7,8,9,10,11,12,13,14];
+  const res=cals.map(c=>{const v=parseFloat(document.getElementById('cal_'+c)?.value)||0;return v>0?`Cal ${c}: ${v} cajas (${(v*4.5).toFixed(1)} kg)`:'';}).filter(Boolean);
+  return res.length?res.join(' | '):'No especificado';
+}
+
+async function gRec(){
   if(!PA){alert('Selecciona un pedido');return;}
   const kr=parseFloat(document.getElementById('reckg').value)||0;
   if(!kr){alert('Ingresa los kilos recibidos');return;}
   const rej=parseFloat(document.getElementById('recrej').value)||0;
   const peq=parseFloat(document.getElementById('recpeq').value)||0;
-  const r={id:'r'+Date.now(),pedidoId:PA.id,productor:PA.productor,semana:PA.semana,precio:PA.precio,kNeg:PA.kilos,gavetas:parseFloat(document.getElementById('recgav').value)||0,kRec:kr,kNeto:kr-rej,rechazo:rej,pctRec:kr>0?rej/kr:0,pequena:peq,pctPeq:kr>0?peq/kr:0,destRej:document.getElementById('recdest').value,destPeq:document.getElementById('recdestp').value,valorNeto:(kr-rej)*PA.precio,fechaPago:PA.fechaPago,obs:document.getElementById('recobs').value.trim(),fecha:new Date().toLocaleDateString('es-EC')};
-  const rs=lc.recs();rs.unshift(r);lc.sR(rs);
-  const peds=lc.peds();const i=peds.findIndex(p=>p.id===PA.id);
-  if(i>=0){peds[i].estado='Recibido';lc.sP(peds);}
+  const pctRec=kr>0?rej/kr:0;
+  const cals=[6,7,8,9,10,11,12,13,14];
+  const calData={};cals.forEach(c=>{calData['cal_'+c]=parseFloat(document.getElementById('cal_'+c)?.value)||0;});
+  const r={id:'r'+Date.now(),pedido_id:PA.id,productor:PA.productor,semana:PA.semana,precio:PA.precio||0,k_neg:PA.kilos||0,gavetas:parseFloat(document.getElementById('recgav').value)||0,k_rec:kr,k_neto:kr-rej,rechazo:rej,pct_rec:pctRec,pequena:peq,pct_peq:kr>0?peq/kr:0,dest_rej:document.getElementById('recdest').value,dest_peq:document.getElementById('recdestp').value,valor_neto:(kr-rej)*(PA.precio||0),fecha_pago:PA.fecha_pago,obs:document.getElementById('recobs').value.trim(),calibres:JSON.stringify(calData),fecha:new Date().toLocaleDateString('es-EC'),creado_por:USUARIO_ACTUAL?.nombre||'—',...calData};
+  await lc.sR(r);
+  await lc.updP(PA.id,{estado:'Recibido'});
+  // Alerta si rechazo > 30%
+  if(pctRec>0.30){await enviarAlertaRechazoAlto(PA.productor,PA.semana,(pctRec*100).toFixed(1),kr,rej);}
   alert(`✓ Recepción registrada — ${PA.productor}`);
+  poblarSelectsProduccion();
 }
 
-function waRec(){
+async function enviarAlertaRechazoAlto(productor,semana,pct,kgRec,kgRej){
+  const asunto=`🚨 ALERTA RECHAZO ALTO — ${productor} S${semana} (${pct}%)`;
+  const msg=`ALERTA AUTOMÁTICA — RECHAZO SUPERIOR AL 30%\n\nProductor: ${productor}\nSemana: ${semana}\nKilos recibidos: ${kgRec.toFixed(1)} kg\nKilos rechazados: ${kgRej.toFixed(1)} kg\nPorcentaje rechazo: ${pct}%\n\nAcción requerida: revisar situación con el productor inmediatamente.\n\nAgrovip S.A.`;
+  try{
+    for(const email of [MAIL_DANIEL, MAIL_ALEJANDRO]){
+      await fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service_id:'service_lptgrd5',template_id:'template_2z6dond',user_id:'ZvrnAlzPIyQhSUzWj',template_params:{to_email:email,asunto,mensaje:msg}})}); 
+    }
+  }catch(e){console.log('Error alerta:',e);}
+}
+
+async function waRec(){
   if(!PA)return;
   const kr=parseFloat(document.getElementById('reckg').value)||0;
   const rej=parseFloat(document.getElementById('recrej').value)||0;
   const peq=parseFloat(document.getElementById('recpeq').value)||0;
   const kn=kr-rej;const pr=kr>0?(rej/kr*100).toFixed(1):0;
-  const msg=`*REPORTE DE RECEPCIÓN — AGROVIP S.A.*\n\n👤 ${PA.productor}\n📅 Semana ${PA.semana} · ${new Date().toLocaleDateString('es-EC')}\n\n📦 Kilos negociados: ${PA.kilos.toFixed(1)} kg\n✅ Kilos recibidos: ${kr.toFixed(1)} kg\nDiferencia: ${(kr-PA.kilos>=0?'+':'')}${(kr-PA.kilos).toFixed(1)} kg\nRechazo: ${rej.toFixed(1)} kg (${pr}%)\nFruta pequeña: ${peq.toFixed(1)} kg\nKilos netos: *${kn.toFixed(1)} kg*\n\n💰 *Valor a liquidar: ${f2(kn*PA.precio)}*\n📅 *Fecha tentativa pago: ${PA.fechaPago||'—'}*\n\nGracias.\n*Agrovip S.A. · PackVip*`;
+  const calibreRes=getCalibreResumen();
+  const msg=`*REPORTE DE RECEPCIÓN — AGROVIP S.A.*\n\n👤 ${PA.productor}\n📅 Semana ${PA.semana} · ${new Date().toLocaleDateString('es-EC')}\n\n📦 Negociados: ${(PA.kilos||0).toFixed(1)} kg\n✅ Recibidos: ${kr.toFixed(1)} kg\nDiferencia: ${(kr-(PA.kilos||0)>=0?'+':'')+((kr-(PA.kilos||0)).toFixed(1))} kg\nRechazo: ${rej.toFixed(1)} kg (${pr}%)\nFruta pequeña: ${peq.toFixed(1)} kg\nKilos netos: *${kn.toFixed(1)} kg*\n\n📦 Calibres: ${calibreRes}\n\n💰 *Valor a liquidar: ${f2(kn*(PA.precio||0))}*\n📅 *Fecha pago: ${PA.fecha_pago||'—'}*\n\n*Agrovip S.A. · PackVip*`;
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
 }
 
-// REPORTE DE RECHAZO
-const fotosGuia={
-  'Rechazo por calidad':'Foto general de la fruta afectada · Foto de cerca mostrando el defecto',
-  'Rechazo por calibre':'Foto de la fruta pequeña junto a una de tamaño normal · Foto del lote separado',
-  'Fruta pequeña excesiva':'Foto del porcentaje visual del lote · Foto de muestra representativa',
-  'Daño en transporte':'Foto del estado de las gavetas · Foto de la fruta dañada',
-  'Fruta madura / sobremadurez':'Foto del color y textura · Foto del corte si aplica',
-  'Tierra / suciedad':'Foto general del lote · Foto de cerca de la suciedad',
-  'Hongos / moho':'Foto clara del hongo/moho · Foto del porcentaje afectado del lote',
-  'Daño estético (apto para valor agregado)':'Foto del daño estético · Foto mostrando que la pulpa está bien',
-  'Otro problema':'Foto general del problema · Foto de cerca del detalle',
-};
+const fotosGuia={'Rechazo por calidad':'Foto general de la fruta afectada · Foto de cerca del defecto','Rechazo por calibre':'Foto de fruta pequeña junto a una normal · Foto del lote separado','Fruta pequeña excesiva':'Foto del porcentaje visual del lote · Foto de muestra representativa','Daño en transporte':'Foto del estado de las gavetas · Foto de la fruta dañada','Fruta madura / sobremadurez':'Foto del color y textura · Foto del corte si aplica','Tierra / suciedad':'Foto general del lote · Foto de cerca de la suciedad','Hongos / moho':'Foto clara del hongo/moho · Foto del porcentaje afectado','Daño estético (apto para valor agregado)':'Foto del daño estético · Foto mostrando que la pulpa está bien','Otro problema':'Foto general del problema · Foto de cerca del detalle'};
 
-function toggleChip(btn){
-  btn.classList.toggle('sel');
-  actualizarFotosGuia();
-  actualizarPctFields();
+function toggleChip(btn){btn.classList.toggle('sel');actualizarFotosGuia();actualizarPctFields();}
+function actualizarFotosGuia(){
+  const sels=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>b.dataset.prob);
+  const el=document.getElementById('fotosGuiaText');
+  if(!sels.length){el.textContent='Selecciona los problemas arriba para ver qué fotos necesitas.';return;}
+  el.textContent=sels.map(p=>`• ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('\n');
 }
-
 function actualizarPctFields(){
   const sels=Array.from(document.querySelectorAll('.prob-chip.sel'));
   const panel=document.getElementById('probPctPanel');
   const fields=document.getElementById('probPctFields');
   if(!sels.length){panel.style.display='none';return;}
   panel.style.display='block';
-  // Mantener valores existentes
-  const existing={};
-  document.querySelectorAll('.prob-pct-input').forEach(i=>{existing[i.dataset.prob]=i.value;});
-  fields.innerHTML=sels.map(b=>`
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px">
-      <span style="flex:1;color:var(--ink)">${b.dataset.prob}</span>
-      <div style="display:flex;align-items:center;gap:4px">
-        <input type="number" class="prob-pct-input" data-prob="${b.dataset.prob}" 
-          value="${existing[b.dataset.prob]||''}" min="0" max="100" step="1" placeholder="0"
-          style="width:70px;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:right">
-        <span style="color:var(--gris)">%</span>
-      </div>
-    </div>`).join('');
-}
-
-function actualizarFotosGuia(){
-  const sel=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>b.dataset.prob);
-  if(!sel.length){document.getElementById('fotosGuia').textContent='Selecciona los problemas arriba para ver qué fotos necesitas.';return;}
-  const guia=sel.map(p=>`• ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('\n');
-  document.getElementById('fotosGuia').textContent=guia;
+  const existing={};document.querySelectorAll('.prob-pct-input').forEach(i=>{existing[i.dataset.prob]=i.value;});
+  fields.innerHTML=sels.map(b=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px"><span style="flex:1;color:var(--ink)">${b.dataset.prob}</span><div style="display:flex;align-items:center;gap:4px"><input type="number" class="prob-pct-input" data-prob="${b.dataset.prob}" value="${existing[b.dataset.prob]||''}" min="0" max="100" step="1" placeholder="0" style="width:70px;padding:6px 8px;font-size:13px;border:1px solid var(--bd);border-radius:6px;text-align:right"><span style="color:var(--gris)">%</span></div></div>`).join('');
 }
 
 async function generarMailReporte(){
@@ -1639,106 +825,41 @@ async function generarMailReporte(){
   const dest=document.getElementById('rdest').value;
   const desc=document.getElementById('rdesc').value;
   const hora=document.getElementById('rhora').value;
-  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:' (% no especificado)');});
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:' (% no especificado)');  });
   if(!problemas.length){alert('Selecciona al menos un tipo de problema.');return;}
-  const fotos=problemas.map(p=>`• ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('<br>');
-  const fecha=new Date().toLocaleDateString('es-EC',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})+'  · '+new Date().toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});
+  const fecha=new Date().toLocaleDateString('es-EC',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})+(hora?' · '+hora:'');
   const asunto=`⚠️ Reporte de rechazo — ${productor} ${semana} — ${new Date().toLocaleDateString('es-EC')}`;
   const problemasTexto=problemas.map(p=>'🔴 '+p).join('\n');
   const fotosTexto=problemas.map(p=>`• ${p}: ${fotosGuia[p]||'Foto del problema'}`).join('\n');
-
-  const calibreResumen=getCalibreResumen();
-  const params={
-    to_email:'placeholder',
-    asunto,
-    nombre,
-    fecha,
-    productor:`${productor} ${semana}`,
-    kg:kg||'—',
-    destino:dest,
-    problemas:problemasTexto,
-    descripcion:(desc||'Sin descripción adicional.')+'\n\nDistribución por calibre:\n'+calibreResumen,
-    fotos:fotosTexto
-  };
-
+  const calibreRes=getCalibreResumen();
+  const params={to_email:'',asunto,nombre,fecha,productor:`${productor} ${semana}`,kg:kg||'—',destino:dest,problemas:problemasTexto,descripcion:(desc||'Sin descripción.')+`\n\nCalibre: ${calibreRes}`,fotos:fotosTexto};
   const btnEl=document.querySelector('[onclick="generarMailReporte()"]');
   if(btnEl){btnEl.textContent='⏳ Enviando...';btnEl.disabled=true;}
   try{
-    for(const email of [MAIL_LILI, MAIL_DANIEL, MAIL_PABLO]){
-      await fetch('https://api.emailjs.com/api/v1.0/email/send',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          service_id:'service_lptgrd5',
-          template_id:'template_i4iu7bd',
-          user_id:'ZvrnAlzPIyQhSUzWj',
-          template_params:{...params, to_email:email}
-        })
-      });
+    for(const email of [MAIL_LILI,MAIL_DANIEL,MAIL_PABLO]){
+      await fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service_id:'service_lptgrd5',template_id:'template_i4iu7bd',user_id:'ZvrnAlzPIyQhSUzWj',template_params:{...params,to_email:email}})}); 
     }
-    alert(`✅ Reporte enviado a Lili, Daniel y Pablo.\n\n📷 Recuerda: adjunta las fotos respondiendo este email.`);
-  }catch(e){
-    alert('Error al enviar. Verifica la conexión.');
-  }
+    alert('✅ Reporte enviado a Lili, Daniel y Pablo.\n\n📷 Usa el botón de WhatsApp para enviar las fotos.');
+  }catch(e){alert('Error al enviar. Verifica la conexión.');}
   if(btnEl){btnEl.textContent='📧 Enviar reporte por email a Lili, Daniel y Pablo';btnEl.disabled=false;}
 }
 
-function calcCalibreTotales(){
-  const calibres=[6,7,8,9,10,11,12,13,14];
-  let totalCajas=0;
-  calibres.forEach(c=>{
-    const v=parseFloat(document.getElementById('cal_'+c)?.value)||0;
-    totalCajas+=v;
-  });
-  const pesoTotal=totalCajas*4.5;
-  document.getElementById('cal_total_cajas').textContent=totalCajas.toLocaleString();
-  document.getElementById('cal_total_peso').textContent=pesoTotal.toFixed(1)+' kg';
-  // Comparar con kilos recibidos
-  const kgRec=parseFloat(document.getElementById('reckg')?.value)||0;
-  const diffAlert=document.getElementById('cal_diff_alert');
-  if(kgRec>0&&totalCajas>0){
-    const diff=pesoTotal-kgRec;
-    if(Math.abs(diff)>50){
-      diffAlert.style.display='';
-      diffAlert.textContent=`⚠ Diferencia de ${Math.abs(diff).toFixed(1)} kg vs kilos recibidos`;
-    } else {
-      diffAlert.style.display='none';
-    }
-  } else {
-    diffAlert.style.display='none';
-  }
-}
-
-function getCalibreResumen(){
-  const calibres=[6,7,8,9,10,11,12,13,14];
-  const resumen=calibres.map(c=>{
-    const v=parseFloat(document.getElementById('cal_'+c)?.value)||0;
-    return v>0?`Cal ${c}: ${v} cajas (${(v*4.5).toFixed(1)} kg)`:'';
-  }).filter(Boolean);
-  return resumen.length?resumen.join(' | '):'No especificado';
-}
-
-
 async function waFotos(){
   const nombre=document.getElementById('rnom').value;
-  const prodMan=document.getElementById('rprodman').value;
   const pedId=document.getElementById('rprod').value;
-  const allPedsCache=_peds||[];
-  const ped=allPedsCache.find(p=>p.id===pedId);
+  const prodMan=document.getElementById('rprodman').value;
+  const allPeds=_peds||[];
+  const ped=allPeds.find(p=>p.id===pedId);
   const productor=ped?ped.productor:prodMan||'—';
   const semana=ped?`S${ped.semana}`:'';
-  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{
-    const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;
-    return b.dataset.prob+(pct?` (${pct}%)`:' (% no especificado)');
-  });
+  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:' (% no especificado)');  });
   const kg=document.getElementById('rkg').value;
-  const fecha=new Date().toLocaleDateString('es-EC');
   const hora=document.getElementById('rhora').value;
+  const fecha=new Date().toLocaleDateString('es-EC');
+  const calibreRes=getCalibreResumen();
   const fotosNecesarias=problemas.map(p=>`📷 ${p}:\n   ${fotosGuia[p]||'Foto del problema'}`).join('\n\n');
-  const calibreResumenWa=getCalibreResumen();
-  const msg=`*FOTOS REPORTE DE RECHAZO — AGROVIP*\n\n👤 ${nombre}\n📅 ${fecha}${hora?' · '+hora:''}\n🌿 Productor: ${productor} ${semana}\n⚖️ Kilos afectados: ${kg||'—'} kg\n📦 Calibres: ${calibreResumenWa}\n\n*Fotos adjuntas a este mensaje:*\n\n${fotosNecesarias}\n\n_Por favor adjunta las fotos correspondientes a este mensaje._\n\n*Agrovip S.A. · PackVip*`;
-  const waNum='593995938213';
-  window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`,'_blank');
+  const msg=`*FOTOS REPORTE RECHAZO — AGROVIP*\n\n👤 ${nombre}\n📅 ${fecha}${hora?' · '+hora:''}\n🌿 Productor: ${productor} ${semana}\n⚖️ Kilos afectados: ${kg||'—'} kg\n📦 Calibres: ${calibreRes}\n\n*Fotos adjuntas:*\n\n${fotosNecesarias}\n\n*Agrovip S.A. · PackVip*`;
+  window.open(`https://wa.me/593995938213?text=${encodeURIComponent(msg)}`,'_blank');
 }
 
 function rProd(){
@@ -1749,17 +870,10 @@ function rProd(){
   if(f==='top')ps.sort((a,b2)=>b2.Rendimiento-a.Rendimiento);
   else if(f==='rechazo')ps.sort((a,b2)=>b2.PctRechazoReal-a.PctRechazoReal);
   else ps.sort((a,b2)=>b2.KilosTotales-a.KilosTotales);
-  document.getElementById('pl').innerHTML=ps.map(p=>{
-    const rend=p.Rendimiento;const prc=p.PctRechazoReal;const sc=rend*0.6+(1-prc)*0.4;
-    const cc=sc>0.8?'#1A6B3C':sc>0.7?'#D4A017':'#C0392B';
-    const cl=sc>0.8?'⭐ Excelente':sc>0.7?'✓ Bueno':'⚠ Regular';
-    return`<div class="pr"><span style="font-weight:500">${p.Productores}</span><span>${(p.KilosTotales/1000).toFixed(1)}t</span><span style="color:${rend>0.85?'var(--g)':rend>0.75?'var(--am)':'var(--rd)'}">${(rend*100).toFixed(1)}%</span><span style="color:${prc>0.15?'var(--rd)':prc>0.10?'var(--am)':'var(--g)'}">${(prc*100).toFixed(1)}%</span><span>$${p.PrecioPromedio.toFixed(3)}</span><span>${p.Entregas}</span><span style="color:${cc};font-weight:600">${cl}</span><button class="bsm" onclick="uP('${p.Productores}')">→ Usar</button></div>`;
-  }).join('');
+  document.getElementById('pl').innerHTML=ps.map(p=>{const rend=p.Rendimiento;const prc=p.PctRechazoReal;const sc=rend*0.6+(1-prc)*0.4;const cc=sc>0.8?'#1A6B3C':sc>0.7?'#D4A017':'#C0392B';const cl=sc>0.8?'⭐ Excelente':sc>0.7?'✓ Bueno':'⚠ Regular';return`<div class="pr"><span style="font-weight:500">${p.Productores}</span><span>${(p.KilosTotales/1000).toFixed(1)}t</span><span style="color:${rend>0.85?'var(--g)':rend>0.75?'var(--am)':'var(--rd)'}">${(rend*100).toFixed(1)}%</span><span style="color:${prc>0.15?'var(--rd)':prc>0.10?'var(--am)':'var(--g)'}">${(prc*100).toFixed(1)}%</span><span>$${p.PrecioPromedio.toFixed(3)}</span><span>${p.Entregas}</span><span style="color:${cc};font-weight:600">${cl}</span><button class="bsm" onclick="uP('${p.Productores}')">→ Usar</button></div>`;}).join('');
 }
-
 function uP(n){document.getElementById('pp').value=n;chProd();gt('pedido');}
 
-// HISTORICO
 function rH(){
   const ss=HIST.semanas.filter(s=>s.Semana>=1&&s.Semana<=52).sort((a,b)=>a.Semana-b.Semana);
   if(!ss.length)return;
