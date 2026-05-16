@@ -226,8 +226,9 @@ input,select,textarea,button{font-family:inherit}
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="bp" style="flex:2;margin-top:0" onclick="guardarDespacho()">💾 Guardar despacho</button>
-        <button class="bwa" style="flex:1" onclick="waDespacho()">📱 Resumen WhatsApp</button>
+        <button class="bp" style="flex:2;margin-top:0" onclick="guardarDespacho()">💾 Confirmar despacho</button>
+        <button class="bs" style="flex:1;margin-top:0" onclick="guardarBorrador()">📝 Guardar borrador</button>
+        <button class="bwa" style="flex:1" onclick="waDespacho()">📱 WhatsApp</button>
       </div>
     </div>
 
@@ -325,7 +326,8 @@ async function autoGuardarBorrador(){
   const calTotals={};let totalCajas=0;
   CALS.forEach(c=>calTotals[c]=0);
   const asignacion=tipo==='aereo'?aereoRows:pallets;
-  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});};
+  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});};
+  const datos={
     id:_borradorId||('borr'+Date.now()),
     tipo,documento:doc,
     fecha:document.getElementById('dfecha').value,
@@ -438,15 +440,20 @@ async function init(){
 
 async function cargarCotizaciones(){
   const data=await supaFetch('GET','cotizaciones?select=id,num_cot,cliente,valor_cotizado,estado,tipo_pitahaya,cajas_total,fecha_despacho&order=created_at.desc');
+  const despData=await supaFetch('GET','despachos?select=cotizacion_id&estado=neq.Borrador');
+  const cotizacionesUsadas=new Set((despData||[]).map(d=>d.cotizacion_id).filter(Boolean));
   const sel=document.getElementById('dcot');
   if(data&&data.length){
     data.forEach(c=>{
       const o=document.createElement('option');
+      const yaUsada=cotizacionesUsadas.has(c.id);
       o.value=c.id;
-      o.textContent=`${c.num_cot||'—'} · ${c.cliente} · ${c.estado}`;
+      o.textContent=(yaUsada?'✓ ':'')+`${c.num_cot||'—'} · ${c.cliente} · ${c.estado}`+(yaUsada?' (ya despachada)':'');
       o.dataset.cliente=c.cliente||'';
       o.dataset.cajas=c.cajas_total||0;
       o.dataset.tipo=c.tipo_pitahaya||'';
+      o.disabled=yaUsada;
+      o.style.color=yaUsada?'#9CA3AF':'';
       sel.appendChild(o);
     });
   }
@@ -919,6 +926,46 @@ async function guardarDespacho(){
   if(ind){ind.textContent='';} 
 }
 
+async function guardarBorrador(){
+  const tipo=document.getElementById('dtipo').value;
+  const doc=document.getElementById('ddoc').value.trim()||'Borrador '+new Date().toLocaleDateString('es-EC');
+  const cliente=document.getElementById('dcliente').value.trim()||'—';
+  const calTotals={};let totalCajas=0;
+  CALS.forEach(c=>calTotals[c]=0);
+  if(tipo==='aereo'){
+    aereoRows.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});
+  } else {
+    pallets.forEach(p=>{p.rows.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});
+  }
+  const desp={
+    id:_borradorId||('d'+Date.now()),tipo,documento:doc,
+    fecha:document.getElementById('dfecha').value,
+    semana:parseInt(document.getElementById('dsemana').value)||0,
+    cotizacion_id:document.getElementById('dcot').value||null,
+    cliente,naviera:document.getElementById('dnaviera').value.trim(),
+    destino:document.getElementById('ddestino').value.trim(),
+    notas:document.getElementById('dnotas').value.trim(),
+    cajas_obj:parseFloat(document.getElementById('dcajas_obj').value)||0,
+    kg_caja:parseFloat(document.getElementById('dkg_caja').value)||4.5,
+    total_cajas:totalCajas,total_kg:totalCajas*4.5,
+    cal_6:calTotals[6],cal_7:calTotals[7],cal_8:calTotals[8],cal_9:calTotals[9],
+    cal_10:calTotals[10],cal_11:calTotals[11],cal_12:calTotals[12],cal_13:calTotals[13],cal_14:calTotals[14],
+    productores:JSON.stringify(tipo==='aereo'?aereoRows:pallets),
+    estado:'Borrador',creado_por:USUARIO_ACTUAL?.nombre||'—'
+  };
+  if(_borradorId){
+    await supaFetch('PATCH','despachos?id=eq.'+_borradorId,desp);
+  } else {
+    const res=await supaFetch('POST','despachos',desp);
+    if(res&&res[0])_borradorId=res[0].id||desp.id;
+    else _borradorId=desp.id;
+  }
+  _desps=null;
+  const st=document.getElementById('borradorStatus');
+  if(st){st.textContent='Borrador guardado '+new Date().toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});st.style.color='var(--am)';}
+  alert('Borrador guardado. Puedes continuar luego desde la lista de despachos.');
+}
+
 function waDespacho(){
   const tipo=document.getElementById('dtipo').value;
   const doc=document.getElementById('ddoc').value||'—';
@@ -1005,6 +1052,40 @@ async function renderLista(){
       </div>
     </div>`;
   }).join('');
+}
+
+async function editarDespacho(id){
+  const desps=await loadDesps();
+  const d=desps.find(x=>x.id===id);
+  if(!d)return;
+  // Load into form
+  document.getElementById('dtipo').value=d.tipo||'maritimo';
+  document.getElementById('ddoc').value=d.documento||'';
+  document.getElementById('dfecha').value=d.fecha||'';
+  document.getElementById('dsemana').value=d.semana||'';
+  document.getElementById('dcliente').value=d.cliente||'';
+  document.getElementById('dnaviera').value=d.naviera||'';
+  document.getElementById('ddestino').value=d.destino||'';
+  document.getElementById('dnotas').value=d.notas||'';
+  document.getElementById('dcajas_obj').value=d.cajas_obj||'';
+  document.getElementById('dkg_caja').value=d.kg_caja||4.5;
+  // Load pallets
+  try{
+    const prods=JSON.parse(d.productores||'[]');
+    if(d.tipo==='aereo'){aereoRows=prods;renderAereoRows();}
+    else{
+      // Convert old format if needed
+      pallets=prods.map(p=>p.rows?p:{...p,rows:[{productor:p.productor||'',cals:p.cals||{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}}]});
+      renderPallets();
+    }
+  }catch(e){console.error('Error cargando pallets:',e);}
+  _borradorId=d.id;
+  actualizarTipo();
+  actualizarParams();
+  const st=document.getElementById('borradorStatus');
+  if(st){st.textContent='Editando: '+d.documento;st.style.color='var(--am)';}
+  gt('nuevo');
+  alert('Despacho cargado para editar. Al guardar se actualizara el registro existente.');
 }
 
 async function cambiarEstadoDesp(id,estado){await supaFetch('PATCH',`despachos?id=eq.${id}`,{estado});_desps=null;renderLista();}
