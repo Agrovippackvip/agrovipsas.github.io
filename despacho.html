@@ -100,7 +100,10 @@ input,select,textarea,button{font-family:inherit}
 
     <!-- NUEVO DESPACHO -->
     <div class="tab show" id="tab-nuevo">
-      <div class="sl">Nuevo despacho</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="sl" style="margin:0;border:none;padding:0">Nuevo despacho</div>
+        <span id="autoSaveInd" style="font-size:11px;color:var(--gris)"></span>
+      </div>
       <div class="g2" style="margin-bottom:14px">
         <div class="card">
           <div class="ct">🚢 Datos del despacho</div>
@@ -212,6 +215,13 @@ input,select,textarea,button{font-family:inherit}
 
     <!-- LISTA -->
     <div class="tab" id="tab-lista">
+      <div class="card" id="borradoresPanel" style="margin-bottom:14px;border-left:4px solid var(--am);display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-weight:600;font-size:13px;color:var(--am)">📝 Borradores pendientes</div>
+          <button class="bsm" onclick="renderBorradores()">Actualizar</button>
+        </div>
+        <div id="borradoresList"></div>
+      </div>
       <div class="g4" style="margin-bottom:16px">
         <div class="sc"><div class="et">Total despachos</div><div class="nm hl" id="sl_total">0</div></div>
         <div class="sc"><div class="et">Cajas totales</div><div class="nm hl" id="sl_cajas">0</div></div>
@@ -271,6 +281,8 @@ const CALS=[6,7,8,9,10,11,12,13,14];
 let USUARIO_ACTUAL=null;
 let _desps=null;
 let pallets=[]; // [{id, productor, cals:{6:0,...}}]
+let _borradorId=null;
+let _autoSaveTimer=null;
 let aereoRows=[]; // for aereo mode
 let recepciones_cargadas=[];
 
@@ -457,6 +469,7 @@ function renderPallets(){
     </div>`;
   }).join('');
   calcGrandTotals();
+  programarAutoGuardado();
   // Populate producer selects with recepciones only
   pallets.forEach((p,pi)=>{
     const sel=document.getElementById('psel_'+pi);
@@ -559,6 +572,74 @@ function updateAereoP(ri,val){aereoRows[ri].productor=val;renderAereoRows();}
 function updateAereoC(ri,cal,val){aereoRows[ri].cals[cal]=parseInt(val)||0;calcGrandTotals();}
 function eliminarAereoRow(ri){aereoRows.splice(ri,1);renderAereoRows();}
 
+// BORRADORES Y AUTOSAVE
+function programarAutoGuardado(){
+  if(_autoSaveTimer)clearTimeout(_autoSaveTimer);
+  _autoSaveTimer=setTimeout(autoGuardarBorrador, 30000);
+  // Show indicator
+  var ind=document.getElementById('autoSaveInd');
+  if(ind){ind.textContent='Sin guardar...';ind.style.color='var(--am)';}
+}
+
+async function autoGuardarBorrador(){
+  var tipo=document.getElementById('dtipo').value;
+  var doc=document.getElementById('ddoc').value.trim();
+  var fecha=document.getElementById('dfecha').value;
+  if(!doc&&!pallets.length&&!aereoRows.length)return;
+  var calTotals={};var totalCajas=0;
+  CALS.forEach(function(c){calTotals[c]=0;});
+  var asig=tipo==='aereo'?aereoRows:pallets;
+  asig.forEach(function(r){CALS.forEach(function(c){calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});
+  var borrador={
+    tipo:tipo,documento:doc||'BORRADOR',fecha:fecha,
+    semana:parseInt(document.getElementById('dsemana').value)||0,
+    cotizacion_id:document.getElementById('dcot').value||null,
+    cliente:document.getElementById('dcliente').value.trim()||'—',
+    naviera:document.getElementById('dnaviera').value.trim(),
+    destino:document.getElementById('ddestino').value.trim(),
+    notas:document.getElementById('dnotas').value.trim(),
+    cajas_obj:parseFloat(document.getElementById('dcajas_obj').value)||0,
+    kg_caja:parseFloat(document.getElementById('dkg_caja').value)||4.5,
+    total_cajas:totalCajas,total_kg:totalCajas*4.5,
+    cal_6:calTotals[6],cal_7:calTotals[7],cal_8:calTotals[8],cal_9:calTotals[9],
+    cal_10:calTotals[10],cal_11:calTotals[11],cal_12:calTotals[12],cal_13:calTotals[13],cal_14:calTotals[14],
+    productores:JSON.stringify(tipo==='aereo'?aereoRows:pallets),
+    estado:'Borrador',creado_por:USUARIO_ACTUAL?USUARIO_ACTUAL.nombre:'—'
+  };
+  if(_borradorId){
+    await supaFetch('PATCH','despachos?id=eq.'+_borradorId,borrador);
+  } else {
+    borrador.id='bor'+Date.now();
+    var res=await supaFetch('POST','despachos',borrador);
+    if(res&&res[0])_borradorId=res[0].id;
+  }
+  _desps=null;
+  var ind=document.getElementById('autoSaveInd');
+  if(ind){ind.textContent='Guardado automaticamente '+new Date().toLocaleTimeString('es-EC');ind.style.color='var(--g)';}
+}
+
+async function cargarBorrador(id){
+  var d=await supaFetch('GET','despachos?id=eq.'+id+'&select=*');
+  if(!d||!d[0])return;
+  var desp=d[0];
+  _borradorId=id;
+  document.getElementById('dtipo').value=desp.tipo||'maritimo';
+  document.getElementById('ddoc').value=desp.documento||'';
+  document.getElementById('dfecha').value=desp.fecha||'';
+  document.getElementById('dsemana').value=desp.semana||'';
+  document.getElementById('dcliente').value=desp.cliente||'';
+  document.getElementById('dnaviera').value=desp.naviera||'';
+  document.getElementById('ddestino').value=desp.destino||'';
+  document.getElementById('dnotas').value=desp.notas||'';
+  document.getElementById('dcajas_obj').value=desp.cajas_obj||'';
+  var prods=JSON.parse(desp.productores||'[]');
+  if(desp.tipo==='aereo'){aereoRows=prods;renderAereoRows();}
+  else{pallets=prods;renderPallets();}
+  actualizarTipo();
+  gt('nuevo');
+  alert('Borrador cargado. Continua donde lo dejaste.');
+}
+
 // GUARDAR
 async function guardarDespacho(){
   const tipo=document.getElementById('dtipo').value;
@@ -588,7 +669,11 @@ async function guardarDespacho(){
   await supaFetch('POST','despachos',desp);
   _desps=null;
   alert(`✓ Despacho guardado — ${doc} · ${totalCajas} cajas · ${(totalCajas*4.5).toFixed(1)} kg`);
+  // Eliminar borrador si existia
+  if(_borradorId){_borradorId=null;}
   pallets=[];aereoRows=[];renderPallets();renderAereoRows();
+  var ind=document.getElementById('autoSaveInd');
+  if(ind){ind.textContent='';} 
 }
 
 function waDespacho(){
@@ -612,11 +697,30 @@ async function loadDesps(){
   return _desps;
 }
 
+async function renderBorradores(){
+  var desps=await loadDesps();
+  var bors=desps.filter(function(d){return d.estado==='Borrador';});
+  var panel=document.getElementById('borradoresPanel');
+  var list=document.getElementById('borradoresList');
+  if(!bors.length){if(panel)panel.style.display='none';return;}
+  if(panel)panel.style.display='block';
+  list.innerHTML=bors.map(function(b){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">'+
+      '<div><b>'+(b.documento||'Sin documento')+'</b> · '+(b.cliente||'—')+'<br><span style="font-size:11px;color:var(--gris)">'+(b.fecha||'—')+' · '+(b.total_cajas||0)+' cajas · S'+(b.semana||'—')+'</span></div>'+
+      '<div style="display:flex;gap:6px">'+
+      '<button class="bs" style="font-size:11px" onclick="cargarBorrador(''+b.id+'')">Continuar</button>'+
+      '<button class="bsm" onclick="eliminarDesp(''+b.id+'')">🗑</button>'+
+      '</div></div>';
+  }).join('');
+}
+
 async function renderLista(){
   const desps=await loadDesps();
   const filtTipo=document.getElementById('filtroTipo').value;
   const filtEst=document.getElementById('filtroEstado').value;
-  let list=desps;
+  renderBorradores();
+  // Solo mostrar no-borradores en lista principal
+  let list=desps.filter(function(d){return d.estado!=='Borrador';});
   if(filtTipo)list=list.filter(d=>d.tipo===filtTipo);
   if(filtEst)list=list.filter(d=>d.estado===filtEst);
   document.getElementById('sl_total').textContent=desps.length;

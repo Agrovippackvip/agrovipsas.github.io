@@ -491,6 +491,9 @@ input,select,textarea,button{font-family:inherit}
       <div class="sl">Historial de reportes de rechazo</div>
       <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
         <input type="text" id="filtProd" placeholder="Filtrar por productor..." oninput="renderHistReportes()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;flex:1">
+        <input type="number" id="filtSem" placeholder="Semana #" oninput="renderHistReportes()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;width:90px">
+        <input type="date" id="filtDesde" onchange="renderHistReportes()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px">
+        <input type="date" id="filtHasta" onchange="renderHistReportes()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px">
         <select id="filtProb" onchange="renderHistReportes()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white">
           <option value="">Todos los problemas</option>
           <option value="calidad">Calidad</option>
@@ -505,6 +508,9 @@ input,select,textarea,button{font-family:inherit}
         <div class="sc"><div class="et">Kg afectados</div><div class="nm hl" id="hr_kg">0</div></div>
         <div class="sc"><div class="et">Productores con reporte</div><div class="nm hl" id="hr_prods">0</div></div>
         <div class="sc"><div class="et">Último reporte</div><div class="nm" id="hr_ultimo" style="font-size:14px">—</div></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="bs" onclick="exportarReportesExcel()">📥 Exportar a Excel</button>
       </div>
       <div id="histReportesList"><div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">Cargando reportes...</div></div>
     </div>
@@ -740,7 +746,7 @@ async function poblarSelectsProduccion(){
   const allRecs=await lc.recs();
   const selR=document.getElementById('rprod');
   if(selR){
-    const recsConRechazo=allRecs.filter(r=>(r.rechazo||0)>0);
+    const recsConRechazo=allRecs.filter(function(r){return(r.rechazo||0)>0&&!r.reportado;});
     selR.innerHTML='<option value="">— Seleccionar recepción —</option>'+
       recsConRechazo.map(r=>`<option value="${r.id}">${r.productor} · S${r.semana} · ${(r.pct_rec*100).toFixed(1)}% rechazo</option>`).join('');
     if(!recsConRechazo.length)selR.innerHTML='<option value="">Sin recepciones con rechazo registradas</option>';
@@ -905,7 +911,11 @@ async function generarMailReporte(){
       nombre,problemas:problemas.join(', '),kg,
       destino:dest,descripcion:desc,hora,calibres:calibreRes
     });
-    alert('Reporte enviado a Lili, Daniel y Pablo. Usa el boton de copiar para enviar las fotos por WhatsApp.');
+    // Marcar recepcion como reportada
+    if(recId)await supaFetch('PATCH','recepciones?id=eq.'+recId,{reportado:true});
+    _recs=null;
+    await poblarSelectsProduccion();
+    alert('Reporte enviado y guardado. Usa el boton de copiar para enviar las fotos por WhatsApp.');
   }catch(e){alert('Error al enviar. Verifica la conexión.');}
   if(btnEl){btnEl.textContent='📧 Enviar reporte por email a Lili, Daniel y Pablo';btnEl.disabled=false;}
 }
@@ -971,20 +981,71 @@ async function guardarReporte(data){
 
 async function renderHistReportes(){
   var reps=await loadReportes();
-  var filtP=document.getElementById("filtProd").value.toLowerCase();
-  var filtPr=document.getElementById("filtProb").value.toLowerCase();
+  var filtP=(document.getElementById("filtProd").value||"").toLowerCase();
+  var filtS=document.getElementById("filtSem").value;
+  var filtPr=(document.getElementById("filtProb").value||"").toLowerCase();
   var list=reps;
+  var filtDesde=document.getElementById("filtDesde").value;
+  var filtHasta=document.getElementById("filtHasta").value;
   if(filtP)list=list.filter(function(r){return(r.productor||"").toLowerCase().includes(filtP);});
+  if(filtS)list=list.filter(function(r){return String(r.semana||"")===filtS;});
   if(filtPr)list=list.filter(function(r){return(r.problemas||"").toLowerCase().includes(filtPr);});
+  if(filtDesde)list=list.filter(function(r){return(r.fecha||"")>=filtDesde;});
+  if(filtHasta)list=list.filter(function(r){return(r.fecha||"")<=filtHasta;});
   document.getElementById("hr_total").textContent=list.length;
   document.getElementById("hr_kg").textContent=list.reduce(function(s,r){return s+(r.kg_afectados||0);},0).toFixed(1)+" kg";
   var prods=new Set(list.map(function(r){return r.productor;}));
   document.getElementById("hr_prods").textContent=prods.size;
-  document.getElementById("hr_ultimo").textContent=list.length?list[0].fecha+" · "+list[0].productor:"—";
+  document.getElementById("hr_ultimo").textContent=list.length?list[0].fecha+" - "+list[0].productor:"—";
   if(!list.length){
-    document.getElementById("histReportesList").innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">Sin reportes registrados aun.</div>';
+    document.getElementById("histReportesList").innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">Sin reportes con ese filtro.</div>';
     return;
   }
+  var html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'+
+    '<thead><tr style="background:var(--g);color:white">'+
+    '<th style="padding:8px 10px;text-align:left">Fecha</th>'+
+    '<th style="padding:8px 10px;text-align:left">Sem</th>'+
+    '<th style="padding:8px 10px;text-align:left">Productor</th>'+
+    '<th style="padding:8px 10px;text-align:left">Problemas</th>'+
+    '<th style="padding:8px 10px;text-align:right">Kg afect.</th>'+
+    '<th style="padding:8px 10px;text-align:left">Destino</th>'+
+    '<th style="padding:8px 10px;text-align:left">Calibres</th>'+
+    '<th style="padding:8px 10px;text-align:left">Descripcion</th>'+
+    '<th style="padding:8px 10px;text-align:left">Reportado por</th>'+
+    '</tr></thead><tbody>';
+  list.forEach(function(r,i){
+    var bg=i%2===0?"white":"var(--cr)";
+    html+='<tr style="background:'+bg+';border-bottom:1px solid var(--bd)">'+
+      '<td style="padding:7px 10px">'+( r.fecha||"—")+'</td>'+
+      '<td style="padding:7px 10px">S'+(r.semana||"—")+'</td>'+
+      '<td style="padding:7px 10px;font-weight:600">'+( r.productor||"—")+'</td>'+
+      '<td style="padding:7px 10px;color:var(--rd)">'+( r.problemas||"—")+'</td>'+
+      '<td style="padding:7px 10px;text-align:right;font-weight:600">'+( r.kg_afectados||0)+'</td>'+
+      '<td style="padding:7px 10px">'+( r.destino||"—")+'</td>'+
+      '<td style="padding:7px 10px;font-size:11px">'+( r.calibres||"—")+'</td>'+
+      '<td style="padding:7px 10px;font-size:11px;max-width:200px">'+( r.descripcion||"—")+'</td>'+
+      '<td style="padding:7px 10px">'+( r.reportado_por||"—")+'</td>'+
+      '</tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById("histReportesList").innerHTML=html;
+}
+
+async function exportarReportesExcel(){
+  var reps=await loadReportes();
+  if(!reps.length){alert("Sin reportes para exportar.");return;}
+  var headers=["Fecha","Semana","Productor","Problemas","Kg afectados","Destino","Calibres","Descripcion","Reportado por","Hora"];
+  var rows=reps.map(function(r){return[
+    r.fecha||"",r.semana||"",r.productor||"",r.problemas||"",r.kg_afectados||0,
+    r.destino||"",r.calibres||"",r.descripcion||"",r.reportado_por||"",r.hora||""
+  ];});
+  var csv=[headers.join(",")].concat(rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'\'')+'"';}).join(",");})).join("\n");
+  var blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");a.href=url;a.download="reportes_rechazo_agrovip.csv";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
   document.getElementById("histReportesList").innerHTML=list.map(function(r){
     var probs=(r.problemas||"").split(",").map(function(p){return p.trim();});
     return '<div class="card" style="margin-bottom:10px">'+
