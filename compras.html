@@ -880,20 +880,26 @@ async function generarMailReporte(){
 }
 
 async function waFotos(){
-  const nombre=document.getElementById('rnom').value;
-  const recId=document.getElementById('rprod').value;
-  const allRecs=_recs||[];
-  const rec=allRecs.find(r=>r.id===recId);
-  const productor=rec?rec.productor:'—';
-  const semana=rec?`S${rec.semana}`:'';
-  const problemas=Array.from(document.querySelectorAll('.prob-chip.sel')).map(b=>{const pct=document.querySelector(`.prob-pct-input[data-prob="${b.dataset.prob}"]`)?.value;return b.dataset.prob+(pct?` (${pct}%)`:'(% no especificado)');});
-  const kg=document.getElementById('rkg').value||rec?.rechazo||0;
-  const hora=document.getElementById('rhora').value;
-  const fecha=new Date().toLocaleDateString('es-EC');
-  const calibreRes=getCalibreResumen();
-  const fotosNecesarias=problemas.map(p=>`📷 ${p}:\n   ${fotosGuia[p]||'Foto del problema'}`).join('\n\n');
-  const msg=`*FOTOS REPORTE RECHAZO — AGROVIP*\n\n👤 ${nombre}\n📅 ${fecha}${hora?' · '+hora:''}\n🌿 Productor: ${productor} ${semana}\n⚖️ Kilos afectados: ${kg||'—'} kg\n📦 Calibres: ${calibreRes}\n\n*Fotos adjuntas:*\n\n${fotosNecesarias}\n\n*Agrovip S.A. · PackVip*`;
-  window.open(`https://wa.me/593995938213?text=${encodeURIComponent(msg)}`,'_blank');
+  var nombre=document.getElementById("rnom").value;
+  var recId=document.getElementById("rprod").value;
+  var allRecs=_recs||[];
+  var rec=allRecs.find(function(r){return r.id===recId;});
+  var productor=rec?rec.productor:"—";
+  var semana=rec?"S"+rec.semana:"";
+  var kg=document.getElementById("rkg").value||(rec?rec.rechazo:0)||0;
+  var hora=document.getElementById("rhora").value;
+  var fecha=new Date().toLocaleDateString("es-EC");
+  var calibreRes=getCalibreResumen();
+  var chips=Array.from(document.querySelectorAll(".prob-chip.sel"));
+  var problemas=chips.map(function(b){
+    var inp=document.querySelector(".prob-pct-input[data-prob=\""+b.dataset.prob+"\"]");
+    var pct=inp?inp.value:"";
+    return b.dataset.prob+(pct?" ("+pct+"%)":"");
+  });
+  var fotosNec=problemas.map(function(p){return "Foto - "+p+":\n   "+(fotosGuia[p]||"Foto del problema");}).join("\n\n");
+  var partes=["FOTOS REPORTE RECHAZO - AGROVIP","","Reportado por: "+nombre,"Fecha: "+fecha+(hora?" - "+hora:""),"Productor: "+productor+" "+semana,"Kilos afectados: "+kg+" kg","Calibres: "+calibreRes,"","Fotos adjuntas:","",fotosNec,"","Agrovip S.A. - PackVip"];
+  var msg=partes.join("\n");
+  window.open("https://wa.me/593995938213?text="+encodeURIComponent(msg),"_blank");
 }
 
 function rProd(){
