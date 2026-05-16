@@ -445,7 +445,7 @@ input,select,textarea,button{font-family:inherit}
           <span id="fotosGuiaText">Selecciona los problemas arriba para ver qué fotos necesitas.</span>
         </div>
         <button class="bmail" onclick="generarMailReporte()">📧 Enviar reporte por email a Lili, Daniel y Pablo</button>
-        <button class="bwa" style="margin-top:8px;width:100%;justify-content:center" onclick="waFotos()">📱 Enviar fotos por WhatsApp</button>
+        <button class="bwa" style="margin-top:8px;width:100%;justify-content:center" onclick="waFotos()">📋 Copiar mensaje para WhatsApp</button>
       </div>
     </div>
 
@@ -897,9 +897,18 @@ async function waFotos(){
     return b.dataset.prob+(pct?" ("+pct+"%)":"");
   });
   var fotosNec=problemas.map(function(p){return "Foto - "+p+":\n   "+(fotosGuia[p]||"Foto del problema");}).join("\n\n");
-  var partes=["FOTOS REPORTE RECHAZO - AGROVIP","","Reportado por: "+nombre,"Fecha: "+fecha+(hora?" - "+hora:""),"Productor: "+productor+" "+semana,"Kilos afectados: "+kg+" kg","Calibres: "+calibreRes,"","Fotos adjuntas:","",fotosNec,"","Agrovip S.A. - PackVip"];
+  var partes=["REPORTE DE RECHAZO - AGROVIP","","Reportado por: "+nombre,"Fecha: "+fecha+(hora?" - "+hora:""),"Productor: "+productor+" "+semana,"Kilos afectados: "+kg+" kg","Calibres: "+calibreRes,"","Problemas detectados:","",problemas.join("\n"),"","Fotos a adjuntar en este mensaje:","",fotosNec,"","Agrovip S.A."];
   var msg=partes.join("\n");
-  window.open("https://wa.me/593995938213?text="+encodeURIComponent(msg),"_blank");
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(msg).then(function(){
+      alert("Mensaje copiado. Pega en WhatsApp y adjunta las fotos.");
+    });
+  } else {
+    var ta=document.createElement("textarea");
+    ta.value=msg;document.body.appendChild(ta);ta.select();
+    document.execCommand("copy");document.body.removeChild(ta);
+    alert("Mensaje copiado. Pega en WhatsApp y adjunta las fotos.");
+  }
 }
 
 function rProd(){
