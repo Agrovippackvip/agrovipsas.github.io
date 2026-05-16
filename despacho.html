@@ -800,20 +800,24 @@ async function loadDesps(){
 
 async function renderBorradores(){
   var desps=await loadDesps();
-  var bors=desps.filter(function(d){return d.estado==='Borrador';});
-  var panel=document.getElementById('borradoresPanel');
-  var list=document.getElementById('borradoresList');
-  if(!bors.length){if(panel)panel.style.display='none';return;}
-  if(panel)panel.style.display='block';
-  list.innerHTML=bors.map(function(b){
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">'+
-      '<div><b>'+(b.documento||'Sin documento')+'</b> · '+(b.cliente||'—')+'<br><span style="font-size:11px;color:var(--gris)">'+(b.fecha||'—')+' · '+(b.total_cajas||0)+' cajas · S'+(b.semana||'—')+'</span></div>'+
-      '<div style="display:flex;gap:6px">'+
-      '<button class="bs" style="font-size:11px" onclick="cargarBorrador(\"'+b.id+'\");">Continuar</button>'+
-      '<button class="bsm" onclick="eliminarDesp(\"'+b.id+'\");">🗑</button>'+
-      '</div></div>';
+  var bors=desps.filter(function(d){return d.estado==="Borrador";});
+  var panel=document.getElementById("borradoresPanel");
+  var list=document.getElementById("borradoresList");
+  if(!bors.length){if(panel)panel.style.display="none";return;}
+  if(panel)panel.style.display="block";
+  list.innerHTML=bors.map(function(b,i){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)">'
+      +'<div><b>'+(b.documento||'Sin doc')+'</b> - '+(b.cliente||'—')+' - '+(b.total_cajas||0)+' cajas ('+(b.fecha||'—')+')</div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<button class="bs" style="font-size:11px" onclick="window._loadBorrador('+i+')">Continuar</button>'
+      +'<button class="bsm" onclick="window._delBorrador('+i+')">X</button>'
+      +'</div></div>';
   }).join('');
+  window._borradores=bors;
+  window._loadBorrador=function(i){cargarBorrador(bors[i].id);};
+  window._delBorrador=function(i){if(confirm("Eliminar borrador?"))eliminarDesp(bors[i].id);};
 }
+
 
 async function renderLista(){
   const desps=await loadDesps();
