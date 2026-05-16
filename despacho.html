@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agrovip · Despachos</title>
+<style>
+:root{--g:#1A6B3C;--g2:#7A9A2E;--am:#D4A017;--rd:#C0392B;--cr:#F5F0E8;--cr2:#EAE3D2;--gris:#6B6B5A;--ink:#1C1C1C;--bd:#E0D8C8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--cr);color:var(--ink);min-height:100vh}
+input,select,textarea,button{font-family:inherit}
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--g)}
+.lb{background:white;border-radius:12px;padding:40px 36px;width:340px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.ll{width:56px;height:56px;background:var(--g2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:white;margin:0 auto 16px}
+.lt{font-size:20px;font-weight:700;color:var(--g);margin-bottom:4px}
+.ls{font-size:13px;color:var(--gris);margin-bottom:24px}
+.lb input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:14px;margin-bottom:12px;outline:none}
+.lb input:focus{border-color:var(--g)}
+.lbtn{width:100%;padding:12px;background:var(--g);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.lerr{color:var(--rd);font-size:12px;margin-top:8px;display:none}
+.app{display:none}
+.hdr{background:var(--g);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.hl{display:flex;align-items:center;gap:12px}
+.hlogo{width:36px;height:36px;background:var(--g2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white}
+.htitle{font-size:14px;font-weight:600;color:white}
+.htitle span{opacity:.6;font-size:11px;display:block;margin-top:1px}
+.hdate{font-size:11px;color:rgba(255,255,255,.6)}
+.blogout{background:none;border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.8);padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer}
+.nav{display:flex;background:white;border-bottom:1px solid var(--bd);overflow-x:auto}
+.nb{padding:11px 18px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;color:var(--gris);border-bottom:2.5px solid transparent;white-space:nowrap}
+.nb.active{color:var(--g);border-bottom-color:var(--g)}
+.main{max-width:1200px;margin:0 auto;padding:20px 16px 40px}
+.tab{display:none}.tab.show{display:block}
+.sl{font-size:10px;font-weight:600;color:var(--gris);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.card{background:white;border:1px solid var(--bd);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+.ct{font-size:12px;font-weight:600;color:var(--gris);margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:11px;color:var(--gris);margin-bottom:4px}
+.fld input,.fld select,.fld textarea{width:100%;padding:8px 11px;font-size:13px;border:1px solid var(--bd);border-radius:7px;background:white;color:var(--ink);outline:none}
+.fld input:focus,.fld select:focus{border-color:var(--g)}
+.fld textarea{resize:vertical;min-height:52px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.bp{width:100%;padding:11px;background:var(--g);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px}
+.bp:hover{opacity:.9}
+.bs{padding:7px 14px;background:none;border:1px solid var(--g);color:var(--g);border-radius:7px;font-size:12px;cursor:pointer}
+.bsm{padding:5px 10px;background:none;border:1px solid var(--bd);color:var(--gris);border-radius:6px;font-size:11px;cursor:pointer}
+.bsm:hover{border-color:var(--g);color:var(--g)}
+.bwa{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#25D366;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.bg{background:#D1FAE5;color:#065F46}.ba{background:#FEF3C7;color:#92400E}.br{background:#FEE2E2;color:#991B1B}.bb{background:#EFF6FF;color:#1E40AF}.bp2{background:#F3E8FF;color:#6B21A8}
+.sc{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.sc .et{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--gris);margin-bottom:6px}
+.sc .nm{font-size:24px;font-weight:700;color:var(--ink)}.sc .nm.hl{color:var(--g)}
+.rr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.rr:last-child{border-bottom:none}
+.rr .lb{color:var(--gris)}
+.al{background:#FEF3C7;border-left:3px solid var(--am);border-radius:0 7px 7px 0;padding:10px 14px;font-size:12px;color:#92400E;margin:8px 0}
+.al.rd{background:#FEE2E2;border-left-color:var(--rd);color:#991B1B}
+.al.g{background:#D1FAE5;border-left-color:var(--g);color:#065F46}
+.pallet-card{background:white;border:1px solid var(--bd);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.pallet-header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--g);color:white;font-size:12px;font-weight:600;cursor:pointer}
+.pallet-body{padding:10px 12px}
+.pallet-row{display:grid;grid-template-columns:180px repeat(9,44px) 70px 70px 28px;gap:4px;align-items:center;margin-bottom:4px;font-size:11px}
+.pallet-row input{padding:4px;font-size:11px;border:1px solid var(--bd);border-radius:4px;text-align:center;width:100%}
+.pallet-row input:focus{border-color:var(--g);outline:none}
+.pallet-head-row{display:grid;grid-template-columns:180px repeat(9,44px) 70px 70px 28px;gap:4px;font-size:10px;font-weight:600;color:var(--gris);text-align:center;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--bd)}
+.pallet-total-row{display:grid;grid-template-columns:180px repeat(9,44px) 70px 70px 28px;gap:4px;font-size:11px;font-weight:700;color:var(--g);text-align:center;padding-top:6px;border-top:2px solid var(--g)}
+.desp-card{background:white;border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px;border-left:4px solid var(--g)}
+.desp-card.aereo{border-left-color:#3B82F6}
+.desp-card.local{border-left-color:var(--am)}
+@media(max-width:768px){.g2,.g3,.g4,.fr2,.fr3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="lw" id="lw">
+  <div class="lb">
+    <div class="ll">AV</div>
+    <div class="lt">Agrovip · Despachos</div>
+    <div class="ls">Trazabilidad por pallet · Exportación</div>
+    <input type="password" id="lp" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
+    <button class="lbtn" onclick="login()">Ingresar</button>
+    <div class="lerr" id="le">Contraseña incorrecta</div>
+  </div>
+</div>
+<div class="app" id="aw">
+  <div class="hdr">
+    <div class="hl"><div class="hlogo">AV</div><div class="htitle">DESPACHOS <span id="roleLabel">Agrovip S.A. · Exportación</span></div></div>
+    <div style="display:flex;align-items:center;gap:12px"><div class="hdate" id="hd"></div><button class="blogout" onclick="logout()">Salir</button></div>
+  </div>
+  <div class="nav">
+    <button class="nb active" onclick="gt('nuevo')">📦 Nuevo Despacho</button>
+    <button class="nb" onclick="gt('lista')">📋 Despachos</button>
+    <button class="nb" onclick="gt('reporte')">📊 Reporte</button>
+  </div>
+  <div class="main">
+
+    <!-- NUEVO DESPACHO -->
+    <div class="tab show" id="tab-nuevo">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="sl" style="margin:0;border:none;padding:0">Nuevo despacho</div>
+        <span id="autoSaveInd" style="font-size:11px;color:var(--gris)"></span>
+      </div>
+      <div class="g2" style="margin-bottom:14px">
+        <div class="card">
+          <div class="ct">🚢 Datos del despacho</div>
+          <div class="fr2">
+            <div class="fld"><label>Tipo de despacho</label>
+              <select id="dtipo" onchange="actualizarTipo()">
+                <option value="maritimo">Marítimo (BL)</option>
+                <option value="aereo">Aéreo (AWB)</option>
+                <option value="local">Local (Guía)</option>
+              </select>
+            </div>
+            <div class="fld"><label id="docLabel">Número de BL</label>
+              <input type="text" id="ddoc" placeholder="Ej: MSKU1234567">
+            </div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Fecha de salida</label><input type="date" id="dfecha"></div>
+            <div class="fld"><label>Semana #</label><input type="number" id="dsemana" placeholder="Ej: 20"></div>
+          </div>
+          <div class="fld"><label>Cotización asociada</label>
+            <select id="dcot" onchange="cargarDatosCot()">
+              <option value="">— Seleccionar cotización —</option>
+            </select>
+          </div>
+          <div class="fld"><label>O escribe el cliente</label>
+            <input type="text" id="dcliente" placeholder="Ej: Veritas Commodities">
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Naviera / Aerolínea</label><input type="text" id="dnaviera" placeholder="Ej: Maersk"></div>
+            <div class="fld"><label>Destino</label><input type="text" id="ddestino" placeholder="Ej: Rotterdam"></div>
+          </div>
+          <div class="fld"><label>Notas</label><textarea id="dnotas" placeholder="Observaciones..."></textarea></div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="ct">📊 Parámetros del despacho</div>
+            <div class="fr2">
+              <div class="fld"><label>Cajas objetivo total</label><input type="number" id="dcajas_obj" placeholder="3840" oninput="actualizarParams()"></div>
+              <div class="fld"><label>Kg por caja</label><input type="number" id="dkg_caja" value="4.5" step="0.05" oninput="actualizarParams()"></div>
+            </div>
+            <div class="fr2" id="palletParamsRow">
+              <div class="fld"><label>Cajas por pallet</label><input type="number" id="dcajas_pallet" value="160" oninput="actualizarParams()"></div>
+              <div class="fld"><label>Pallets calculados</label><input type="text" id="dpallets_calc" readonly style="background:var(--cr);font-weight:600;color:var(--g)"></div>
+            </div>
+            <div class="rr"><span class="lb">Total cajas asignadas</span><span id="rs_cajas" style="font-weight:700;color:var(--g)">0</span></div>
+            <div class="rr"><span class="lb">Total kg neto</span><span id="rs_kg" style="font-weight:700;color:var(--g)">0 kg</span></div>
+            <div class="rr"><span class="lb">Productores</span><span id="rs_prods">0</span></div>
+            <div id="rs_alert" style="margin-top:8px"></div>
+          </div>
+          <div class="card">
+            <div class="ct">📦 Cargar recepciones de la semana</div>
+            <div class="fr2">
+              <div class="fld"><label>Semana a cargar</label>
+                <input type="number" id="semRecepcion" placeholder="Ej: 20">
+              </div>
+              <div style="display:flex;align-items:flex-end;padding-bottom:10px">
+                <button class="bs" onclick="cargarRecepciones()">Cargar recepciones</button>
+              </div>
+            </div>
+            <div id="recepcionesPanel" style="display:none">
+              <div style="font-size:12px;color:var(--gris);margin-bottom:8px">Recepciones disponibles — haz clic para agregar al despacho:</div>
+              <div id="recepcionesList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVENTARIO + PALLETS -->
+      <div class="card" id="inventarioCard" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="ct" style="margin:0">📦 Inventario disponible por productor</div>
+          <div style="font-size:11px;color:var(--gris)" id="inventarioResumen">0 cajas totales</div>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="border-collapse:collapse;font-size:12px;width:100%">
+            <thead><tr style="background:var(--g);color:white;text-align:center">
+              <th style="padding:6px 10px;text-align:left">Productor</th>
+              <th style="padding:6px 8px">C6</th><th style="padding:6px 8px">C7</th><th style="padding:6px 8px">C8</th>
+              <th style="padding:6px 8px">C9</th><th style="padding:6px 8px">C10</th><th style="padding:6px 8px">C11</th>
+              <th style="padding:6px 8px">C12</th><th style="padding:6px 8px">C13</th><th style="padding:6px 8px">C14</th>
+              <th style="padding:6px 8px;background:#065F46">Total</th><th style="padding:6px 8px;background:#065F46">Usadas</th><th style="padding:6px 8px;background:#065F46">Restantes</th>
+            </tr></thead>
+            <tbody id="inventarioBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="palletsCard">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="ct" style="margin:0">🏗️ Asignación por pallet</div>
+          <div style="display:flex;gap:8px">
+            <button class="bs" onclick="agregarPallet()">+ Pallet</button>
+            <button class="bsm" onclick="autoDistribuir()">⚡ Auto-distribuir</button>
+          </div>
+        </div>
+        <div id="aereoSimple" style="display:none">
+          <div class="al b">✈️ Despacho aéreo — máx 110 cajas</div>
+          <div style="overflow-x:auto;margin-top:10px">
+            <div class="pallet-head-row">
+              <div style="text-align:left">PRODUCTOR</div>
+              <div>C6</div><div>C7</div><div>C8</div><div>C9</div><div>C10</div><div>C11</div><div>C12</div><div>C13</div><div>C14</div>
+              <div>CAJAS</div><div>KG</div><div></div>
+            </div>
+            <div id="aereoRows"></div>
+            <div class="pallet-total-row" id="aereoTotals">
+              <div style="text-align:left">TOTAL</div>
+              <div id="at6">0</div><div id="at7">0</div><div id="at8">0</div><div id="at9">0</div>
+              <div id="at10">0</div><div id="at11">0</div><div id="at12">0</div><div id="at13">0</div><div id="at14">0</div>
+              <div id="attotal">0</div><div id="atkg">0</div><div></div>
+            </div>
+          </div>
+          <button class="bs" style="margin-top:10px" onclick="agregarFilaAereo()">+ Agregar productor</button>
+        </div>
+        <div id="palletsList"></div>
+        <div class="pallet-total-row" id="grandTotals" style="display:none;margin-top:10px;padding:10px 12px;background:var(--cr);border-radius:8px">
+          <div style="text-align:left;color:var(--ink)">GRAN TOTAL</div>
+          <div id="gt6">0</div><div id="gt7">0</div><div id="gt8">0</div><div id="gt9">0</div>
+          <div id="gt10">0</div><div id="gt11">0</div><div id="gt12">0</div><div id="gt13">0</div><div id="gt14">0</div>
+          <div id="gttotal">0</div><div id="gtkg">0</div><div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="bp" style="flex:2;margin-top:0" onclick="guardarDespacho()">💾 Guardar despacho</button>
+        <button class="bwa" style="flex:1" onclick="waDespacho()">📱 Resumen WhatsApp</button>
+      </div>
+    </div>
+
+    <!-- LISTA -->
+    <div class="tab" id="tab-lista">
+      <div class="card" id="borradoresPanel" style="margin-bottom:14px;border-left:4px solid var(--am);display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-weight:600;font-size:13px;color:var(--am)">📝 Borradores pendientes</div>
+          <button class="bsm" onclick="renderBorradores()">Actualizar</button>
+        </div>
+        <div id="borradoresList"></div>
+      </div>
+      <div class="g4" style="margin-bottom:16px">
+        <div class="sc"><div class="et">Total despachos</div><div class="nm hl" id="sl_total">0</div></div>
+        <div class="sc"><div class="et">Cajas totales</div><div class="nm hl" id="sl_cajas">0</div></div>
+        <div class="sc"><div class="et">Marítimos</div><div class="nm hl" id="sl_mar">0</div></div>
+        <div class="sc"><div class="et">Aéreos</div><div class="nm hl" id="sl_aer">0</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <select id="filtroTipo" onchange="renderLista()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white">
+          <option value="">Todos los tipos</option>
+          <option value="maritimo">Marítimo</option>
+          <option value="aereo">Aéreo</option>
+          <option value="local">Local</option>
+        </select>
+        <select id="filtroEstado" onchange="renderLista()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white">
+          <option value="">Todos los estados</option>
+          <option value="Programado">Programado</option>
+          <option value="En tránsito">En tránsito</option>
+          <option value="Entregado">Entregado</option>
+          <option value="Facturado">Facturado</option>
+        </select>
+      </div>
+      <div id="despLista"></div>
+    </div>
+
+    <!-- REPORTE -->
+    <div class="tab" id="tab-reporte">
+      <div class="sl">Resumen de despachos</div>
+      <div class="g4" style="margin-bottom:16px">
+        <div class="sc"><div class="et">Total cajas</div><div class="nm hl" id="rp_cajas">0</div></div>
+        <div class="sc"><div class="et">Total kg neto</div><div class="nm hl" id="rp_kg">0</div></div>
+        <div class="sc"><div class="et">Marítimos</div><div class="nm hl" id="rp_mar">0</div></div>
+        <div class="sc"><div class="et">Aéreos</div><div class="nm hl" id="rp_aer">0</div></div>
+      </div>
+      <div class="card">
+        <div class="ct">📦 Cajas por calibre (histórico)</div>
+        <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:10px;text-align:center">
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px"><div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL 6</div><div id="rp_cal_6" style="font-size:18px;font-weight:700;color:var(--g)">0</div></div>
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px"><div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL 7</div><div id="rp_cal_7" style="font-size:18px;font-weight:700;color:var(--g)">0</div></div>
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px"><div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL 8</div><div id="rp_cal_8" style="font-size:18px;font-weight:700;color:var(--g)">0</div></div>
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px"><div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL 9</div><div id="rp_cal_9" style="font-size:18px;font-weight:700;color:var(--g)">0</div></div>
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px"><div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL 10</div><div id="rp_cal_10" style="font-size:18px;font-weight:700;color:var(--g)">0</div></div>
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px"><div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL 11</div><div id="rp_cal_11" style="font-size:18px;font-weight:700;color:var(--g)">0</div></div>
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px"><div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL 12</div><div id="rp_cal_12" style="font-size:18px;font-weight:700;color:var(--g)">0</div></div>
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px"><div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL 13</div><div id="rp_cal_13" style="font-size:18px;font-weight:700;color:var(--g)">0</div></div>
+          <div style="background:var(--cr);border-radius:8px;padding:10px 6px"><div style="font-size:10px;color:var(--gris);margin-bottom:4px">CAL 14</div><div id="rp_cal_14" style="font-size:18px;font-weight:700;color:var(--g)">0</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0';
+const CALS=[6,7,8,9,10,11,12,13,14];
+let _borradorId=null;
+let _autoSaveTimer=null;
+let USUARIO_ACTUAL=null;
+let _desps=null;
+let pallets=[]; // [{id, productor, cals:{6:0,...}}]
+let aereoRows=[]; // for aereo mode
+let recepciones_cargadas=[];
+
+const f2=n=>{try{return'$'+parseFloat(n).toFixed(2);}catch{return'—';}};
+const fk=n=>{try{return'$'+Math.round(parseFloat(n)).toLocaleString();}catch{return'—';}};
+
+async function supaFetch(method,path,body){
+  const r=await fetch(SUPA_URL+'/rest/v1/'+path,{
+    method,headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':method==='POST'?'return=representation':''},
+    body:body?JSON.stringify(body):undefined
+  });
+  if(!r.ok){console.error('Supa:',await r.text());return null;}
+  return r.status===204?true:r.json();
+}
+
+// BORRADORES
+async function autoGuardarBorrador(){
+  const tipo=document.getElementById('dtipo').value;
+  const doc=document.getElementById('ddoc').value.trim();
+  const cliente=document.getElementById('dcliente').value.trim();
+  if(!doc&&!cliente&&!pallets.length&&!aereoRows.length)return;
+  const calTotals={};let totalCajas=0;
+  CALS.forEach(c=>calTotals[c]=0);
+  const asignacion=tipo==='aereo'?aereoRows:pallets;
+  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});};
+  const datos={
+    id:_borradorId||('borr'+Date.now()),
+    tipo,documento:doc,
+    fecha:document.getElementById('dfecha').value,
+    semana:parseInt(document.getElementById('dsemana').value)||0,
+    cotizacion_id:document.getElementById('dcot').value||null,
+    cliente,
+    naviera:document.getElementById('dnaviera').value.trim(),
+    destino:document.getElementById('ddestino').value.trim(),
+    notas:document.getElementById('dnotas').value.trim(),
+    cajas_obj:parseFloat(document.getElementById('dcajas_obj').value)||0,
+    kg_caja:parseFloat(document.getElementById('dkg_caja').value)||4.5,
+    total_cajas:totalCajas,total_kg:totalCajas*4.5,
+    cal_6:calTotals[6],cal_7:calTotals[7],cal_8:calTotals[8],cal_9:calTotals[9],
+    cal_10:calTotals[10],cal_11:calTotals[11],cal_12:calTotals[12],cal_13:calTotals[13],cal_14:calTotals[14],
+    productores:JSON.stringify(tipo==='aereo'?aereoRows:pallets),
+    estado:'Borrador',
+    creado_por:USUARIO_ACTUAL?.nombre||'—'
+  };
+  if(!_borradorId){
+    const res=await supaFetch('POST','despachos',datos);
+    if(res&&res[0])_borradorId=res[0].id||datos.id;
+    else _borradorId=datos.id;
+    _desps=null;
+  } else {
+    await supaFetch('PATCH','despachos?id=eq.'+_borradorId,datos);
+  }
+  const st=document.getElementById('borradorStatus');
+  if(st){const t=new Date().toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});st.textContent='Guardado '+t;st.style.color='var(--g)';}
+}
+
+function iniciarAutoGuardado(){
+  if(_autoSaveTimer)clearInterval(_autoSaveTimer);
+  _autoSaveTimer=setInterval(autoGuardarBorrador,30000);
+  const st=document.getElementById('borradorStatus');
+  if(st){st.textContent='Auto-guardado activo';st.style.color='var(--gris)';}
+}
+
+async function cargarBorradores(){
+  const borradores=(_desps||await loadDesps()).filter(d=>d.estado==='Borrador');
+  if(!borradores.length){alert('Sin borradores guardados.');return;}
+  const opciones=borradores.map((b,i)=>`${i+1}. ${b.documento||'Sin doc'} · ${b.cliente||'—'} · ${b.total_cajas||0} cajas (${b.fecha})`).join('\n');
+  const idx=prompt('Borradores disponibles:\n\n'+opciones+'\n\nEscribe el número para cargar:');
+  if(!idx)return;
+  const b=borradores[parseInt(idx)-1];
+  if(!b)return;
+  // Load into form
+  document.getElementById('dtipo').value=b.tipo||'maritimo';
+  document.getElementById('ddoc').value=b.documento||'';
+  document.getElementById('dfecha').value=b.fecha||'';
+  document.getElementById('dsemana').value=b.semana||'';
+  document.getElementById('dcliente').value=b.cliente||'';
+  document.getElementById('dnaviera').value=b.naviera||'';
+  document.getElementById('ddestino').value=b.destino||'';
+  document.getElementById('dnotas').value=b.notas||'';
+  document.getElementById('dcajas_obj').value=b.cajas_obj||'';
+  // Load pallets
+  try{
+    const prods=JSON.parse(b.productores||'[]');
+    if(b.tipo==='aereo'){aereoRows=prods;renderAereoRows();}
+    else{pallets=prods;renderPallets();}
+  }catch(e){}
+  _borradorId=b.id;
+  actualizarTipo();
+  const st=document.getElementById('borradorStatus');
+  if(st){st.textContent='Borrador cargado';st.style.color='var(--am)';}
+  alert('Borrador cargado. Continua desde donde lo dejaste.');
+}
+
+function limpiarFormulario(){
+  if(!confirm('Limpiar todo el formulario?'))return;
+  _borradorId=null;
+  if(_autoSaveTimer){clearInterval(_autoSaveTimer);_autoSaveTimer=null;}
+  pallets=[];aereoRows=[];
+  document.getElementById('ddoc').value='';
+  document.getElementById('dcliente').value='';
+  document.getElementById('dnaviera').value='';
+  document.getElementById('ddestino').value='';
+  document.getElementById('dnotas').value='';
+  document.getElementById('dcajas_obj').value='';
+  renderPallets();renderAereoRows();
+  const st=document.getElementById('borradorStatus');
+  if(st){st.textContent='Formulario limpio';st.style.color='var(--gris)';}
+}
+
+async function login(){
+  const pw=document.getElementById('lp').value.trim();
+  const data=await supaFetch('GET',`usuarios?clave=eq.${encodeURIComponent(pw)}&select=*`);
+  if(!data||!data.length){document.getElementById('le').style.display='block';return;}
+  USUARIO_ACTUAL=data[0];
+  document.getElementById('lw').style.display='none';
+  document.getElementById('aw').style.display='block';
+  document.getElementById('roleLabel').textContent=USUARIO_ACTUAL.nombre+' · Despachos';
+  init();
+}
+function logout(){document.getElementById('lw').style.display='flex';document.getElementById('aw').style.display='none';document.getElementById('lp').value='';USUARIO_ACTUAL=null;_desps=null;}
+
+async function init(){
+  const now=new Date();
+  document.getElementById('hd').textContent=now.toLocaleDateString('es-EC',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  document.getElementById('dfecha').value=now.toISOString().split('T')[0];
+  const sy=new Date(now.getFullYear(),0,1);
+  const wk=Math.ceil(((now-sy)/86400000+sy.getDay()+1)/7);
+  document.getElementById('dsemana').value=wk;
+  document.getElementById('semRecepcion').value=wk;
+  await cargarCotizaciones();
+  renderLista();
+  renderReporte();
+  iniciarAutoGuardado();
+}
+
+async function cargarCotizaciones(){
+  const data=await supaFetch('GET','cotizaciones?select=id,num_cot,cliente,valor_cotizado,estado,tipo_pitahaya,cajas_total,fecha_despacho&order=created_at.desc');
+  const sel=document.getElementById('dcot');
+  if(data&&data.length){
+    data.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.id;
+      o.textContent=`${c.num_cot||'—'} · ${c.cliente} · ${c.estado}`;
+      o.dataset.cliente=c.cliente||'';
+      o.dataset.cajas=c.cajas_total||0;
+      o.dataset.tipo=c.tipo_pitahaya||'';
+      sel.appendChild(o);
+    });
+  }
+}
+
+function cargarDatosCot(){
+  const sel=document.getElementById('dcot');
+  const opt=sel.options[sel.selectedIndex];
+  if(opt&&opt.dataset.cliente){
+    document.getElementById('dcliente').value=opt.dataset.cliente;
+    if(opt.dataset.cajas)document.getElementById('dcajas_obj').value=opt.dataset.cajas;
+    actualizarParams();
+  }
+}
+
+function gt(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('show'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('show');
+  const idx={nuevo:0,lista:1,reporte:2}[id];
+  document.querySelectorAll('.nb')[idx].classList.add('active');
+  if(id==='lista')renderLista();
+  if(id==='reporte')renderReporte();
+}
+
+function actualizarTipo(){
+  const tipo=document.getElementById('dtipo').value;
+  const labels={maritimo:'Número de BL',aereo:'Número de AWB',local:'Número de guía'};
+  document.getElementById('docLabel').textContent=labels[tipo]||'Número de documento';
+  const esAereo=tipo==='aereo';
+  document.getElementById('palletParamsRow').style.display=esAereo?'none':'';
+  document.getElementById('aereoSimple').style.display=esAereo?'block':'none';
+  document.getElementById('palletsList').style.display=esAereo?'none':'block';
+  document.getElementById('grandTotals').style.display=esAereo?'none':'';
+  // Set cajas objetivo based on type
+  if(esAereo){
+    document.getElementById('dcajas_obj').value=110;
+  }
+  if(esAereo&&aereoRows.length===0)agregarFilaAereo();
+  actualizarParams();
+}
+
+function actualizarParams(){
+  const cajasObj=parseFloat(document.getElementById('dcajas_obj').value)||0;
+  const cajasXPallet=parseFloat(document.getElementById('dcajas_pallet').value)||160;
+  const palletsCalc=cajasObj>0?Math.ceil(cajasObj/cajasXPallet):0;
+  document.getElementById('dpallets_calc').value=palletsCalc>0?`${palletsCalc} pallets`:'—';
+  calcGrandTotals();
+}
+
+// RECEPCIONES
+async function cargarRecepciones(){
+  const sem=parseInt(document.getElementById('semRecepcion').value)||0;
+  const data=await supaFetch('GET',`recepciones?semana=eq.${sem}&select=*&order=created_at.desc`);
+  if(!data||!data.length){alert(`Sin recepciones para semana ${sem}.`);return;}
+  recepciones_cargadas=data;
+  document.getElementById('recepcionesPanel').style.display='block';
+  document.getElementById('inventarioCard').style.display='block';
+  actualizarInventario();
+  document.getElementById('recepcionesList').innerHTML=data.map(r=>{
+    const cals=CALS.map(c=>r['cal_'+c]>0?`Cal${c}:${r['cal_'+c]}`:'').filter(Boolean).join(' ');
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--cr);border-radius:6px;margin-bottom:6px;font-size:12px">
+      <div><b>${r.productor}</b><br><span style="color:var(--gris)">${r.k_neto||r.k_rec||0} kg netos · ${cals||'Sin calibres'}</span></div>
+      <button class="bs" style="font-size:11px" onclick="agregarRecepcionAPallet('${r.id}')">+ Agregar</button>
+    </div>`;
+  }).join('');
+}
+
+function actualizarInventario(){
+  const body=document.getElementById('inventarioBody');
+  if(!body)return;
+  let totalDisp=0;
+  body.innerHTML=recepciones_cargadas.map(rec=>{
+    const totalRec=CALS.reduce((s,c)=>s+(rec['cal_'+c]||0),0);
+    const usadas=CALS.reduce((s,c)=>{
+      return s+pallets.reduce((ps,p)=>ps+p.rows.reduce((rs,r)=>r.productor===rec.productor?rs+(r.cals[c]||0):rs,0),0);
+    },0);
+    const restantes=totalRec-usadas;
+    totalDisp+=restantes;
+    const calsHTML=CALS.map(c=>{
+      const tot=rec['cal_'+c]||0;
+      const usad=pallets.reduce((s,p)=>s+p.rows.reduce((rs,r)=>r.productor===rec.productor?rs+(r.cals[c]||0):rs,0),0);
+      const rest=tot-usad;
+      const color=rest===0?'var(--gris)':rest<20?'var(--am)':'var(--g)';
+      return `<td style="padding:5px 8px;text-align:center;color:${color};font-weight:${rest>0?'600':'400'}">${rest>0?rest:'—'}</td>`;
+    }).join('');
+    return `<tr style="border-bottom:1px solid var(--bd)">
+      <td style="padding:6px 10px;font-weight:600">${rec.productor}</td>
+      ${calsHTML}
+      <td style="padding:5px 8px;text-align:center;font-weight:700">${totalRec}</td>
+      <td style="padding:5px 8px;text-align:center;color:var(--am)">${usadas}</td>
+      <td style="padding:5px 8px;text-align:center;font-weight:700;color:${restantes>0?'var(--g)':'var(--gris)'}">${restantes}</td>
+    </tr>`;
+  }).join('');
+  const resEl=document.getElementById('inventarioResumen');
+  if(resEl)resEl.textContent=totalDisp+' cajas disponibles';
+}
+
+function agregarRecepcionAPallet(recId){
+  // Solo para aéreo — en marítimo se usa el panel de inventario + pallets manualmente
+  const rec=recepciones_cargadas.find(r=>r.id===recId);
+  if(!rec)return;
+  const tipo=document.getElementById('dtipo').value;
+  if(tipo==='aereo'){
+    const calsData={};
+    CALS.forEach(c=>{calsData[c]=rec['cal_'+c]||0;});
+    aereoRows.push({id:'ar'+Date.now(),productor:rec.productor,cals:calsData});
+    renderAereoRows();
+  } else {
+    // Para marítimo: agregar fila vacía con el productor preseleccionado en el último pallet
+    if(pallets.length===0)agregarPallet();
+    const lastPallet=pallets[pallets.length-1];
+    // Check if there's already a row for this producer
+    const existingRow=lastPallet.rows.find(r=>r.productor===rec.productor);
+    if(!existingRow){
+      lastPallet.rows.push({productor:rec.productor,cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}});
+    }
+    renderPallets();
+    actualizarInventario();
+  }
+}
+
+// PALLETS
+function agregarPallet(){
+  const n=pallets.length+1;
+  pallets.push({id:'pal'+Date.now(),num:n,rows:[{productor:'',cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}}]});
+  renderPallets();
+}
+
+function renderPallets(){
+  const cont=document.getElementById('palletsList');
+  const gt=document.getElementById('grandTotals');
+  if(!pallets.length){
+    cont.innerHTML='<div style="padding:20px;text-align:center;font-size:13px;color:var(--gris)">Agrega pallets o carga recepciones.</div>';
+    gt.style.display='none';return;
+  }
+  gt.style.display='';
+  const cajasXPallet=parseFloat(document.getElementById('dcajas_pallet').value)||160;
+  cont.innerHTML=pallets.map((p,pi)=>{
+    const totalCajas=p.rows.reduce((s,r)=>s+CALS.reduce((ss,c)=>ss+(r.cals[c]||0),0),0);
+    const pct=cajasXPallet>0?Math.round(totalCajas/cajasXPallet*100):0;
+    const barColor=pct>=100?'#1A6B3C':pct>=80?'#D4A017':'#C0392B';
+    const prodNames=p.rows.filter(r=>r.productor).map(r=>r.productor).join(' + ')||'Sin productor';
+    return`<div class="pallet-card">
+      <div class="pallet-header" onclick="togglePallet(${pi})">
+        <span>Pallet ${String(p.num).padStart(2,'0')} · ${prodNames}</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:80px;height:8px;background:rgba(255,255,255,.3);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${Math.min(pct,100)}%;background:${barColor};border-radius:4px"></div>
+          </div>
+          <span>${totalCajas}/${cajasXPallet} cajas</span>
+          <button onclick="event.stopPropagation();eliminarPallet(${pi})" style="background:none;border:none;color:white;cursor:pointer;font-size:14px">🗑</button>
+        </div>
+      </div>
+      <div class="pallet-body" id="pbody_${pi}">
+        <div class="pallet-head-row">
+          <div style="text-align:left">PRODUCTOR</div>
+          <div>C6</div><div>C7</div><div>C8</div><div>C9</div><div>C10</div><div>C11</div><div>C12</div><div>C13</div><div>C14</div>
+          <div>CAJAS</div><div>KG</div><div></div>
+        </div>
+        ${p.rows.map((row,ri)=>{
+          const rowCajas=CALS.reduce((s,c)=>s+(row.cals[c]||0),0);
+          const rec=recepciones_cargadas.find(r=>r.productor===row.productor);
+          return`<div class="pallet-row">
+            <select id="psel_${pi}_${ri}" onchange="updatePalletProd(${pi},${ri},this.value)" style="padding:4px 6px;font-size:11px;border:1px solid var(--bd);border-radius:5px;width:100%">
+              <option value="">— Productor —</option>
+            </select>
+            ${CALS.map(c=>{
+              const stock=rec?rec['cal_'+c]||0:999;
+              const yaOtros=pallets.reduce((s,pp,ppi)=>s+pp.rows.reduce((ss,rr,rri)=>ppi===pi&&rri===ri?ss:ss+(rr.cals[c]||0),0),0);
+              const max=Math.max(0,stock-yaOtros);
+              return`<input type="number" min="0" max="${rec?max:999}" step="1" placeholder="0" value="${row.cals[c]||''}" 
+                title="Stock: ${stock} · Disponible: ${max}"
+                oninput="updatePalletCal(${pi},${ri},${c},this.value)" 
+                style="padding:4px;font-size:11px;border:1px solid ${rec&&(row.cals[c]||0)>(max+(row.cals[c]||0))?'var(--rd)':'var(--bd)'};border-radius:4px;text-align:center">`;
+            }).join('')}
+            <div style="font-weight:700;color:var(--g);text-align:center;font-size:12px">${rowCajas}</div>
+            <div style="font-weight:700;color:var(--g);text-align:center;font-size:12px">${(rowCajas*4.5).toFixed(1)}</div>
+            <button class="bsm" onclick="eliminarFilaPallet(${pi},${ri})" style="font-size:10px">🗑</button>
+          </div>`;
+        }).join('')}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <button class="bs" style="font-size:11px" onclick="agregarFilaPallet(${pi})">+ Agregar productor</button>
+          ${pct>100?`<div style="font-size:12px;color:var(--rd);font-weight:600">⚠ Excede ${totalCajas-cajasXPallet} cajas</div>`:''}
+          ${cajasXPallet-totalCajas>0&&totalCajas>0?`<div style="font-size:12px;color:var(--am)">⚠ Incompleto — faltan ${cajasXPallet-totalCajas} cajas</div>`:totalCajas===cajasXPallet&&totalCajas>0?'<div style="font-size:12px;color:var(--g)">✓ Pallet completo</div>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // Populate selects
+  pallets.forEach((p,pi)=>{
+    p.rows.forEach((row,ri)=>{
+      const sel=document.getElementById('psel_'+pi+'_'+ri);
+      if(!sel)return;
+      sel.innerHTML='<option value="">— Productor —</option>'+
+        recepciones_cargadas.map(r=>`<option value="${r.productor}" ${row.productor===r.productor?'selected':''}>${r.productor} (${Math.round(r.k_neto||r.k_rec||0)} kg)</option>`).join('');
+    });
+  });
+  calcGrandTotals();
+}
+
+function agregarFilaPallet(pi){
+  pallets[pi].rows.push({productor:'',cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}});
+  renderPallets();
+}
+function eliminarFilaPallet(pi,ri){
+  if(pallets[pi].rows.length<=1){alert('El pallet necesita al menos un productor.');return;}
+  pallets[pi].rows.splice(ri,1);renderPallets();
+}
+
+function togglePallet(pi){
+  const body=document.getElementById('pbody_'+pi);
+  if(body)body.style.display=body.style.display==='none'?'block':'none';
+}
+function updatePalletProd(pi,ri,val){pallets[pi].rows[ri].productor=val;renderPallets();}
+function updatePalletCal(pi,ri,cal,val){
+  const v=parseInt(val)||0;
+  const cajasXPallet=parseFloat(document.getElementById('dcajas_pallet').value)||160;
+  // Check stock from recepcion
+  const prod=pallets[pi].rows[ri].productor;
+  const rec=prod?recepciones_cargadas.find(r=>r.productor===prod):null;
+  if(rec){
+    const stock=rec['cal_'+cal]||0;
+    const yaOtros=pallets.reduce((s,pp,ppi)=>s+pp.rows.reduce((ss,rr,rri)=>
+      (ppi===pi&&rri===ri)?ss:ss+(rr.cals[cal]||0),0),0);
+    const maxDisp=Math.max(0,stock-yaOtros);
+    if(v>maxDisp){
+      alert('Stock insuficiente Cal '+cal+'. Disponible: '+maxDisp+' cajas de '+prod);
+      const inp=document.querySelectorAll('#pbody_'+pi+' .pallet-row')[ri]?.querySelectorAll('input')[CALS.indexOf(cal)];
+      if(inp)inp.value=maxDisp;
+      pallets[pi].rows[ri].cals[cal]=maxDisp;
+      calcGrandTotals();return;
+    }
+  }
+  pallets[pi].rows[ri].cals[cal]=v;
+  // Check pallet total
+  const total=pallets[pi].rows.reduce((s,r)=>s+CALS.reduce((ss,c)=>ss+(r.cals[c]||0),0),0);
+  if(total>cajasXPallet){
+    const exceso=total-cajasXPallet;
+    pallets[pi].rows[ri].cals[cal]=Math.max(0,v-exceso);
+    const allRows=document.querySelectorAll('#pbody_'+pi+' .pallet-row');
+    if(allRows[ri]){
+      const inp=allRows[ri].querySelectorAll('input[type=number]')[CALS.indexOf(cal)];
+      if(inp)inp.value=pallets[pi].rows[ri].cals[cal];
+    }
+    const tipo=document.getElementById('dtipo').value;
+    const maxCajas=tipo==='aereo'?110:cajasXPallet;
+    alert('Pallet lleno — máximo '+maxCajas+' cajas. Se ajustó automáticamente a '+pallets[pi].rows[ri].cals[cal]+' cajas.');
+  }
+  calcGrandTotals();
+}
+
+function eliminarPallet(pi){if(!confirm('Eliminar pallet?'))return;pallets.splice(pi,1);pallets.forEach((p,i)=>p.num=i+1);renderPallets();}
+
+function calcGrandTotals(){
+  const tipo=document.getElementById('dtipo').value;
+  const calTotals={};CALS.forEach(c=>calTotals[c]=0);
+  let totalCajas=0;
+  if(tipo==='aereo'){
+    aereoRows.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});
+    CALS.forEach(c=>{const el=document.getElementById('at'+c);if(el)el.textContent=calTotals[c]||0;});
+    const att=document.getElementById('attotal');if(att)att.textContent=totalCajas;
+    const atkg=document.getElementById('atkg');if(atkg)atkg.textContent=(totalCajas*4.5).toFixed(1);
+  } else {
+    pallets.forEach(p=>{p.rows.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});
+    CALS.forEach(c=>{const el=document.getElementById('gt'+c);if(el)el.textContent=calTotals[c]||0;});
+    const gtt=document.getElementById('gttotal');if(gtt)gtt.textContent=totalCajas.toLocaleString();
+    const gtk=document.getElementById('gtkg');if(gtk)gtk.textContent=(totalCajas*4.5).toFixed(1);
+  }
+  document.getElementById('rs_cajas').textContent=totalCajas.toLocaleString();
+  actualizarInventario();
+  document.getElementById('rs_kg').textContent=(totalCajas*4.5).toFixed(1)+' kg';
+  document.getElementById('rs_prods').textContent=tipo==='aereo'?aereoRows.length:pallets.length;
+  const obj=parseFloat(document.getElementById('dcajas_obj').value)||0;
+  const alertEl=document.getElementById('rs_alert');
+  if(obj>0){
+    const diff=totalCajas-obj;
+    const tipo=document.getElementById('dtipo').value;
+    const incompletePallets=tipo!=='aereo'?pallets.filter(p=>{
+      const cajasXP=parseFloat(document.getElementById('dcajas_pallet').value)||160;
+      const total=p.rows.reduce(function(s,r){return s+CALS.reduce(function(ss,c){return ss+(r.cals[c]||0);},0);},0);
+      return total>0&&total<cajasXP;
+    }).length:0;
+    if(Math.abs(diff)<=10)alertEl.innerHTML='<div class="al g">✓ Cajas cuadran con el objetivo.'+(incompletePallets>0?' · '+incompletePallets+' pallet(s) incompleto(s)':'')+'</div>';
+    else if(diff<0)alertEl.innerHTML='<div class="al rd">⚠ Faltan '+Math.abs(diff)+' cajas para el objetivo.'+(incompletePallets>0?' · '+incompletePallets+' pallet(s) incompleto(s)':'')+'</div>';
+    else alertEl.innerHTML='<div class="al">⚠ Excede por '+diff+' cajas.</div>';
+  } else {
+    const tipo=document.getElementById('dtipo').value;
+    const cajasXP=parseFloat(document.getElementById('dcajas_pallet').value)||160;
+    const incompletePallets=tipo!=='aereo'?pallets.filter(p=>{const t=p.rows.reduce(function(s,r){return s+CALS.reduce(function(ss,c){return ss+(r.cals[c]||0);},0);},0);return t>0&&t<cajasXP;}).length:0;
+    if(incompletePallets>0)alertEl.innerHTML='<div class="al">'+incompletePallets+' pallet(s) incompleto(s) — OK para despachar parcial.</div>';
+    else alertEl.innerHTML='';
+  }
+}
+
+// AUTO-DISTRIBUIR
+function autoDistribuir(){
+  if(!recepciones_cargadas.length){alert('Primero carga las recepciones de la semana.');return;}
+  const cajasXPallet=parseFloat(document.getElementById('dcajas_pallet').value)||160;
+  const cajasObj=parseFloat(document.getElementById('dcajas_obj').value)||3840;
+  pallets=[];
+  let palletActual=null;
+  let cajasEnPallet=0;
+  recepciones_cargadas.forEach(rec=>{
+    CALS.forEach(c=>{
+      let cajasPendientes=rec['cal_'+c]||0;
+      while(cajasPendientes>0){
+        if(!palletActual||cajasEnPallet>=cajasXPallet){
+          if(pallets.length>=Math.ceil(cajasObj/cajasXPallet))return;
+          palletActual={id:'pal'+Date.now()+Math.random(),num:pallets.length+1,rows:[{productor:rec.productor,cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}}]};
+          pallets.push(palletActual);cajasEnPallet=0;
+        }
+        const disponible=cajasXPallet-cajasEnPallet;
+        const asignar=Math.min(cajasPendientes,disponible);
+        palletActual.rows[0].cals[c]=(palletActual.rows[0].cals[c]||0)+asignar;
+        cajasEnPallet+=asignar;cajasPendientes-=asignar;
+      }
+    });
+  });
+  renderPallets();
+}
+
+// AÉREO
+function agregarFilaAereo(){
+  aereoRows.push({id:'ar'+Date.now(),productor:'',cals:{6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0}});
+  renderAereoRows();
+}
+function renderAereoRows(){
+  const cont=document.getElementById('aereoRows');
+  cont.innerHTML=aereoRows.map((r,ri)=>`
+    <div class="pallet-row">
+      <select onchange="updateAereoP(${ri},this.value)" style="padding:5px;font-size:11px;border:1px solid var(--bd);border-radius:5px;width:100%" id="asel_${ri}">
+        <option value="">— Productor —</option>
+      </select>
+      ${CALS.map(c=>`<input type="number" min="0" step="1" placeholder="0" value="${r.cals[c]||''}" oninput="updateAereoC(${ri},${c},this.value)">`).join('')}
+      <div style="font-weight:700;color:var(--g);text-align:center">${CALS.reduce((s,c)=>s+(r.cals[c]||0),0)}</div>
+      <div style="font-weight:700;color:var(--g);text-align:center">${(CALS.reduce((s,c)=>s+(r.cals[c]||0),0)*4.5).toFixed(1)}</div>
+      <button class="bsm" onclick="eliminarAereoRow(${ri})">🗑</button>
+    </div>`).join('');
+  calcGrandTotals();
+  // Populate aereo selects with recepciones only
+  aereoRows.forEach((r,ri)=>{
+    const sel=document.getElementById('asel_'+ri);
+    if(!sel)return;
+    sel.innerHTML='<option value="">— Productor —</option>'+
+      recepciones_cargadas.map(rc=>`<option value="${rc.productor}" ${r.productor===rc.productor?'selected':''}>${rc.productor}</option>`).join('');
+  });
+}
+function updateAereoP(ri,val){aereoRows[ri].productor=val;renderAereoRows();}
+function updateAereoC(ri,cal,val){
+  const v=parseInt(val)||0;
+  aereoRows[ri].cals[cal]=v;
+  const totalAereo=aereoRows.reduce(function(s,r){return s+CALS.reduce(function(ss,c){return ss+(r.cals[c]||0);},0);},0);
+  if(totalAereo>110){
+    const exceso=totalAereo-110;
+    aereoRows[ri].cals[cal]=Math.max(0,v-exceso);
+    renderAereoRows();
+    alert('Despacho aéreo — máximo 110 cajas. Se ajustó automáticamente.');
+  }
+  calcGrandTotals();
+}
+function eliminarAereoRow(ri){aereoRows.splice(ri,1);renderAereoRows();}
+
+// BORRADORES Y AUTOSAVE
+function programarAutoGuardado(){
+  if(_autoSaveTimer)clearTimeout(_autoSaveTimer);
+  _autoSaveTimer=setTimeout(autoGuardarBorrador, 30000);
+  // Show indicator
+  var ind=document.getElementById('autoSaveInd');
+  if(ind){ind.textContent='Sin guardar...';ind.style.color='var(--am)';}
+}
+
+async function autoGuardarBorrador(){
+  var tipo=document.getElementById('dtipo').value;
+  var doc=document.getElementById('ddoc').value.trim();
+  var fecha=document.getElementById('dfecha').value;
+  if(!doc&&!pallets.length&&!aereoRows.length)return;
+  var calTotals={};var totalCajas=0;
+  CALS.forEach(function(c){calTotals[c]=0;});
+  var asig=tipo==='aereo'?aereoRows:pallets;
+  asig.forEach(function(r){CALS.forEach(function(c){calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});
+  var borrador={
+    tipo:tipo,documento:doc||'BORRADOR',fecha:fecha,
+    semana:parseInt(document.getElementById('dsemana').value)||0,
+    cotizacion_id:document.getElementById('dcot').value||null,
+    cliente:document.getElementById('dcliente').value.trim()||'—',
+    naviera:document.getElementById('dnaviera').value.trim(),
+    destino:document.getElementById('ddestino').value.trim(),
+    notas:document.getElementById('dnotas').value.trim(),
+    cajas_obj:parseFloat(document.getElementById('dcajas_obj').value)||0,
+    kg_caja:parseFloat(document.getElementById('dkg_caja').value)||4.5,
+    total_cajas:totalCajas,total_kg:totalCajas*4.5,
+    cal_6:calTotals[6],cal_7:calTotals[7],cal_8:calTotals[8],cal_9:calTotals[9],
+    cal_10:calTotals[10],cal_11:calTotals[11],cal_12:calTotals[12],cal_13:calTotals[13],cal_14:calTotals[14],
+    productores:JSON.stringify(tipo==='aereo'?aereoRows:pallets),
+    estado:'Borrador',creado_por:USUARIO_ACTUAL?USUARIO_ACTUAL.nombre:'—'
+  };
+  if(_borradorId){
+    await supaFetch('PATCH','despachos?id=eq.'+_borradorId,borrador);
+  } else {
+    borrador.id='bor'+Date.now();
+    var res=await supaFetch('POST','despachos',borrador);
+    if(res&&res[0])_borradorId=res[0].id;
+  }
+  _desps=null;
+  var ind=document.getElementById('autoSaveInd');
+  if(ind){ind.textContent='Guardado automaticamente '+new Date().toLocaleTimeString('es-EC');ind.style.color='var(--g)';}
+}
+
+async function cargarBorrador(id){
+  var d=await supaFetch('GET','despachos?id=eq.'+id+'&select=*');
+  if(!d||!d[0])return;
+  var desp=d[0];
+  _borradorId=id;
+  document.getElementById('dtipo').value=desp.tipo||'maritimo';
+  document.getElementById('ddoc').value=desp.documento||'';
+  document.getElementById('dfecha').value=desp.fecha||'';
+  document.getElementById('dsemana').value=desp.semana||'';
+  document.getElementById('dcliente').value=desp.cliente||'';
+  document.getElementById('dnaviera').value=desp.naviera||'';
+  document.getElementById('ddestino').value=desp.destino||'';
+  document.getElementById('dnotas').value=desp.notas||'';
+  document.getElementById('dcajas_obj').value=desp.cajas_obj||'';
+  var prods=JSON.parse(desp.productores||'[]');
+  if(desp.tipo==='aereo'){aereoRows=prods;renderAereoRows();}
+  else{pallets=prods;renderPallets();}
+  actualizarTipo();
+  gt('nuevo');
+  alert('Borrador cargado. Continua donde lo dejaste.');
+}
+
+// GUARDAR
+async function guardarDespacho(){
+  const tipo=document.getElementById('dtipo').value;
+  const doc=document.getElementById('ddoc').value.trim();
+  const fecha=document.getElementById('dfecha').value;
+  const cliente=document.getElementById('dcliente').value.trim()||'—';
+  if(!doc||!fecha){alert('Completa número de documento y fecha de salida.');return;}
+  const calTotals={};let totalCajas=0;
+  CALS.forEach(c=>calTotals[c]=0);
+  const asignacion=tipo==='aereo'?aereoRows:pallets;
+  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});};
+  const desp={
+    id:'d'+Date.now(),tipo,documento:doc,fecha,
+    semana:parseInt(document.getElementById('dsemana').value)||0,
+    cotizacion_id:document.getElementById('dcot').value||null,
+    cliente,naviera:document.getElementById('dnaviera').value.trim(),
+    destino:document.getElementById('ddestino').value.trim(),
+    notas:document.getElementById('dnotas').value.trim(),
+    cajas_obj:parseFloat(document.getElementById('dcajas_obj').value)||0,
+    kg_caja:parseFloat(document.getElementById('dkg_caja').value)||4.5,
+    total_cajas:totalCajas,total_kg:totalCajas*4.5,
+    cal_6:calTotals[6],cal_7:calTotals[7],cal_8:calTotals[8],cal_9:calTotals[9],
+    cal_10:calTotals[10],cal_11:calTotals[11],cal_12:calTotals[12],cal_13:calTotals[13],cal_14:calTotals[14],
+    productores:JSON.stringify(tipo==='aereo'?aereoRows:pallets),
+    estado:'Programado',creado_por:USUARIO_ACTUAL?.nombre||'—'
+  };
+  await supaFetch('POST','despachos',desp);
+  _desps=null;
+  // Si era borrador, actualizar estado a Programado
+  if(_borradorId){
+    await supaFetch('PATCH','despachos?id=eq.'+_borradorId,{...desp,estado:'Programado'});
+    _borradorId=null;
+  }
+  alert('Despacho confirmado — '+doc+' · '+totalCajas+' cajas · '+(totalCajas*4.5).toFixed(1)+' kg');
+  // Eliminar borrador si existia
+  if(_borradorId){_borradorId=null;}
+  pallets=[];aereoRows=[];renderPallets();renderAereoRows();
+  var ind=document.getElementById('autoSaveInd');
+  if(ind){ind.textContent='';} 
+}
+
+function waDespacho(){
+  const tipo=document.getElementById('dtipo').value;
+  const doc=document.getElementById('ddoc').value||'—';
+  const fecha=document.getElementById('dfecha').value||'—';
+  const cliente=document.getElementById('dcliente').value||'—';
+  const naviera=document.getElementById('dnaviera').value||'—';
+  const destino=document.getElementById('ddestino').value||'—';
+  const tipoLabel={maritimo:'Maritimo',aereo:'Aereo',local:'Local'}[tipo]||tipo;
+  let totalCajas=0;
+  const asignacion=tipo==='aereo'?aereoRows:pallets;
+  var resumen;
+  if(tipo==='aereo'){
+    resumen=asignacion.map(function(r){let pc=0;CALS.forEach(function(c){pc+=(r.cals[c]||0);});totalCajas+=pc;return'- '+(r.productor||'Sin productor')+': '+pc+' cajas';}).join('\n');
+  } else {
+    resumen=pallets.map(function(p){let pc=0;p.rows.forEach(function(r){CALS.forEach(function(c){pc+=(r.cals[c]||0);});});totalCajas+=pc;return'Pallet '+p.num+' ('+p.rows.map(function(r){return r.productor||'—';}).join('+')+'):'+pc+' cajas';}).join('\n');
+  }
+  const lineas=['*DESPACHO AGROVIP S.A.*','',tipoLabel,'Doc: '+doc,'Salida: '+fecha,'Cliente: '+cliente,'Ruta: '+naviera+' a '+destino,'','Total: '+totalCajas+' cajas '+(totalCajas*4.5).toFixed(1)+' kg','',resumen,'','Agrovip S.A.'];
+  const msg=lineas.join('\n');
+  window.open('https://wa.me/?text='+encodeURIComponent(msg));
+}
+
+async function loadDesps(){
+  if(_desps===null){const d=await supaFetch('GET','despachos?select=*&order=created_at.desc');_desps=d||[];}
+  return _desps;
+}
+
+async function renderBorradores(){
+  var desps=await loadDesps();
+  var bors=desps.filter(function(d){return d.estado==="Borrador";});
+  var panel=document.getElementById("borradoresPanel");
+  var list=document.getElementById("borradoresList");
+  if(!bors.length){if(panel)panel.style.display="none";return;}
+  if(panel)panel.style.display="block";
+  list.innerHTML=bors.map(function(b,i){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)">'
+      +'<div><b>'+(b.documento||'Sin doc')+'</b> - '+(b.cliente||'—')+' - '+(b.total_cajas||0)+' cajas ('+(b.fecha||'—')+')</div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<button class="bs" style="font-size:11px" onclick="window._loadBorrador('+i+')">Continuar</button>'
+      +'<button class="bsm" onclick="window._delBorrador('+i+')">X</button>'
+      +'</div></div>';
+  }).join('');
+  window._borradores=bors;
+  window._loadBorrador=function(i){cargarBorrador(bors[i].id);};
+  window._delBorrador=function(i){if(confirm("Eliminar borrador?"))eliminarDesp(bors[i].id);};
+}
+
+
+async function renderLista(){
+  const desps=await loadDesps();
+  const filtTipo=document.getElementById('filtroTipo').value;
+  const filtEst=document.getElementById('filtroEstado').value;
+  renderBorradores();
+  // Solo mostrar no-borradores en lista principal
+  let list=desps.filter(function(d){return d.estado!=='Borrador';});
+  if(filtTipo)list=list.filter(d=>d.tipo===filtTipo);
+  if(filtEst)list=list.filter(d=>d.estado===filtEst);
+  document.getElementById('sl_total').textContent=desps.length;
+  document.getElementById('sl_cajas').textContent=desps.reduce((s,d)=>s+(d.total_cajas||0),0).toLocaleString();
+  document.getElementById('sl_mar').textContent=desps.filter(d=>d.tipo==='maritimo').length;
+  document.getElementById('sl_aer').textContent=desps.filter(d=>d.tipo==='aereo').length;
+  if(!list.length){document.getElementById('despLista').innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">No hay despachos.</div>';return;}
+  const tipoLabel={maritimo:'🚢 Marítimo',aereo:'✈️ Aéreo',local:'🚛 Local'};
+  document.getElementById('despLista').innerHTML=list.map(d=>{
+    const prods=JSON.parse(d.productores||'[]');
+    const ecls={Programado:'bb','En tránsito':'ba',Entregado:'bg',Facturado:'bp2'}[d.estado]||'bk';
+    const borderColor=d.estado==='Borrador'?'#9CA3AF':{maritimo:'var(--g)',aereo:'#3B82F6',local:'var(--am)'}[d.tipo]||'var(--g)';
+    return`<div class="desp-card" style="border-left-color:${borderColor}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-size:15px;font-weight:700">${tipoLabel[d.tipo]||d.tipo} · ${d.documento}</div>
+          <div style="font-size:12px;color:var(--gris);margin-top:2px">${d.fecha} · ${d.cliente} · ${d.naviera||'—'} → ${d.destino||'—'}</div>
+        </div>
+        <span class="badge ${ecls}">${d.estado}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:10px">
+        <div style="background:var(--cr);border-radius:7px;padding:8px 10px"><div style="font-size:10px;color:var(--gris)">CAJAS</div><div style="font-size:16px;font-weight:700;color:var(--g)">${(d.total_cajas||0).toLocaleString()}</div></div>
+        <div style="background:var(--cr);border-radius:7px;padding:8px 10px"><div style="font-size:10px;color:var(--gris)">KG NETO</div><div style="font-size:16px;font-weight:700;color:var(--g)">${(d.total_kg||0).toFixed(1)}</div></div>
+        <div style="background:var(--cr);border-radius:7px;padding:8px 10px"><div style="font-size:10px;color:var(--gris)">PALLETS/PRODS</div><div style="font-size:16px;font-weight:700;color:var(--g)">${prods.length}</div></div>
+        <div style="background:var(--cr);border-radius:7px;padding:8px 10px"><div style="font-size:10px;color:var(--gris)">SEMANA</div><div style="font-size:16px;font-weight:700;color:var(--g)">S${d.semana||'—'}</div></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        ${['Programado','En tránsito','Entregado','Facturado'].map(s=>`<button style="padding:4px 12px;border-radius:12px;font-size:11px;font-weight:600;border:none;cursor:pointer;opacity:${d.estado===s?1:.4};background:${s==='Programado'?'#EFF6FF':s==='En tránsito'?'#FEF3C7':s==='Entregado'?'#D1FAE5':'#F3E8FF'};color:${s==='Programado'?'#1E40AF':s==='En tránsito'?'#92400E':s==='Entregado'?'#065F46':'#6B21A8'}" onclick="cambiarEstadoDesp('${d.id}','${s}')">${s}</button>`).join('')}
+        <button class="bsm" onclick="eliminarDesp('${d.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function cambiarEstadoDesp(id,estado){await supaFetch('PATCH',`despachos?id=eq.${id}`,{estado});_desps=null;renderLista();}
+async function eliminarDesp(id){if(!confirm('¿Eliminar despacho?'))return;await supaFetch('DELETE',`despachos?id=eq.${id}`);_desps=null;renderLista();}
+
+async function renderReporte(){
+  const desps=await loadDesps();
+  document.getElementById('rp_cajas').textContent=desps.reduce((s,d)=>s+(d.total_cajas||0),0).toLocaleString();
+  document.getElementById('rp_kg').textContent=desps.reduce((s,d)=>s+(d.total_kg||0),0).toFixed(1)+' kg';
+  document.getElementById('rp_mar').textContent=desps.filter(d=>d.tipo==='maritimo').length;
+  document.getElementById('rp_aer').textContent=desps.filter(d=>d.tipo==='aereo').length;
+  CALS.forEach(c=>{const tot=desps.reduce((s,d)=>s+(d['cal_'+c]||0),0);const el=document.getElementById('rp_cal_'+c);if(el)el.textContent=tot.toLocaleString();});
+}
+</script>
+</body>
+</html>
