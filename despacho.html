@@ -278,6 +278,8 @@ input,select,textarea,button{font-family:inherit}
 const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0';
 const CALS=[6,7,8,9,10,11,12,13,14];
+let _borradorId=null;
+let _autoSaveTimer=null;
 let USUARIO_ACTUAL=null;
 let _desps=null;
 let pallets=[]; // [{id, productor, cals:{6:0,...}}]
@@ -296,6 +298,101 @@ async function supaFetch(method,path,body){
   });
   if(!r.ok){console.error('Supa:',await r.text());return null;}
   return r.status===204?true:r.json();
+}
+
+// BORRADORES
+async function autoGuardarBorrador(){
+  const tipo=document.getElementById('dtipo').value;
+  const doc=document.getElementById('ddoc').value.trim();
+  const cliente=document.getElementById('dcliente').value.trim();
+  if(!doc&&!cliente&&!pallets.length&&!aereoRows.length)return;
+  const calTotals={};let totalCajas=0;
+  CALS.forEach(c=>calTotals[c]=0);
+  const asignacion=tipo==='aereo'?aereoRows:pallets;
+  asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});
+  const datos={
+    id:_borradorId||('borr'+Date.now()),
+    tipo,documento:doc,
+    fecha:document.getElementById('dfecha').value,
+    semana:parseInt(document.getElementById('dsemana').value)||0,
+    cotizacion_id:document.getElementById('dcot').value||null,
+    cliente,
+    naviera:document.getElementById('dnaviera').value.trim(),
+    destino:document.getElementById('ddestino').value.trim(),
+    notas:document.getElementById('dnotas').value.trim(),
+    cajas_obj:parseFloat(document.getElementById('dcajas_obj').value)||0,
+    kg_caja:parseFloat(document.getElementById('dkg_caja').value)||4.5,
+    total_cajas:totalCajas,total_kg:totalCajas*4.5,
+    cal_6:calTotals[6],cal_7:calTotals[7],cal_8:calTotals[8],cal_9:calTotals[9],
+    cal_10:calTotals[10],cal_11:calTotals[11],cal_12:calTotals[12],cal_13:calTotals[13],cal_14:calTotals[14],
+    productores:JSON.stringify(tipo==='aereo'?aereoRows:pallets),
+    estado:'Borrador',
+    creado_por:USUARIO_ACTUAL?.nombre||'—'
+  };
+  if(!_borradorId){
+    const res=await supaFetch('POST','despachos',datos);
+    if(res&&res[0])_borradorId=res[0].id||datos.id;
+    else _borradorId=datos.id;
+    _desps=null;
+  } else {
+    await supaFetch('PATCH','despachos?id=eq.'+_borradorId,datos);
+  }
+  const st=document.getElementById('borradorStatus');
+  if(st){const t=new Date().toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});st.textContent='Guardado '+t;st.style.color='var(--g)';}
+}
+
+function iniciarAutoGuardado(){
+  if(_autoSaveTimer)clearInterval(_autoSaveTimer);
+  _autoSaveTimer=setInterval(autoGuardarBorrador,30000);
+  const st=document.getElementById('borradorStatus');
+  if(st){st.textContent='Auto-guardado activo';st.style.color='var(--gris)';}
+}
+
+async function cargarBorradores(){
+  const borradores=(_desps||await loadDesps()).filter(d=>d.estado==='Borrador');
+  if(!borradores.length){alert('Sin borradores guardados.');return;}
+  const opciones=borradores.map((b,i)=>`${i+1}. ${b.documento||'Sin doc'} · ${b.cliente||'—'} · ${b.total_cajas||0} cajas (${b.fecha})`).join('\n');
+  const idx=prompt('Borradores disponibles:\n\n'+opciones+'\n\nEscribe el número para cargar:');
+  if(!idx)return;
+  const b=borradores[parseInt(idx)-1];
+  if(!b)return;
+  // Load into form
+  document.getElementById('dtipo').value=b.tipo||'maritimo';
+  document.getElementById('ddoc').value=b.documento||'';
+  document.getElementById('dfecha').value=b.fecha||'';
+  document.getElementById('dsemana').value=b.semana||'';
+  document.getElementById('dcliente').value=b.cliente||'';
+  document.getElementById('dnaviera').value=b.naviera||'';
+  document.getElementById('ddestino').value=b.destino||'';
+  document.getElementById('dnotas').value=b.notas||'';
+  document.getElementById('dcajas_obj').value=b.cajas_obj||'';
+  // Load pallets
+  try{
+    const prods=JSON.parse(b.productores||'[]');
+    if(b.tipo==='aereo'){aereoRows=prods;renderAereoRows();}
+    else{pallets=prods;renderPallets();}
+  }catch(e){}
+  _borradorId=b.id;
+  actualizarTipo();
+  const st=document.getElementById('borradorStatus');
+  if(st){st.textContent='Borrador cargado';st.style.color='var(--am)';}
+  alert('Borrador cargado. Continua desde donde lo dejaste.');
+}
+
+function limpiarFormulario(){
+  if(!confirm('Limpiar todo el formulario?'))return;
+  _borradorId=null;
+  if(_autoSaveTimer){clearInterval(_autoSaveTimer);_autoSaveTimer=null;}
+  pallets=[];aereoRows=[];
+  document.getElementById('ddoc').value='';
+  document.getElementById('dcliente').value='';
+  document.getElementById('dnaviera').value='';
+  document.getElementById('ddestino').value='';
+  document.getElementById('dnotas').value='';
+  document.getElementById('dcajas_obj').value='';
+  renderPallets();renderAereoRows();
+  const st=document.getElementById('borradorStatus');
+  if(st){st.textContent='Formulario limpio';st.style.color='var(--gris)';}
 }
 
 async function login(){
@@ -321,6 +418,7 @@ async function init(){
   await cargarCotizaciones();
   renderLista();
   renderReporte();
+  iniciarAutoGuardado();
 }
 
 async function cargarCotizaciones(){
@@ -668,7 +766,12 @@ async function guardarDespacho(){
   };
   await supaFetch('POST','despachos',desp);
   _desps=null;
-  alert(`✓ Despacho guardado — ${doc} · ${totalCajas} cajas · ${(totalCajas*4.5).toFixed(1)} kg`);
+  // Si era borrador, actualizar estado a Programado
+  if(_borradorId){
+    await supaFetch('PATCH','despachos?id=eq.'+_borradorId,{...desp,estado:'Programado'});
+    _borradorId=null;
+  }
+  alert('Despacho confirmado — '+doc+' · '+totalCajas+' cajas · '+(totalCajas*4.5).toFixed(1)+' kg');
   // Eliminar borrador si existia
   if(_borradorId){_borradorId=null;}
   pallets=[];aereoRows=[];renderPallets();renderAereoRows();
@@ -732,7 +835,7 @@ async function renderLista(){
   document.getElementById('despLista').innerHTML=list.map(d=>{
     const prods=JSON.parse(d.productores||'[]');
     const ecls={Programado:'bb','En tránsito':'ba',Entregado:'bg',Facturado:'bp2'}[d.estado]||'bk';
-    const borderColor={maritimo:'var(--g)',aereo:'#3B82F6',local:'var(--am)'}[d.tipo]||'var(--g)';
+    const borderColor=d.estado==='Borrador'?'#9CA3AF':{maritimo:'var(--g)',aereo:'#3B82F6',local:'var(--am)'}[d.tipo]||'var(--g)';
     return`<div class="desp-card" style="border-left-color:${borderColor}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
         <div>
