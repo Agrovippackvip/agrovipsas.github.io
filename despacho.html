@@ -325,8 +325,7 @@ async function autoGuardarBorrador(){
   const calTotals={};let totalCajas=0;
   CALS.forEach(c=>calTotals[c]=0);
   const asignacion=tipo==='aereo'?aereoRows:pallets;
-  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});});};
-  const datos={
+  if(tipo==='aereo'){asignacion.forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});}else{asignacion.forEach(p=>{(p.rows||[]).forEach(r=>{CALS.forEach(c=>{calTotals[c]+=(r.cals[c]||0);totalCajas+=(r.cals[c]||0);});});};
     id:_borradorId||('borr'+Date.now()),
     tipo,documento:doc,
     fecha:document.getElementById('dfecha').value,
