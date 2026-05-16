@@ -435,9 +435,8 @@ function renderPallets(){
       <div class="pallet-body" id="pbody_${pi}">
         <div class="fld" style="margin-bottom:8px">
           <label>Productor (de las recepciones cargadas)</label>
-          <select onchange="updatePalletProd(${pi},this.value)" style="padding:6px 10px;font-size:12px;border:1px solid var(--bd);border-radius:6px">
+          <select id="psel_${pi}" onchange="updatePalletProd(${pi},this.value)" style="padding:6px 10px;font-size:12px;border:1px solid var(--bd);border-radius:6px">
             <option value="">— Seleccionar —</option>
-            ${recepciones_cargadas.map(r=>`<option value="${r.productor}" ${p.productor===r.productor?'selected':''}>${r.productor} (${r.k_neto||r.k_rec||0} kg)</option>`).join('')}
           </select>
         </div>
         <div class="pallet-head-row">
@@ -458,6 +457,13 @@ function renderPallets(){
     </div>`;
   }).join('');
   calcGrandTotals();
+  // Populate producer selects with recepciones only
+  pallets.forEach((p,pi)=>{
+    const sel=document.getElementById('psel_'+pi);
+    if(!sel)return;
+    sel.innerHTML='<option value="">— Seleccionar —</option>'+
+      recepciones_cargadas.map(r=>`<option value="${r.productor}" ${p.productor===r.productor?'selected':''}>${r.productor} (${Math.round(r.k_neto||r.k_rec||0)} kg)</option>`).join('');
+  });
 }
 
 function togglePallet(pi){
@@ -532,9 +538,8 @@ function renderAereoRows(){
   const cont=document.getElementById('aereoRows');
   cont.innerHTML=aereoRows.map((r,ri)=>`
     <div class="pallet-row">
-      <select onchange="updateAereoP(${ri},this.value)" style="padding:5px;font-size:11px;border:1px solid var(--bd);border-radius:5px;width:100%">
+      <select onchange="updateAereoP(${ri},this.value)" style="padding:5px;font-size:11px;border:1px solid var(--bd);border-radius:5px;width:100%" id="asel_${ri}">
         <option value="">— Productor —</option>
-        ${recepciones_cargadas.map(r=>`<option value="${r.productor}">${r.productor}</option>`).join("")}
       </select>
       ${CALS.map(c=>`<input type="number" min="0" step="1" placeholder="0" value="${r.cals[c]||''}" oninput="updateAereoC(${ri},${c},this.value)">`).join('')}
       <div style="font-weight:700;color:var(--g);text-align:center">${CALS.reduce((s,c)=>s+(r.cals[c]||0),0)}</div>
@@ -542,6 +547,13 @@ function renderAereoRows(){
       <button class="bsm" onclick="eliminarAereoRow(${ri})">🗑</button>
     </div>`).join('');
   calcGrandTotals();
+  // Populate aereo selects with recepciones only
+  aereoRows.forEach((r,ri)=>{
+    const sel=document.getElementById('asel_'+ri);
+    if(!sel)return;
+    sel.innerHTML='<option value="">— Productor —</option>'+
+      recepciones_cargadas.map(rc=>`<option value="${rc.productor}" ${r.productor===rc.productor?'selected':''}>${rc.productor}</option>`).join('');
+  });
 }
 function updateAereoP(ri,val){aereoRows[ri].productor=val;renderAereoRows();}
 function updateAereoC(ri,cal,val){aereoRows[ri].cals[cal]=parseInt(val)||0;calcGrandTotals();}
