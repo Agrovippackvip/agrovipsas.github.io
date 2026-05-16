@@ -813,8 +813,9 @@ async function enviarAprobacion(){
 
   // Guardar en Supabase
   const data=await supaFetch('POST','aprobaciones',{
-    cot_id:c.id,num_cot:c.numCot,cliente:c.cliente,
-    valor:c.valorCotizado,margen:c.margenReal,
+    cot_id:c.id,num_cot:c.num_cot||c.numCot,cliente:c.cliente,
+    valor:c.valor_cotizado||c.valorCotizado,margen:c.margen_real||c.margenReal,
+    tipo_pitahaya:c.tipo_pitahaya,cajas_total:c.cajas_total||c.cajasTotal,pv_prom:c.pv_prom||c.pvProm,
     token_daniel:tokenDaniel,token_pablo:tokenPablo,token_cliente:tokenCliente
   });
   if(!data){alert('Error al guardar en Supabase. Verifica la conexión.');return;}
@@ -829,9 +830,9 @@ async function enviarAprobacion(){
   const linkPablo=`${BASE_URL}?aprobar=${supaId}&rol=pablo&token=${tokenPablo}`;
   const linkCliente=`${BASE_URL}?aprobar=${supaId}&rol=cliente&token=${tokenCliente}`;
 
-  const msgInterno=`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n*Aprobar aquí:*\n${linkDaniel}`;
-  const msgPablo=`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n*Aprobar aquí:*\n${linkPablo}`;
-  const msgCliente=`Estimado cliente,\n\nAdjuntamos cotización *${c.numCot}* de Agrovip S.A.\n\n📦 Valor: ${f2(c.valorCotizado)}\n\nPor favor confirme su aprobación en el siguiente enlace:\n${linkCliente}\n\nAgrovip S.A. · agrovipsas.com`;
+  const msgInterno=`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n📊 Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%\n\n*Aprobar aquí:*\n${linkDaniel}`;
+  const msgPablo=`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n📊 Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%\n\n*Aprobar aquí:*\n${linkPablo}`;
+  const msgCliente=`Estimado cliente,\n\nAdjuntamos cotización *${c.numCot}* de Agrovip S.A.\n\n📦 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n\nPor favor confirme su aprobación en el siguiente enlace:\n${linkCliente}\n\nAgrovip S.A. · agrovipsas.com`;
 
   // Mostrar panel de aprobaciones
   document.getElementById('aprovPanel').style.display='block';
@@ -845,8 +846,8 @@ async function enviarAprobacion(){
   navigator.clipboard.writeText(todosLosLinks).catch(()=>{});
 
   // Mensajes WhatsApp
-  const waDaniel=`https://wa.me/${waNumDaniel}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkDaniel}`)}`;
-  const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valorCotizado)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkPablo}`)}`;
+  const waDaniel=`https://wa.me/${waNumDaniel}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n📊 Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkDaniel}`)}`;
+  const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n📊 Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkPablo}`)}`;
 
   // Mostrar botones de envío manual
   document.getElementById('aprovPanel').style.display='block';
@@ -922,10 +923,14 @@ async function procesarAprobacion(supaId,rol,token){
   // Detalle cotización
   document.getElementById('aprovMsg').innerHTML=`
     <div style="text-align:left;background:#F5F0E8;border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px">
-      <div style="font-weight:700;color:#1A6B3C;margin-bottom:8px">📋 ${r.num_cot}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-        <div><span style="color:#6B6B5A;font-size:11px">CLIENTE</span><br><b>${r.cliente}</b></div>
-        <div><span style="color:#6B6B5A;font-size:11px">VALOR</span><br><b>$${parseFloat(r.valor).toFixed(2)}</b></div>
+      <div style="font-weight:700;color:#1A6B3C;margin-bottom:10px">📋 ${r.num_cot}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Cliente</span><br><b>${r.cliente}</b></div>
+        <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Valor total</span><br><b style="color:#1A6B3C;font-size:16px">$${parseFloat(r.valor||0).toFixed(2)}</b></div>
+        <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Tipo de fruta</span><br><b>${r.tipo_pitahaya||'Pitahaya'}</b></div>
+        <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Cajas</span><br><b>${parseFloat(r.cajas_total||0).toLocaleString()}</b></div>
+        <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Margen</span><br><b>${parseFloat(r.margen_real||0).toFixed(1)}%</b></div>
+        <div><span style="color:#6B6B5A;font-size:10px;text-transform:uppercase;letter-spacing:1px">Precio prom./caja</span><br><b>$${parseFloat(r.pv_prom||0).toFixed(2)}</b></div>
       </div>
     </div>`;
 
@@ -1027,13 +1032,13 @@ async function confirmarAprobacion(supaId,rol){
     // Email a Lili, Pablo y Daniel: Daniel aprobó
     const asunto=`✅ Daniel aprobó cotización ${r?.num_cot} — ${r?.cliente}`;
     const utilidad=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
-    const msg=`Hola,\n\nDaniel Polit (Ventas) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad.toFixed(2)}\n📅 Fecha: ${fecha}\n\nPablo — por favor revisa y aprueba aquí:\n${linkPablo}\n\nAgrovip S.A.`;
+    const msg=`Hola,\n\nDaniel Polit (Ventas) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||r?.valor_cotizado||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad.toFixed(2)}\n📅 Fecha: ${fecha}\n\nPablo — por favor revisa y aprueba aquí:\n${linkPablo}\n\nAgrovip S.A.`;
     await enviarEmail(MAIL_LILI, asunto, msg);
     await enviarEmail(MAIL_PABLO, asunto, msg);
     await enviarEmail(MAIL_GERENCIA, asunto, msg);
     // WhatsApp a Pablo
     const utilidadWa=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
-    const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Tu aprobación es requerida*\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad: $${utilidadWa.toFixed(2)}\n\n✅ Daniel Polit ya aprobó.\n\n👉 Aprobar aquí:\n${linkPablo}`)}`;
+    const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Tu aprobación es requerida*\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||r?.valor_cotizado||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad: $${utilidadWa.toFixed(2)}\n\n✅ Daniel Polit ya aprobó.\n\n👉 Aprobar aquí:\n${linkPablo}`)}`;
     document.getElementById('aprovBtn').innerHTML=`
       <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center;margin-bottom:12px">
         <div style="font-size:28px;margin-bottom:6px">✅</div>
@@ -1049,7 +1054,7 @@ async function confirmarAprobacion(supaId,rol){
     // Email a Lili y Daniel: Pablo aprobó — listo para cliente
     const asunto=`✅ Pablo aprobó ${r?.num_cot} — Listo para enviar al cliente`;
     const utilidad2=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
-    const msg=`Hola,\n\nPablo Moysam (Gerencia) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad2.toFixed(2)}\n📅 Fecha: ${fecha}\n\n✅ Ambas aprobaciones internas completadas.\n\nLili — envía el link al cliente:\n${linkCliente}\n\nAgrovip S.A.`;
+    const msg=`Hola,\n\nPablo Moysam (Gerencia) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||r?.valor_cotizado||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad2.toFixed(2)}\n📅 Fecha: ${fecha}\n\n✅ Ambas aprobaciones internas completadas.\n\nLili — envía el link al cliente:\n${linkCliente}\n\nAgrovip S.A.`;
     await enviarEmail(MAIL_LILI, asunto, msg);
     await enviarEmail(MAIL_GERENCIA, asunto, msg);
     // Pablo ya sabe que aprobó, no le reenviamos
@@ -1065,7 +1070,7 @@ async function confirmarAprobacion(supaId,rol){
     // Email a Lili, Daniel y Pablo: cliente aprobó — crear OF
     const asunto=`🎉 ${r?.cliente} aprobó ${r?.num_cot} — Crear Orden de Fabricación`;
     const utilidad3=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
-    const msg=`¡Cotización completamente aprobada! 🎉\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad3.toFixed(2)}\n📅 Fecha: ${fecha}\n\n✅ Daniel Polit aprobó\n✅ Pablo Moysam aprobó\n✅ ${r?.cliente} aprobó y aceptó política de ventas\n\n⚡ Próximo paso: crear Orden de Fabricación en Odoo.\n\nAgrovip S.A.`;
+    const msg=`¡Cotización completamente aprobada! 🎉\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||r?.valor_cotizado||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad3.toFixed(2)}\n📅 Fecha: ${fecha}\n\n✅ Daniel Polit aprobó\n✅ Pablo Moysam aprobó\n✅ ${r?.cliente} aprobó y aceptó política de ventas\n\n⚡ Próximo paso: crear Orden de Fabricación en Odoo.\n\nAgrovip S.A.`;
     await enviarEmail(MAIL_LILI, asunto, msg);
     await enviarEmail(MAIL_GERENCIA, asunto, msg);
     await enviarEmail(MAIL_PABLO, asunto, msg);
@@ -1096,23 +1101,23 @@ async function renderCots(){
 
 function cotCard(c){
   const ecls={'Borrador':'bk','Enviada':'bb','Aprobada':'bg','Facturada':'bp','Rechazado':'br'}[c.estado]||'bk';
-  const scol=c.margenReal>=(c.margenObj||15)?'#1A6B3C':c.margenReal>=(c.margenObj||15)-4?'#D4A017':'#C0392B';
+  const scol=(c.margen_real||c.margenReal)>=(c.margen_obj||c.margenObj||15)?'#1A6B3C':(c.margen_real||c.margenReal)>=(c.margen_obj||c.margenObj||15)-4?'#D4A017':'#C0392B';
   return`<div class="cot-card">
     <div class="cot-head">
       <div>
         <div class="cot-title">${c.cliente} <span style="color:var(--gris);font-weight:400;font-size:12px">· ${c.numCot}</span></div>
-        <div class="cot-sub">${c.fecha} · ${c.tipo} · ${(c.cajasTotal||0).toLocaleString()} cajas · <span style="color:var(--g)">por ${c.creado_por||'—'}</span></div>
+        <div class="cot-sub">${c.fecha} · ${c.tipo} · ${(c.cajas_total||c.cajasTotal||0).toLocaleString()} cajas · <span style="color:var(--g)">por ${c.creado_por||'—'}</span></div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <span class="badge ${ecls}">${c.estado}</span>
-        <span style="font-size:13px;font-weight:700;color:${scol}">${(c.margenReal||0).toFixed(1)}%</span>
+        <span style="font-size:13px;font-weight:700;color:${scol}">${(c.margen_real||c.margenReal||0).toFixed(1)}%</span>
       </div>
     </div>
     <div class="cot-metrics">
-      <div class="cot-m"><div class="et">Valor cotizado</div><div class="nm hl">${f2(c.valorCotizado)}</div></div>
-      <div class="cot-m"><div class="et">Valor cobrado</div><div class="nm">${f2(c.valorCobrado)}</div></div>
-      <div class="cot-m"><div class="et">Costo CIF/caja</div><div class="nm">${f2(c.costoTotalCaja)}</div></div>
-      <div class="cot-m"><div class="et">Utilidad bruta</div><div class="nm hl">${f2(c.utilidad)}</div></div>
+      <div class="cot-m"><div class="et">Valor cotizado</div><div class="nm hl">${f2(c.valor_cotizado||c.valorCotizado)}</div></div>
+      <div class="cot-m"><div class="et">Valor cobrado</div><div class="nm">${f2(c.valor_cobrado||c.valorCobrado)}</div></div>
+      <div class="cot-m"><div class="et">Costo CIF/caja</div><div class="nm">${f2(c.costo_total_caja||c.costoTotalCaja)}</div></div>
+      <div class="cot-m"><div class="et">Utilidad bruta</div><div class="nm hl">${f2(c.utilidad||0)}</div></div>
       ${c.estado==='Facturada'&&c.valorFacturadoReal?`
         <div class="cot-m"><div class="et">Facturado real</div><div class="nm hl">${f2(c.valorFacturadoReal)}</div></div>
         <div class="cot-m"><div class="et">Cajas facturadas</div><div class="nm">${(c.cajasFacturadas||c.cajasTotal||0).toLocaleString()}</div></div>
@@ -1289,7 +1294,7 @@ document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>
 // COPIAR
 function copiarCot(){
   if(!ultimoCalculo)return;const c=ultimoCalculo;
-  const txt=`*COTIZACIÓN AGROVIP · ${c.numCot}*\n📅 ${c.fecha} | ${c.cliente}\n\n💰 Cotizado: ${f2(c.valorCotizado)}\n📦 Costo CIF/caja: ${f2(c.costoTotalCaja)}\n📊 Margen: ${c.margenReal.toFixed(1)}%\n✅ Utilidad: ${f2(c.utilidad)}\n⚠ Precio mínimo: ${f2(c.precioMin)}/caja\n🌿 Fruta: $${c.pFrutaProm.toFixed(3)}/kg\nCajas: ${c.cajasTotal.toLocaleString()}\n\nAgrovip S.A. · agrovipsas.com`;
+  const txt=`*COTIZACIÓN AGROVIP · ${c.numCot}*\n📅 ${c.fecha} | ${c.cliente}\n\n💰 Cotizado: ${f2(c.valor_cotizado||c.valorCotizado)}\n📦 Costo CIF/caja: ${f2(c.costo_total_caja||c.costoTotalCaja)}\n📊 Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%\n✅ Utilidad: ${f2(c.utilidad||0)}\n⚠ Precio mínimo: ${f2(c.precio_min||c.precioMin)}/caja\n🌿 Fruta: $${(c.pf_fruta_prom||c.pFrutaProm||0).toFixed(3)}/kg\nCajas: ${(c.cajas_total||c.cajasTotal||0).toLocaleString()}\n\nAgrovip S.A. · agrovipsas.com`;
   navigator.clipboard.writeText(txt).catch(()=>{});
   alert('✓ Copiado — listo para WhatsApp');
 }
@@ -1388,9 +1393,9 @@ async function renderReporte(){
         <div style="font-size:9px;color:var(--gris)">${s.replace(/^\d+-W/,'W')}</div>
       </div>`;}).join('')+'</div>';
   document.getElementById('rptTbody').innerHTML=cots.map(c=>{
-    const scol=c.margenReal>=(c.margenObj||15)?'#065F46':c.margenReal>=(c.margenObj||15)-4?'#92400E':'#991B1B';
+    const scol=(c.margen_real||c.margenReal)>=(c.margen_obj||c.margenObj||15)?'#065F46':(c.margen_real||c.margenReal)>=(c.margen_obj||c.margenObj||15)-4?'#92400E':'#991B1B';
     const ecls={'Borrador':'bk','Enviada':'bb','Aprobada':'bg','Facturada':'bp','Rechazado':'br'}[c.estado]||'bk';
-    return`<tr><td style="font-family:monospace;font-size:11px">${c.numCot}</td><td>${c.cliente}</td><td>${c.fecha}</td><td style="font-size:11px">${c.tipo}</td><td><span class="badge ${ecls}" style="font-size:10px">${c.estado}</span></td><td style="font-size:11px">${c.supaId?'🔗 En Supabase':'—'}</td><td style="text-align:right">${f2(c.valorCotizado)}</td><td style="text-align:right">${c.valorFacturadoReal?f2(c.valorFacturadoReal):f2(c.valorCobrado)}</td><td style="text-align:right;font-weight:700;color:${scol}">${(c.margenReal||0).toFixed(1)}%</td></tr>`;
+    return`<tr><td style="font-family:monospace;font-size:11px">${c.numCot}</td><td>${c.cliente}</td><td>${c.fecha}</td><td style="font-size:11px">${c.tipo}</td><td><span class="badge ${ecls}" style="font-size:10px">${c.estado}</span></td><td style="font-size:11px">${c.supaId?'🔗 En Supabase':'—'}</td><td style="text-align:right">${f2(c.valor_cotizado||c.valorCotizado)}</td><td style="text-align:right">${c.valorFacturadoReal?f2(c.valorFacturadoReal):f2(c.valor_cobrado||c.valorCobrado)}</td><td style="text-align:right;font-weight:700;color:${scol}">${(c.margen_real||c.margenReal||0).toFixed(1)}%</td></tr>`;
   }).join('');
 }
 async function exportarReporte(){
@@ -1408,7 +1413,7 @@ async function enviarIA(){
   msgs.innerHTML+=`<div class="ai-mu"><strong>TÚ</strong>${q}</div>`;
   inp.value='';btn.disabled=true;btn.innerHTML='<span class="spin"></span>';msgs.scrollTop=msgs.scrollHeight;
   let ctx='No hay operación calculada.';
-  if(ultimoCalculo){const c=ultimoCalculo;ctx=`Cliente: ${c.cliente}. Fruta: $${c.pFrutaProm.toFixed(3)}/kg. Costo CIF/caja: $${c.costoTotalCaja.toFixed(2)}. Precio prom: $${c.pvProm.toFixed(2)}/caja. Margen: ${c.margenReal.toFixed(1)}%. Objetivo: ${c.margenObj}%. Utilidad: $${c.utilidad.toFixed(2)}. Precio mínimo: $${c.precioMin.toFixed(2)}/caja.`;}
+  if(ultimoCalculo){const c=ultimoCalculo;ctx=`Cliente: ${c.cliente}. Fruta: $${(c.pf_fruta_prom||c.pFrutaProm||0).toFixed(3)}/kg. Costo CIF/caja: $${c.costoTotalCaja.toFixed(2)}. Precio prom: $${c.pvProm.toFixed(2)}/caja. Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%. Objetivo: ${c.margenObj}%. Utilidad: $${c.utilidad.toFixed(2)}. Precio mínimo: $${c.precioMin.toFixed(2)}/caja.`;}
   const sys=`Eres el asesor de precio y margen de Daniel Polit (Ventas) y Pablo Moysam (Gerente General) de Agrovip S.A., exportadora ecuatoriana de pitahaya. Directo, conciso, español. Margen objetivo 14-16%. Máximo 4 líneas con recomendación concreta. Operación: ${ctx}`;
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:sys,messages:[{role:'user',content:q}]})});
