@@ -187,6 +187,7 @@ input,select,textarea,button{font-family:inherit}
           <div class="fld"><label>Cargar cliente guardado</label>
             <select id="clienteSel" onchange="cargarCliente(this.value)"><option value="">— Seleccionar —</option></select>
           </div>
+          <div id="clienteInfoPanel"></div>
           <div class="fld"><label>Nombre cliente</label><input type="text" id="clienteNombre" placeholder="Ej: Veritas Commodities"></div>
           <div class="fr2">
             <div class="fld"><label>Cajas totales</label><input type="number" id="cajasTotal" value="3840"></div>
@@ -1354,6 +1355,16 @@ async function abrirModalFactura(id){
   facturaTargetId=id;
   const allC=await lc.cots();const c=allC.find(x=>x.id===id);
   document.getElementById('mf_fecha').value=new Date().toISOString().split('T')[0];
+  // Pre-fill dias credito from cliente
+  const allCsM=await lc.clis();
+  const cM=allCsM.find(x=>x.nombre===c.cliente);
+  if(cM?.dias_credito){
+    document.getElementById('mf_dias_credito').value=cM.dias_credito;
+    calcFechaVenc();
+  }
+  // Add listeners
+  document.getElementById('mf_fecha').addEventListener('change',calcFechaVenc);
+  document.getElementById('mf_dias_credito').addEventListener('input',()=>{calcFechaVenc();checkVencido();});
   document.getElementById('mf_factura').value='';
   document.getElementById('mf_valor').value=c?.valorCobrado?.toFixed(2)||'';
   document.getElementById('mf_cajas').value=c?.cajasTotal||'';
@@ -1388,6 +1399,7 @@ async function confirmarFactura(){
   const valor=parseFloat(document.getElementById('mf_valor').value)||0;
   const cajas=parseFloat(document.getElementById('mf_cajas').value)||0;
   const ncMonto=parseFloat(document.getElementById('mf_nc_monto').value)||0;
+  const diasCred=parseInt(document.getElementById('mf_dias_credito').value)||0;
   const update={
     num_factura:document.getElementById('mf_factura').value.trim(),
     valor_facturado_real:valor,
@@ -1397,6 +1409,10 @@ async function confirmarFactura(){
     nc_factura_monto:ncMonto,
     nc_factura_detalle:document.getElementById('mf_nc_detalle').value.trim(),
     fecha_factura:document.getElementById('mf_fecha').value,
+    dias_credito:diasCred,
+    fecha_vencimiento:document.getElementById('mf_fecha_venc').value||null,
+    fecha_pago_real:document.getElementById('mf_fecha_pago').value||null,
+    estado_pago:document.getElementById('mf_estado_pago').value,
     estado:'Facturada'
   };
   await supaFetch('PATCH',`cotizaciones?id=eq.${facturaTargetId}`,update);
@@ -1427,6 +1443,32 @@ async function poblClienteSel(){
 }
 async function cargarCliente(id){
   if(!id)return;const allC=await lc.clis();const c=allC.find(x=>x.id===id);if(!c)return;
+  // Show client credit info
+  const allCots=await lc.cots();
+  const histCli=allCots.filter(x=>x.cliente===c.nombre&&x.estado==='Facturada').slice(0,5);
+  const pendiente=allCots.filter(x=>x.cliente===c.nombre&&x.estado==='Facturada'&&x.estado_pago!=='Pagado').reduce((s,x)=>s+(x.valor_facturado_real||x.valor_cotizado||0),0);
+  const cupoDisp=Math.max(0,(c.cupo||0)-pendiente);
+  let infoHtml='';
+  if(c.cupo>0||c.dias_credito>0){
+    infoHtml+=`<div style="background:${pendiente>c.cupo?'#FEE2E2':'#D1FAE5'};border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px">`;
+    infoHtml+=`<div style="font-weight:600;margin-bottom:4px">${c.nombre} · Condiciones de crédito</div>`;
+    infoHtml+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px">`;
+    infoHtml+=`<div><span style="color:var(--gris)">Cupo total</span><br><b>$${(c.cupo||0).toFixed(2)}</b></div>`;
+    infoHtml+=`<div><span style="color:var(--gris)">Usado</span><br><b style="color:${pendiente>c.cupo?'var(--rd)':'var(--am)'}">$${pendiente.toFixed(2)}</b></div>`;
+    infoHtml+=`<div><span style="color:var(--gris)">Disponible</span><br><b style="color:${cupoDisp>0?'var(--g)':'var(--rd)'}">$${cupoDisp.toFixed(2)}</b></div>`;
+    infoHtml+=`</div>`;
+    if(c.dias_credito>0)infoHtml+=`<div style="margin-top:6px;font-size:11px;color:var(--gris)">Crédito: ${c.dias_credito} días · Días máximos acordados</div>`;
+    if(pendiente>c.cupo)infoHtml+=`<div style="color:var(--rd);font-weight:600;margin-top:4px">⚠ Cliente tiene cupo excedido</div>`;
+    infoHtml+='</div>';
+  }
+  if(histCli.length){
+    infoHtml+=`<div style="background:var(--cr);border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px">`;
+    infoHtml+=`<div style="font-weight:600;margin-bottom:6px">Últimas entregas</div>`;
+    infoHtml+=histCli.map(h=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bd)"><span>${h.fecha} · ${h.num_cot||'—'}</span><span style="font-weight:600;color:var(--g)">$${(h.valor_facturado_real||h.valor_cotizado||0).toFixed(2)}</span><span class="badge ${h.estado_pago==='Pagado'?'bg':h.dias_vencido>0?'br':'bb'}">${h.estado_pago||'—'}</span></div>`).join('');
+    infoHtml+='</div>';
+  }
+  const infoEl=document.getElementById('clienteInfoPanel');
+  if(infoEl)infoEl.innerHTML=infoHtml;
   document.getElementById('clienteNombre').value=c.nombre;
   if(c.cajas)document.getElementById('cajasTotal').value=c.cajas;
   if(c.margen)document.getElementById('margenObj').value=c.margen;
@@ -1446,6 +1488,8 @@ function abrirModalCliente(id){
   document.getElementById('mc_wapais').value=c?.wapais||'+1';
   document.getElementById('mc_wanum').value=c?.wanum||'';
   document.getElementById('mc_notif_wa').checked=c?.notifWa!==false;
+  document.getElementById('mc_cupo').value=c?.cupo||0;
+  document.getElementById('mc_dias_credito').value=c?.dias_credito||0;
   document.getElementById('mc_req_aprov').checked=c?.reqAprov||false;
   document.getElementById('mc_notas').value=c?.notas||'';
   document.getElementById('modalCliente').classList.add('show');
@@ -1455,12 +1499,33 @@ async function guardarCliente(){
   const wapais=document.getElementById('mc_wapais').value.trim();
   const wanum=document.getElementById('mc_wanum').value.trim();
   const whatsapp=(wapais+wanum).replace(/[\s\-\(\)]/g,'');
-  const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notas:document.getElementById('mc_notas').value.trim()};
- const cliAllowed=['id','nombre','pais','tipo','cajas','margen','contacto','email','wapais','wanum','whatsapp','notas'];const cliClean=Object.fromEntries(Object.entries(datos).filter(([k])=>cliAllowed.includes(k)));if(editCliId){await lc.updateCli(editCliId,cliClean);}else{await lc.saveClis(cliClean);}
+  const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,cupo:parseFloat(document.getElementById('mc_cupo').value)||0,dias_credito:parseInt(document.getElementById('mc_dias_credito').value)||0,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notas:document.getElementById('mc_notas').value.trim()};
+  if(editCliId){await lc.updateCli(editCliId,datos);}else{await lc.saveClis(datos);}
+  _clis=null;cerrarModal('modalCliente');renderClientes();poblClienteSel();
+}
 async function eliminarCliente(id){if(!confirm('¿Eliminar cliente?'))return;await lc.delCli(id);_clis=null;renderClientes();poblClienteSel();}
 function usarCliente(id){cargarCliente(id);goTab('calc');}
 function cerrarModal(id){document.getElementById(id).classList.remove('show');}
 document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
+
+// Auto-calcular fecha vencimiento
+function calcFechaVenc(){
+  const fecha=document.getElementById('mf_fecha')?.value;
+  const dias=parseInt(document.getElementById('mf_dias_credito')?.value)||0;
+  if(fecha&&dias>0){
+    const d=new Date(fecha);d.setDate(d.getDate()+dias);
+    document.getElementById('mf_fecha_venc').value=d.toISOString().split('T')[0];
+  }
+}
+// Check if payment is overdue automatically
+function checkVencido(){
+  const venc=document.getElementById('mf_fecha_venc')?.value;
+  const pagado=document.getElementById('mf_estado_pago')?.value;
+  if(venc&&pagado!=='Pagado'){
+    const today=new Date().toISOString().split('T')[0];
+    if(venc<today)document.getElementById('mf_estado_pago').value='Vencido';
+  }
+}
 
 // COPIAR
 function copiarCot(){
