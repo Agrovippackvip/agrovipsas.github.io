@@ -4,7 +4,172 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agrovip · Sistema Interno</title>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+// =================== DISPONIBILIDAD ===================
+let _dispRecs=null;
+let _dispCostoPromCaja=0;
+let _dispTotalCajas=0;
+
+async function cargarDisponibilidad(){
+  const sem=parseInt(document.getElementById('dispSemana').value)||0;
+  if(!sem){alert('Ingresa el número de semana.');return;}
+  const data=await supaFetch('GET','recepciones?semana=eq.'+sem+'&select=*&order=created_at.desc');
+  if(!data||!data.length){alert('Sin recepciones para semana '+sem+'.');return;}
+  // Filter out already dispatched
+  const despData=await supaFetch('GET','despachos?select=productores,semana&semana=eq.'+sem+'&estado=neq.Borrador');
+  const despachados={};
+  (despData||[]).forEach(function(d){
+    try{JSON.parse(d.productores||'[]').forEach(function(p){(p.rows||[{...p}]).forEach(function(r){if(!despachados[r.productor])despachados[r.productor]={};[6,7,8,9,10,11,12,13,14].forEach(function(c){despachados[r.productor][c]=(despachados[r.productor][c]||0)+(r.cals&&r.cals[c]?r.cals[c]:0);});});});}catch(e){}
+  });
+  _dispRecs=data;
+  const CALS=[6,7,8,9,10,11,12,13,14];
+  let totalCajas=0,totalKg=0,totalValorFruta=0;
+  let tbody='';
+  data.forEach(function(r){
+    const kgNeto=r.k_neto||r.k_rec||0;
+    const precio=r.precio||0;
+    let cajasDisp=0;
+    const calsHTML=CALS.map(function(c){
+      const tot=r['cal_'+c]||0;
+      const desp=despachados[r.productor]?despachados[r.productor][c]||0:0;
+      const disp=Math.max(0,tot-desp);
+      cajasDisp+=disp;
+      return '<td style="padding:5px 8px;text-align:center;color:'+(disp>0?'var(--g)':'var(--gris)');font-weight:'+(disp>0?'600':'400')+'">'+(disp>0?disp:'—')+'</td>';
+    }).join('');
+    const kgDisp=cajasDisp*4.5;
+    const costoCaja=cajasDisp>0?(kgNeto*precio/cajasDisp):0;
+    totalCajas+=cajasDisp;totalKg+=kgDisp;totalValorFruta+=kgNeto*precio;
+    tbody+='<tr style="border-bottom:1px solid var(--bd)"><td style="padding:6px 10px;font-weight:600">'+r.productor+'</td>'+calsHTML+'<td style="padding:5px 8px;text-align:center;font-weight:700;color:var(--g)">'+cajasDisp+'</td><td style="padding:5px 8px;text-align:center">'+kgDisp.toFixed(1)+'</td><td style="padding:5px 8px;text-align:center">$'+precio.toFixed(3)+'</td><td style="padding:5px 8px;text-align:center;font-weight:600">$'+costoCaja.toFixed(2)+'</td></tr>';
+  });
+  _dispTotalCajas=totalCajas;
+  _dispCostoPromCaja=totalCajas>0?totalValorFruta/totalCajas/4.5*4.5:0;
+  document.getElementById('disp_cajas').textContent=totalCajas.toLocaleString();
+  document.getElementById('disp_kg').textContent=totalKg.toFixed(1)+' kg';
+  document.getElementById('disp_prods').textContent=data.length;
+  document.getElementById('disp_costo').textContent='$'+_dispCostoPromCaja.toFixed(2);
+  document.getElementById('dispTable').innerHTML=tbody;
+  document.getElementById('dispPanel').style.display='block';
+  calcSugerencia();
+}
+
+function calcSugerencia(){
+  if(!_dispTotalCajas)return;
+  const margen=parseFloat(document.getElementById('dispMargen').value)||14;
+  const pvSug=_dispCostoPromCaja>0?_dispCostoPromCaja/(1-margen/100):0;
+  const utilidad=(_dispTotalCajas*(pvSug-_dispCostoPromCaja));
+  document.getElementById('dispPvSugerido').value='$'+pvSug.toFixed(2)+'/caja';
+  document.getElementById('dispUtilidad').value='$'+utilidad.toFixed(2)+' ('+_dispTotalCajas+' cajas)';
+}
+
+function usarEnCotizacion(){
+  const margen=parseFloat(document.getElementById('dispMargen').value)||14;
+  const pvSug=_dispCostoPromCaja>0?_dispCostoPromCaja/(1-margen/100):0;
+  // Set in cotizacion form
+  document.getElementById('cajasTotal').value=_dispTotalCajas;
+  document.getElementById('margenObj').value=margen;
+  if(document.getElementById('pvPB'))document.getElementById('pvPB').value=pvSug.toFixed(2);
+  gt('nueva');
+  alert('Datos cargados en la cotizacion. Ajusta el precio y cliente segun el destino.');
+}
+
+// =================== HISTORIAL CLIENTES ===================
+let _histClientes=null;
+
+async function loadHistClientes(){
+  if(_histClientes===null){
+    const d=await supaFetch('GET','clientes_historial?select=*&order=created_at.desc');
+    _histClientes=d||[];
+  }
+  return _histClientes;
+}
+
+async function renderHistClientes(){
+  const list=await loadHistClientes();
+  const filtC=(document.getElementById('hcFiltCliente').value||'').toLowerCase();
+  const filtE=document.getElementById('hcFiltEstado').value;
+  let filtered=list;
+  if(filtC)filtered=filtered.filter(function(r){return(r.cliente||'').toLowerCase().includes(filtC);});
+  if(filtE)filtered=filtered.filter(function(r){return r.estado_pago===filtE;});
+  const total=list.length;
+  const pend=list.filter(function(r){return r.estado_pago==='Pendiente'||r.estado_pago==='Atrasado';}).length;
+  const vpend=list.filter(function(r){return r.estado_pago!=='Pagado';}).reduce(function(s,r){return s+(r.valor_facturado||0)-(r.nc_monto||0);},0);
+  const nc=list.filter(function(r){return(r.nc_monto||0)>0;}).length;
+  document.getElementById('hc_total').textContent=total;
+  document.getElementById('hc_pend').textContent=pend;
+  document.getElementById('hc_vpend').textContent='$'+vpend.toFixed(2);
+  document.getElementById('hc_nc').textContent=nc;
+  if(!filtered.length){document.getElementById('histClientesList').innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">Sin registros.</div>';return;}
+  // Group by cliente
+  const byCliente={};
+  filtered.forEach(function(r){if(!byCliente[r.cliente])byCliente[r.cliente]=[];byCliente[r.cliente].push(r);});
+  let html='';
+  Object.entries(byCliente).forEach(function(entry){
+    const cliente=entry[0];const rows=entry[1];
+    const totalVal=rows.reduce(function(s,r){return s+(r.valor_facturado||0);},0);
+    const totalNC=rows.reduce(function(s,r){return s+(r.nc_monto||0);},0);
+    const pendVal=rows.filter(function(r){return r.estado_pago!=='Pagado';}).reduce(function(s,r){return s+(r.valor_facturado||0)-(r.nc_monto||0);},0);
+    const cupo=rows[0]?.cupo_asignado||0;
+    const enRiesgo=pendVal>cupo&&cupo>0;
+    html+='<div class="card" style="margin-bottom:12px;border-left:3px solid '+(enRiesgo?'var(--rd)':'var(--g)');}">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+    html+='<div><div style="font-size:15px;font-weight:700">'+cliente+'</div>';
+    html+='<div style="font-size:12px;color:var(--gris)">'+rows.length+' entregas · Total facturado: $'+totalVal.toFixed(2)+'</div></div>';
+    if(enRiesgo)html+='<span class="badge br">⚠ Cupo excedido</span>';
+    else if(pendVal>0)html+='<span class="badge ba">$'+pendVal.toFixed(2)+' pendiente</span>';
+    else html+='<span class="badge bg">Al dia</span>';
+    html+='</div>';
+    if(cupo>0)html+='<div style="font-size:12px;color:var(--gris);margin-bottom:8px">Cupo: $'+cupo.toFixed(2)+' · Usado: $'+pendVal.toFixed(2)+' · Disponible: $'+Math.max(0,cupo-pendVal).toFixed(2)+'</div>';
+    html+='<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:6px">';
+    html+='<thead><tr style="background:var(--cr);font-weight:600"><th style="padding:5px 8px;text-align:left">Fecha</th><th style="padding:5px 8px">Cajas</th><th style="padding:5px 8px">Facturado</th><th style="padding:5px 8px">N/C</th><th style="padding:5px 8px">Causa N/C</th><th style="padding:5px 8px">Vencimiento</th><th style="padding:5px 8px">Estado</th><th style="padding:5px 8px">Reclamo</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      const ec={Pagado:'bg',Pendiente:'bb',Atrasado:'br'}[r.estado_pago]||'bk';
+      html+='<tr style="border-bottom:1px solid var(--bd)">';
+      html+='<td style="padding:5px 8px">'+(r.fecha_entrega||'—')+'</td>';
+      html+='<td style="padding:5px 8px;text-align:center">'+(r.cajas||0)+'</td>';
+      html+='<td style="padding:5px 8px;text-align:right">$'+(r.valor_facturado||0).toFixed(2)+'</td>';
+      html+='<td style="padding:5px 8px;text-align:right;color:'+(r.nc_monto?'var(--rd)':'var(--gris)')+'">'+((r.nc_monto||0)>0?'-$'+r.nc_monto.toFixed(2):'—')+'</td>';
+      html+='<td style="padding:5px 8px">'+(r.nc_causa||'—')+'</td>';
+      html+='<td style="padding:5px 8px">'+(r.fecha_vencimiento||'—')+'</td>';
+      html+='<td style="padding:5px 8px"><span class="badge '+ec+'">'+(r.estado_pago||'—')+'</span></td>';
+      html+='<td style="padding:5px 8px;max-width:150px;font-size:10px">'+(r.reclamo||'—')+'</td>';
+      html+='</tr>';
+    });
+    html+='</tbody></table></div>';
+  });
+  document.getElementById('histClientesList').innerHTML=html;
+}
+
+function abrirModalNuevoHC(){
+  document.getElementById('hcFecha').value=new Date().toISOString().split('T')[0];
+  // Populate cot selector
+  const sel=document.getElementById('hcCotId');
+  if(sel&&_cots){sel.innerHTML='<option value="">— Seleccionar —</option>'+_cots.map(function(c){return '<option value="'+c.id+'">'+( c.num_cot||'—')+' - '+(c.cliente||'—')+'</option>';}).join('');}
+  document.getElementById('modalNuevoHC').style.display='block';
+}
+
+async function guardarHistCliente(){
+  const data={
+    id:'hc'+Date.now(),
+    cliente:document.getElementById('hcCliente').value.trim(),
+    cotizacion_id:document.getElementById('hcCotId').value||null,
+    fecha_entrega:document.getElementById('hcFecha').value,
+    cajas:parseInt(document.getElementById('hcCajas').value)||0,
+    valor_facturado:parseFloat(document.getElementById('hcValor').value)||0,
+    fecha_vencimiento:document.getElementById('hcVencimiento').value||null,
+    estado_pago:document.getElementById('hcEstadoPago').value,
+    cupo_asignado:parseFloat(document.getElementById('hcCupo').value)||0,
+    nc_monto:parseFloat(document.getElementById('hcNcMonto').value)||0,
+    nc_causa:document.getElementById('hcNcCausa').value||null,
+    reclamo:document.getElementById('hcReclamo').value.trim()||null
+  };
+  if(!data.cliente){alert('Ingresa el nombre del cliente.');return;}
+  await supaFetch('POST','clientes_historial',data);
+  _histClientes=null;
+  cerrarModal('modalNuevoHC');
+  renderHistClientes();
+  alert('Registro guardado correctamente.');
+}
+</script>
 <style>
 :root{--g:#1A6B3C;--g2:#7A9A2E;--am:#D4A017;--rd:#C0392B;--cr:#F5F0E8;--cr2:#EAE3D2;--gris:#6B6B5A;--ink:#1C1C1C;--bd:#E0D8C8}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -374,6 +539,66 @@ input,select,textarea,button{font-family:inherit}
     </div>
 
     <!-- CLIENTES -->
+    <div class="tab" id="tab-disponibilidad">
+      <div class="sl">Disponibilidad semanal para cotizar</div>
+      <div class="card">
+        <div class="ct">📦 Selecciona la semana de producción</div>
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div class="fld" style="margin:0;flex:1">
+            <label>Semana #</label>
+            <input type="number" id="dispSemana" placeholder="Ej: 21" style="max-width:120px">
+          </div>
+          <button class="bs" onclick="cargarDisponibilidad()" style="margin-bottom:10px">Cargar disponibilidad</button>
+        </div>
+      </div>
+      <div id="dispPanel" style="display:none">
+        <div class="g4" style="margin-bottom:14px">
+          <div class="sc"><div class="et">Cajas disponibles</div><div class="nm hl" id="disp_cajas">0</div></div>
+          <div class="sc"><div class="et">Kg netos</div><div class="nm hl" id="disp_kg">0</div></div>
+          <div class="sc"><div class="et">Productores</div><div class="nm hl" id="disp_prods">0</div></div>
+          <div class="sc"><div class="et">Costo prom./caja</div><div class="nm hl" id="disp_costo">$0</div></div>
+        </div>
+        <div class="card">
+          <div class="ct">🌿 Detalle por productor</div>
+          <div style="overflow-x:auto">
+            <table style="border-collapse:collapse;font-size:12px;width:100%">
+              <thead><tr style="background:var(--g);color:white;text-align:center">
+                <th style="padding:7px 10px;text-align:left">Productor</th>
+                <th style="padding:7px 8px">C6</th><th style="padding:7px 8px">C7</th>
+                <th style="padding:7px 8px">C8</th><th style="padding:7px 8px">C9</th>
+                <th style="padding:7px 8px">C10</th><th style="padding:7px 8px">C11</th>
+                <th style="padding:7px 8px">C12</th><th style="padding:7px 8px">C13</th>
+                <th style="padding:7px 8px">C14</th>
+                <th style="padding:7px 8px;background:#065F46">Cajas</th>
+                <th style="padding:7px 8px;background:#065F46">Kg</th>
+                <th style="padding:7px 8px;background:#065F46">$/kg</th>
+                <th style="padding:7px 8px;background:#065F46">Costo caja</th>
+              </tr></thead>
+              <tbody id="dispTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card" style="background:var(--cr)">
+          <div class="ct">💡 Sugerencia de precio de venta</div>
+          <div class="g3">
+            <div class="fld">
+              <label>Margen objetivo (%)</label>
+              <input type="number" id="dispMargen" value="14" step="1" oninput="calcSugerencia()">
+            </div>
+            <div class="fld">
+              <label>Precio de venta sugerido ($/caja)</label>
+              <input type="text" id="dispPvSugerido" readonly style="background:white;font-weight:700;color:var(--g);font-size:16px">
+            </div>
+            <div class="fld">
+              <label>Utilidad estimada</label>
+              <input type="text" id="dispUtilidad" readonly style="background:white;font-weight:700;color:var(--g)">
+            </div>
+          </div>
+          <button class="bp" style="margin-top:4px" onclick="usarEnCotizacion()">→ Usar estos datos en cotización</button>
+        </div>
+      </div>
+    </div>
+
     <div class="tab" id="tab-clientes">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div class="sec-lbl" style="margin:0">Clientes guardados</div>
@@ -383,6 +608,76 @@ input,select,textarea,button{font-family:inherit}
     </div>
 
     <!-- REPORTES -->
+    <div class="tab" id="tab-histClientes">
+      <div class="sl">Historial de clientes</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <input type="text" id="hcFiltCliente" placeholder="Buscar cliente..." oninput="renderHistClientes()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;flex:1">
+        <select id="hcFiltEstado" onchange="renderHistClientes()" style="padding:7px 12px;font-size:12px;border:1px solid var(--bd);border-radius:7px;background:white">
+          <option value="">Todos los estados</option>
+          <option value="Pagado">Pagado</option>
+          <option value="Pendiente">Pendiente</option>
+          <option value="Atrasado">Atrasado</option>
+          <option value="Con reclamo">Con reclamo</option>
+        </select>
+        <button class="bs" onclick="abrirModalNuevoHC()">+ Registrar entrega</button>
+      </div>
+      <div class="g4" style="margin-bottom:14px">
+        <div class="sc"><div class="et">Total entregas</div><div class="nm hl" id="hc_total">0</div></div>
+        <div class="sc"><div class="et">Facturas pendientes</div><div class="nm hl" id="hc_pend">0</div></div>
+        <div class="sc"><div class="et">Valor pendiente</div><div class="nm hl" id="hc_vpend">$0</div></div>
+        <div class="sc"><div class="et">N/C emitidas</div><div class="nm hl" id="hc_nc">0</div></div>
+      </div>
+      <div id="histClientesList"></div>
+
+      <!-- Modal nueva entrega -->
+      <div id="modalNuevoHC" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;overflow-y:auto">
+        <div style="background:white;max-width:600px;margin:40px auto;border-radius:12px;padding:24px;position:relative">
+          <button onclick="cerrarModal('modalNuevoHC')" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer">×</button>
+          <h3 style="color:var(--g);margin-bottom:16px">Registrar entrega a cliente</h3>
+          <div class="fr2">
+            <div class="fld"><label>Cliente</label><input type="text" id="hcCliente" placeholder="Nombre del cliente"></div>
+            <div class="fld"><label>Cotización relacionada</label>
+              <select id="hcCotId"><option value="">— Seleccionar —</option></select>
+            </div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Fecha de entrega</label><input type="date" id="hcFecha"></div>
+            <div class="fld"><label>Cajas entregadas</label><input type="number" id="hcCajas" step="1"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Valor facturado ($)</label><input type="number" id="hcValor" step="0.01"></div>
+            <div class="fld"><label>Fecha vencimiento pago</label><input type="date" id="hcVencimiento"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>Estado de pago</label>
+              <select id="hcEstadoPago">
+                <option value="Pendiente">Pendiente</option>
+                <option value="Pagado">Pagado</option>
+                <option value="Atrasado">Atrasado</option>
+              </select>
+            </div>
+            <div class="fld"><label>Cupo asignado ($)</label><input type="number" id="hcCupo" step="100" placeholder="0"></div>
+          </div>
+          <div class="fr2">
+            <div class="fld"><label>N/C monto ($)</label><input type="number" id="hcNcMonto" step="0.01" value="0"></div>
+            <div class="fld"><label>Causa de N/C</label>
+              <select id="hcNcCausa">
+                <option value="">Sin N/C</option>
+                <option value="Calidad">Calidad</option>
+                <option value="Demoras">Demoras</option>
+                <option value="Comercial">Comercial</option>
+                <option value="Precio">Precio</option>
+              </select>
+            </div>
+          </div>
+          <div class="fld"><label>Reclamo / observaciones</label>
+            <textarea id="hcReclamo" placeholder="Descripción del reclamo si aplica..."></textarea>
+          </div>
+          <button class="bp" onclick="guardarHistCliente()">💾 Guardar registro</button>
+        </div>
+      </div>
+    </div>
+
     <div class="tab" id="tab-reportes">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div class="sec-lbl" style="margin:0">Período</div>
