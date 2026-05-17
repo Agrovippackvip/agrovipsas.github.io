@@ -577,6 +577,10 @@ input,select,textarea,button{font-family:inherit}
       <div class="fld"><label>WhatsApp (código país)</label><input type="text" id="mc_wapais" placeholder="+1" value="+1"></div>
       <div class="fld"><label>Número</label><input type="tel" id="mc_wanum" placeholder="305 555 0100"></div>
     </div>
+    <div class="fr2" style="margin-top:8px">
+      <div class="fld"><label>Cupo de crédito (USD)</label><input type="number" id="mc_cupo" placeholder="0" min="0" step="100"></div>
+      <div class="fld"><label>Días de crédito</label><input type="number" id="mc_dias_credito" placeholder="0" min="0" max="120"></div>
+    </div>
     <label class="check-row"><input type="checkbox" id="mc_notif_wa" checked> Enviar por WhatsApp</label>
     <label class="check-row"><input type="checkbox" id="mc_req_aprov"> Requiere aprobación del cliente</label>
     <div class="fld" style="margin-top:8px"><label>Condiciones / notas</label><textarea id="mc_notas" placeholder="Factoring, plazos, requisitos..."></textarea></div>
@@ -1475,8 +1479,8 @@ async function cargarCliente(id){
   document.querySelectorAll('#tipoTabs .tipo-tab').forEach(t=>{t.classList.remove('active');if(t.dataset.tipo===c.tipo)t.classList.add('active');});
   tipoActual=c.tipo||tipoActual;actualizarUI();
 }
-function abrirModalCliente(id){
-  editCliId=id||null;const c=id?lc.clis().find(x=>x.id===id):null;
+async function abrirModalCliente(id){
+  editCliId=id||null;const allCli=await lc.clis();const c=id?allCli.find(x=>x.id===id):null;
   document.getElementById('modalCliTitle').textContent=id?'Editar cliente':'Nuevo cliente';
   document.getElementById('mc_nombre').value=c?.nombre||'';
   document.getElementById('mc_pais').value=c?.pais||'';
