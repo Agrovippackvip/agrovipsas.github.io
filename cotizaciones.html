@@ -330,6 +330,8 @@ input,select,textarea,button{font-family:inherit}
     <button class="nav-btn active" onclick="goTab('calc')">📊 Calcular</button>
     <button class="nav-btn" onclick="goTab('cots')">📋 Cotizaciones <span class="nav-badge" id="cotBadgeNav" style="display:none"></span></button>
     <button class="nav-btn" onclick="goTab('clientes')">👥 Clientes</button>
+    <button class="nav-btn" onclick="goTab('disponibilidad')">🌿 Disponibilidad</button>
+    <button class="nav-btn" onclick="goTab('histClientes')">📊 Hist. Clientes</button>
     <button class="nav-btn" onclick="goTab('reportes')">📈 Reportes</button>
   </div>
 
@@ -895,10 +897,12 @@ function goTab(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('show'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('show');
-  const idx={calc:0,cots:1,clientes:2,reportes:3}[id];
-  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  const idx={calc:0,cots:1,clientes:2,disponibilidad:3,histClientes:4,reportes:5}[id];
+  if(idx!==undefined)document.querySelectorAll('.nav-btn')[idx].classList.add('active');
   if(id==='cots'){renderCots();updateStats();}
   if(id==='clientes')renderClientes();
+  if(id==='disponibilidad'&&document.getElementById('dispSemana')){const sy=new Date();const wk=Math.ceil(((sy-new Date(sy.getFullYear(),0,1))/86400000+new Date(sy.getFullYear(),0,1).getDay()+1)/7);document.getElementById('dispSemana').value=wk;}
+  if(id==='histClientes')renderHistClientes();
   if(id==='reportes')renderReporte();
 }
 
