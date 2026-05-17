@@ -581,6 +581,7 @@ input,select,textarea,button{font-family:inherit}
       <div class="fld"><label>Cupo de crédito (USD)</label><input type="number" id="mc_cupo" placeholder="0" min="0" step="100"></div>
       <div class="fld"><label>Días de crédito</label><input type="number" id="mc_dias_credito" placeholder="0" min="0" max="120"></div>
     </div>
+    <div class="fld"><label>Saldo inicial usado (USD) <span style="font-size:10px;color:var(--gris);font-weight:400">— deuda previa al sistema</span></label><input type="number" id="mc_saldo_inicial" placeholder="0" min="0" step="0.01"></div>
     <label class="check-row"><input type="checkbox" id="mc_notif_wa" checked> Enviar por WhatsApp</label>
     <label class="check-row"><input type="checkbox" id="mc_req_aprov"> Requiere aprobación del cliente</label>
     <div class="fld" style="margin-top:8px"><label>Condiciones / notas</label><textarea id="mc_notas" placeholder="Factoring, plazos, requisitos..."></textarea></div>
@@ -1450,19 +1451,26 @@ async function cargarCliente(id){
   // Show client credit info
   const allCots=await lc.cots();
   const histCli=allCots.filter(x=>x.cliente===c.nombre&&x.estado==='Facturada').slice(0,5);
-  const pendiente=allCots.filter(x=>x.cliente===c.nombre&&x.estado==='Facturada'&&x.estado_pago!=='Pagado').reduce((s,x)=>s+(x.valor_facturado_real||x.valor_cotizado||0),0);
-  const cupoDisp=Math.max(0,(c.cupo||0)-pendiente);
+  const usadoSistema=allCots.filter(x=>x.cliente===c.nombre&&x.estado==='Facturada'&&x.estado_pago!=='Pagado').reduce((s,x)=>s+(x.valor_facturado_real||x.valor_cotizado||0),0);
+  const saldoInicial=c.saldo_inicial||0;
+  const pendiente=usadoSistema+saldoInicial;
+  const cupoTotal=c.cupo||0;
+  const cupoDisp=Math.max(0,cupoTotal-pendiente);
+  const excedido=cupoTotal>0&&pendiente>cupoTotal;
+  const pctUsado=cupoTotal>0?Math.min(100,(pendiente/cupoTotal)*100):0;
   let infoHtml='';
-  if(c.cupo>0||c.dias_credito>0){
-    infoHtml+=`<div style="background:${pendiente>c.cupo?'#FEE2E2':'#D1FAE5'};border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px">`;
-    infoHtml+=`<div style="font-weight:600;margin-bottom:4px">${c.nombre} · Condiciones de crédito</div>`;
-    infoHtml+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px">`;
-    infoHtml+=`<div><span style="color:var(--gris)">Cupo total</span><br><b>$${(c.cupo||0).toFixed(2)}</b></div>`;
-    infoHtml+=`<div><span style="color:var(--gris)">Usado</span><br><b style="color:${pendiente>c.cupo?'var(--rd)':'var(--am)'}">$${pendiente.toFixed(2)}</b></div>`;
-    infoHtml+=`<div><span style="color:var(--gris)">Disponible</span><br><b style="color:${cupoDisp>0?'var(--g)':'var(--rd)'}">$${cupoDisp.toFixed(2)}</b></div>`;
+  if(cupoTotal>0||c.dias_credito>0){
+    infoHtml+=`<div style="background:${excedido?'#FEE2E2':'#F0FDF4'};border:1.5px solid ${excedido?'#EF4444':'#22C55E'};border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:12px">`;
+    infoHtml+=`<div style="font-weight:700;margin-bottom:8px;font-size:13px;color:${excedido?'#DC2626':'#166534'}">${excedido?'⚠ CUPO EXCEDIDO':'✓ Crédito disponible'} · ${c.nombre}</div>`;
+    infoHtml+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">`;
+    infoHtml+=`<div><div style="color:#6B7280;font-size:10px;text-transform:uppercase;letter-spacing:.04em">Cupo total</div><div style="font-size:16px;font-weight:700">$${cupoTotal.toFixed(0)}</div></div>`;
+    infoHtml+=`<div><div style="color:#6B7280;font-size:10px;text-transform:uppercase;letter-spacing:.04em">Saldo previo</div><div style="font-size:16px;font-weight:700;color:#D97706">$${saldoInicial.toFixed(0)}</div></div>`;
+    infoHtml+=`<div><div style="color:#6B7280;font-size:10px;text-transform:uppercase;letter-spacing:.04em">Usado total</div><div style="font-size:16px;font-weight:700;color:${excedido?'#DC2626':'#D97706'}">$${pendiente.toFixed(0)}</div></div>`;
+    infoHtml+=`<div><div style="color:#6B7280;font-size:10px;text-transform:uppercase;letter-spacing:.04em">Disponible</div><div style="font-size:16px;font-weight:700;color:${cupoDisp>0?'#16A34A':'#DC2626'}">$${cupoDisp.toFixed(0)}</div></div>`;
     infoHtml+=`</div>`;
-    if(c.dias_credito>0)infoHtml+=`<div style="margin-top:6px;font-size:11px;color:var(--gris)">Crédito: ${c.dias_credito} días · Días máximos acordados</div>`;
-    if(pendiente>c.cupo)infoHtml+=`<div style="color:var(--rd);font-weight:600;margin-top:4px">⚠ Cliente tiene cupo excedido</div>`;
+    infoHtml+=`<div style="background:#E5E7EB;border-radius:4px;height:6px;margin-bottom:6px"><div style="background:${excedido?'#EF4444':'#22C55E'};height:6px;border-radius:4px;width:${pctUsado}%"></div></div>`;
+    if(c.dias_credito>0)infoHtml+=`<div style="font-size:11px;color:#6B7280">Plazo acordado: <b>${c.dias_credito} días</b></div>`;
+    if(saldoInicial>0)infoHtml+=`<div style="font-size:10px;color:#9CA3AF;margin-top:2px">Incluye $${saldoInicial.toFixed(0)} de saldo previo al sistema</div>`;
     infoHtml+='</div>';
   }
   if(histCli.length){
@@ -1494,6 +1502,7 @@ async function abrirModalCliente(id){
   document.getElementById('mc_notif_wa').checked=c?.notifWa!==false;
   document.getElementById('mc_cupo').value=c?.cupo||0;
   document.getElementById('mc_dias_credito').value=c?.dias_credito||0;
+  document.getElementById('mc_saldo_inicial').value=c?.saldo_inicial||0;
   document.getElementById('mc_req_aprov').checked=c?.reqAprov||false;
   document.getElementById('mc_notas').value=c?.notas||'';
   document.getElementById('modalCliente').classList.add('show');
@@ -1503,7 +1512,7 @@ async function guardarCliente(){
   const wapais=document.getElementById('mc_wapais').value.trim();
   const wanum=document.getElementById('mc_wanum').value.trim();
   const whatsapp=(wapais+wanum).replace(/[\s\-\(\)]/g,'');
-  const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,cupo:parseFloat(document.getElementById('mc_cupo').value)||0,dias_credito:parseInt(document.getElementById('mc_dias_credito').value)||0,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notas:document.getElementById('mc_notas').value.trim()};
+  const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,cupo:parseFloat(document.getElementById('mc_cupo').value)||0,dias_credito:parseInt(document.getElementById('mc_dias_credito').value)||0,saldo_inicial:parseFloat(document.getElementById('mc_saldo_inicial').value)||0,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notas:document.getElementById('mc_notas').value.trim()};
   if(editCliId){await lc.updateCli(editCliId,datos);}else{await lc.saveClis(datos);}
   _clis=null;cerrarModal('modalCliente');renderClientes();poblClienteSel();
 }
