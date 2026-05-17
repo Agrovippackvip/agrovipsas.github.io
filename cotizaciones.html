@@ -1456,9 +1456,7 @@ async function guardarCliente(){
   const wanum=document.getElementById('mc_wanum').value.trim();
   const whatsapp=(wapais+wanum).replace(/[\s\-\(\)]/g,'');
   const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notas:document.getElementById('mc_notas').value.trim()};
-  if(editCliId){await lc.updateCli(editCliId,datos);}else{await lc.saveClis(datos);}
-  _clis=null;cerrarModal('modalCliente');renderClientes();poblClienteSel();
-}
+ const cliAllowed=['id','nombre','pais','tipo','cajas','margen','contacto','email','wapais','wanum','whatsapp','notas'];const cliClean=Object.fromEntries(Object.entries(datos).filter(([k])=>cliAllowed.includes(k)));if(editCliId){await lc.updateCli(editCliId,cliClean);}else{await lc.saveClis(cliClean);}
 async function eliminarCliente(id){if(!confirm('¿Eliminar cliente?'))return;await lc.delCli(id);_clis=null;renderClientes();poblClienteSel();}
 function usarCliente(id){cargarCliente(id);goTab('calc');}
 function cerrarModal(id){document.getElementById(id).classList.remove('show');}
