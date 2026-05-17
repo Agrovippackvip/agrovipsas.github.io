@@ -697,7 +697,9 @@ const lc={
     return _clis;
   },
   saveClis: async (cli)=>{
-    await supaFetch('POST','clientes',cli);_clis=null;
+    const allowed=['id','nombre','pais','tipo','cajas','margen','contacto','email','whatsapp','notas','creado_por'];
+    const clean=Object.fromEntries(Object.entries(cli).filter(([k])=>allowed.includes(k)));
+    await supaFetch('POST','clientes',clean);_clis=null;
   },
   updateCli: async (id,data)=>{
     await supaFetch('PATCH',`clientes?id=eq.${id}`,data);_clis=null;
@@ -1453,8 +1455,7 @@ async function guardarCliente(){
   const wapais=document.getElementById('mc_wapais').value.trim();
   const wanum=document.getElementById('mc_wanum').value.trim();
   const whatsapp=(wapais+wanum).replace(/[\s\-\(\)]/g,'');
-  const clis=lc.clis();
-  const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notifWa:document.getElementById('mc_notif_wa').checked,reqAprov:document.getElementById('mc_req_aprov').checked,notas:document.getElementById('mc_notas').value.trim()};
+  const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notas:document.getElementById('mc_notas').value.trim()};
   if(editCliId){await lc.updateCli(editCliId,datos);}else{await lc.saveClis(datos);}
   _clis=null;cerrarModal('modalCliente');renderClientes();poblClienteSel();
 }
@@ -1670,7 +1671,7 @@ function usarEnCotizacion(){
   document.getElementById('cajasTotal').value=_dispTotalCajas;
   document.getElementById('margenObj').value=margen;
   if(document.getElementById('pvPB'))document.getElementById('pvPB').value=pvSug.toFixed(2);
-  gt('nueva');
+  goTab('calc');
   alert('Datos cargados en la cotizacion. Ajusta el precio y cliente segun el destino.');
 }
 
