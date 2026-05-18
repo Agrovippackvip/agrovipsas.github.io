@@ -1897,7 +1897,7 @@ async function renderHistClientes(){
     html+=`<div class="card" style="margin-bottom:14px;border-left:3px solid ${excedido?'#EF4444':'#22C55E'}">`;
     html+=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">`;
     html+=`<div><div style="font-size:15px;font-weight:700">${cliente}</div>`;
-    html+=`<div style="font-size:11px;color:#6B7280;margin-top:2px">${rows.length} entregas · Total: $${totalFact.toLocaleString('en-US',{maximumFractionDigits:0})}${diasCredito>0?\` · Crédito ${diasCredito} días\`:''}</div></div>`;
+    html+=`<div style="font-size:11px;color:#6B7280;margin-top:2px">${rows.length} entregas · Total: $${totalFact.toLocaleString('en-US',{maximumFractionDigits:0})}${diasCredito>0?' · Crédito '+diasCredito+' días':''}</div></div>`;
     html+=`<span style="background:${excedido?'#FEE2E2':pendVal>0?'#FEF3C7':'#D1FAE5'};color:${excedido?'#DC2626':pendVal>0?'#D97706':'#16A34A'};border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700">${excedido?'⚠ Cupo excedido':pendVal>0?'$'+pendVal.toLocaleString('en-US',{maximumFractionDigits:0})+' pendiente':'✓ Al día'}</span>`;
     html+=`</div>`;
     if(cupoTotal>0){
@@ -1909,7 +1909,7 @@ async function renderHistClientes(){
     }
     html+=`<table style="width:100%;border-collapse:collapse;font-size:11px">`;
     html+=`<thead><tr style="background:#F1F5F9;font-weight:600"><th style="padding:6px 8px;text-align:left">Cotización</th><th style="padding:6px 8px;text-align:left">Fecha despacho</th><th style="padding:6px 8px;text-align:right">Facturado</th><th style="padding:6px 8px;text-align:center">Calibres</th><th style="padding:6px 8px;text-align:left">Vencimiento</th><th style="padding:6px 8px;text-align:center">Pago</th><th style="padding:6px 8px;text-align:right">Días venc.</th></tr></thead><tbody>`;
-    rows.sort((a,b)=>(b.fecha||''). localeCompare(a.fecha||'')).forEach(r=>{
+    rows.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||'')).forEach(r=>{
       const pagoColor=r.estado_pago==='Pagado'?'#16A34A':r.dias_vencido>0?'#DC2626':'#D97706';
       const pagoBg=r.estado_pago==='Pagado'?'#D1FAE5':r.dias_vencido>0?'#FEE2E2':'#FEF3C7';
       let cals=[];try{cals=JSON.parse(r.calibres_despacho||'[]');}catch(e){}
