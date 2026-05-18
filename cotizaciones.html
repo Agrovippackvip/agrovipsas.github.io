@@ -641,6 +641,25 @@ input,select,textarea,button{font-family:inherit}
         <div class="fld"><label>Detalle N/C</label><input type="text" id="mf_nc_detalle" placeholder="Observación..."></div>
       </div>
       <div id="mf_nc_resumen" style="font-size:12px;color:var(--rd);font-weight:600;display:none"></div>
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:600;color:#1E40AF;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px">Crédito y seguimiento de pago</div>
+      <div class="fr2">
+        <div class="fld"><label>Días de crédito</label><input type="number" id="mf_dias_credito" placeholder="0" oninput="calcFechaVenc();checkVencido()"></div>
+        <div class="fld"><label>Fecha vencimiento (auto)</label><input type="date" id="mf_fecha_venc" style="background:#F0FDF4;font-weight:600;color:#16A34A"></div>
+      </div>
+      <div class="fr2" style="margin-top:6px">
+        <div class="fld"><label>Estado de pago</label>
+          <select id="mf_estado_pago" onchange="checkVencido()" style="font-weight:600">
+            <option value="Pendiente">Pendiente</option>
+            <option value="Pagado">✓ Pagado</option>
+            <option value="Vencido">⚠ Vencido</option>
+            <option value="Parcial">Parcial</option>
+          </select>
+        </div>
+        <div class="fld"><label>Fecha de pago real</label><input type="date" id="mf_fecha_pago"></div>
+      </div>
+      <div id="mf_alerta_vencido" style="display:none;background:#FEE2E2;border-radius:6px;padding:6px 10px;margin-top:8px;font-size:12px;font-weight:600;color:#DC2626"></div>
+    </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn-p" style="margin-top:0" onclick="confirmarFactura()">Guardar factura</button>
@@ -881,6 +900,14 @@ async function calcular(){
   const utilidad=valorCobrado-costoTotal;
   const margenReal=valorCobrado>0?(utilidad/valorCobrado)*100:0;
   const precioMin=costoTotalCaja/(1-margenObj/100);
+  // Validar cupo del cliente
+  const cupoDisp=window._clienteCupoDisp||0;
+  const cupoTotal=window._clienteCupoTotal||0;
+  if(cupoTotal>0&&valorFacturado>cupoDisp){
+    const exceso=valorFacturado-cupoDisp;
+    const continuar=confirm(`⚠ ALERTA DE CUPO\n\nEsta cotización ($${valorFacturado.toLocaleString('en-US',{maximumFractionDigits:0})}) excede el cupo disponible del cliente.\n\nCupo disponible: $${cupoDisp.toLocaleString('en-US',{maximumFractionDigits:0})}\nExceso: $${exceso.toLocaleString('en-US',{maximumFractionDigits:0})}\n\n¿Deseas continuar de todas formas?`);
+    if(!continuar)return;
+  }
 
   document.getElementById('d_fr').textContent=f2(costoFrutaCaja);
   document.getElementById('d_fl').textContent=f2(costoFleteCaja);
@@ -1432,6 +1459,20 @@ async function confirmarFactura(){
   const cajas=parseFloat(document.getElementById('mf_cajas').value)||0;
   const ncMonto=parseFloat(document.getElementById('mf_nc_monto').value)||0;
   const diasCred=parseInt(document.getElementById('mf_dias_credito').value)||0;
+  const fechaVenc=document.getElementById('mf_fecha_venc').value||null;
+  const fechaPago=document.getElementById('mf_fecha_pago').value||null;
+  const estadoPago=document.getElementById('mf_estado_pago').value;
+  const today=new Date().toISOString().split('T')[0];
+  // Calcular días vencido
+  let diasVencido=0;
+  if(fechaVenc&&estadoPago!=='Pagado'&&fechaVenc<today){
+    diasVencido=Math.floor((new Date(today)-new Date(fechaVenc))/(1000*60*60*24));
+  }
+  // Calcular días de demora en pago (si ya pagó)
+  let diasDemoraPago=0;
+  if(fechaPago&&fechaVenc&&fechaPago>fechaVenc){
+    diasDemoraPago=Math.floor((new Date(fechaPago)-new Date(fechaVenc))/(1000*60*60*24));
+  }
   const update={
     num_factura:document.getElementById('mf_factura').value.trim(),
     valor_facturado_real:valor,
@@ -1442,9 +1483,11 @@ async function confirmarFactura(){
     nc_factura_detalle:document.getElementById('mf_nc_detalle').value.trim(),
     fecha_factura:document.getElementById('mf_fecha').value,
     dias_credito:diasCred,
-    fecha_vencimiento:document.getElementById('mf_fecha_venc').value||null,
-    fecha_pago_real:document.getElementById('mf_fecha_pago').value||null,
-    estado_pago:document.getElementById('mf_estado_pago').value,
+    fecha_vencimiento:fechaVenc,
+    fecha_pago_real:fechaPago,
+    estado_pago:estadoPago,
+    dias_vencido:diasVencido,
+    dias_demora_pago:diasDemoraPago,
     estado:'Facturada'
   };
   await supaFetch('PATCH',`cotizaciones?id=eq.${facturaTargetId}`,update);
@@ -1477,7 +1520,7 @@ async function cargarCliente(id){
   if(!id)return;const allC=await lc.clis();const c=allC.find(x=>x.id===id);if(!c)return;
   // Show client credit info
   const allCots=await lc.cots();
-  const histCli=allCots.filter(x=>x.cliente===c.nombre&&x.estado==='Facturada').slice(0,5);
+  const histCli=allCots.filter(x=>x.cliente===c.nombre).sort((a,b)=>b.fecha?.localeCompare(a.fecha||'')).slice(0,3);
   const usadoSistema=allCots.filter(x=>x.cliente===c.nombre&&x.estado==='Facturada'&&x.estado_pago!=='Pagado').reduce((s,x)=>s+(x.valor_facturado_real||x.valor_cotizado||0),0);
   const saldoInicial=c.saldo_inicial||0;
   const pendiente=usadoSistema+saldoInicial;
@@ -1501,11 +1544,33 @@ async function cargarCliente(id){
     infoHtml+='</div>';
   }
   if(histCli.length){
-    infoHtml+=`<div style="background:var(--cr);border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px">`;
-    infoHtml+=`<div style="font-weight:600;margin-bottom:6px">Últimas entregas</div>`;
-    infoHtml+=histCli.map(h=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bd)"><span>${h.fecha} · ${h.num_cot||'—'}</span><span style="font-weight:600;color:var(--g)">$${(h.valor_facturado_real||h.valor_cotizado||0).toFixed(2)}</span><span class="badge ${h.estado_pago==='Pagado'?'bg':h.dias_vencido>0?'br':'bb'}">${h.estado_pago||'—'}</span></div>`).join('');
+    infoHtml+=`<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px">`;
+    infoHtml+=`<div style="font-weight:600;margin-bottom:8px;color:#374151">📋 Últimas 3 cotizaciones</div>`;
+    const today=new Date().toISOString().split('T')[0];
+    infoHtml+=histCli.map(h=>{
+      const estadoColor=h.estado==='Facturada'?'#16A34A':h.estado==='Aprobada'?'#2563EB':h.estado==='Borrador'?'#6B7280':'#D97706';
+      // Determinar estado de pago real incluyendo vencido automático
+      let estadoPago=h.estado_pago||'Pendiente';
+      let diasVenc=h.dias_vencido||0;
+      if(estadoPago!=='Pagado'&&h.fecha_vencimiento&&h.fecha_vencimiento<today){
+        estadoPago='Vencido';
+        diasVenc=Math.floor((new Date(today)-new Date(h.fecha_vencimiento))/(1000*60*60*24));
+      }
+      const pagoColor=estadoPago==='Pagado'?'#16A34A':estadoPago==='Vencido'?'#DC2626':'#D97706';
+      const pagoBg=estadoPago==='Pagado'?'#D1FAE5':estadoPago==='Vencido'?'#FEE2E2':'#FEF3C7';
+      return `<div style="display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #E2E8F0">
+        <div><div style="font-weight:600">${h.num_cot||'—'}</div><div style="color:#9CA3AF;font-size:10px">${h.fecha_despacho||h.fecha||'—'}${h.fecha_vencimiento?` · vence ${h.fecha_vencimiento}`:''}</div></div>
+        <div style="font-weight:700;color:#1A6B3C">$${(h.valor_facturado_real||h.valor_cotizado||0).toLocaleString('en-US',{maximumFractionDigits:0})}</div>
+        <span style="background:${estadoColor}20;color:${estadoColor};border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600">${h.estado||'—'}</span>
+        <span style="background:${pagoBg};color:${pagoColor};border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600">${estadoPago}${diasVenc>0?' +'+diasVenc+'d':''}</span>
+      </div>`;
+    }).join('');
     infoHtml+='</div>';
   }
+  // Guardar cupo disponible para validar al calcular
+  window._clienteCupoDisp=cupoDisp;
+  window._clienteCupoTotal=cupoTotal;
+  window._clienteExcedido=excedido;
   const infoEl=document.getElementById('clienteInfoPanel');
   if(infoEl)infoEl.innerHTML=infoHtml;
   document.getElementById('clienteNombre').value=c.nombre;
@@ -1556,14 +1621,22 @@ function calcFechaVenc(){
     const d=new Date(fecha);d.setDate(d.getDate()+dias);
     document.getElementById('mf_fecha_venc').value=d.toISOString().split('T')[0];
   }
+  checkVencido();
 }
-// Check if payment is overdue automatically
 function checkVencido(){
   const venc=document.getElementById('mf_fecha_venc')?.value;
   const pagado=document.getElementById('mf_estado_pago')?.value;
-  if(venc&&pagado!=='Pagado'){
-    const today=new Date().toISOString().split('T')[0];
-    if(venc<today)document.getElementById('mf_estado_pago').value='Vencido';
+  const alerta=document.getElementById('mf_alerta_vencido');
+  if(!venc||!alerta)return;
+  const today=new Date().toISOString().split('T')[0];
+  if(pagado==='Pagado'){alerta.style.display='none';return;}
+  if(venc<today){
+    const dias=Math.floor((new Date(today)-new Date(venc))/(1000*60*60*24));
+    document.getElementById('mf_estado_pago').value='Vencido';
+    alerta.style.display='block';
+    alerta.textContent=`⚠ Factura vencida hace ${dias} día${dias>1?'s':''} — requiere seguimiento urgente`;
+  } else {
+    alerta.style.display='none';
   }
 }
 
@@ -1790,57 +1863,67 @@ async function loadHistClientes(){
 }
 
 async function renderHistClientes(){
-  const list=await loadHistClientes();
+  const allCots=await lc.cots();
+  const allClis=await lc.clis();
   const filtC=(document.getElementById('hcFiltCliente').value||'').toLowerCase();
   const filtE=document.getElementById('hcFiltEstado').value;
-  let filtered=list;
-  if(filtC)filtered=filtered.filter(function(r){return(r.cliente||'').toLowerCase().includes(filtC);});
-  if(filtE)filtered=filtered.filter(function(r){return r.estado_pago===filtE;});
-  const total=list.length;
-  const pend=list.filter(function(r){return r.estado_pago==='Pendiente'||r.estado_pago==='Atrasado';}).length;
-  const vpend=list.filter(function(r){return r.estado_pago!=='Pagado';}).reduce(function(s,r){return s+(r.valor_facturado||0)-(r.nc_monto||0);},0);
-  const nc=list.filter(function(r){return(r.nc_monto||0)>0;}).length;
-  document.getElementById('hc_total').textContent=total;
-  document.getElementById('hc_pend').textContent=pend;
-  document.getElementById('hc_vpend').textContent='$'+vpend.toFixed(2);
-  document.getElementById('hc_nc').textContent=nc;
-  if(!filtered.length){document.getElementById('histClientesList').innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">Sin registros.</div>';return;}
-  // Group by cliente
+  const facturadas=allCots.filter(x=>x.estado==='Facturada'||(x.valor_facturado_real&&x.valor_facturado_real>0));
   const byCliente={};
-  filtered.forEach(function(r){if(!byCliente[r.cliente])byCliente[r.cliente]=[];byCliente[r.cliente].push(r);});
+  facturadas.forEach(r=>{const k=r.cliente||'Sin cliente';if(!byCliente[k])byCliente[k]=[];byCliente[k].push(r);});
+  const totalEnts=facturadas.length;
+  const pendList=facturadas.filter(r=>r.estado_pago!=='Pagado');
+  const vpend=pendList.reduce((s,r)=>s+(r.valor_facturado_real||r.valor_cotizado||0),0);
+  const vencidos=pendList.filter(r=>r.dias_vencido>0).length;
+  document.getElementById('hc_total').textContent=totalEnts;
+  document.getElementById('hc_pend').textContent=pendList.length;
+  document.getElementById('hc_vpend').textContent='$'+(vpend/1000).toFixed(1)+'K';
+  document.getElementById('hc_nc').textContent=vencidos;
+  let entries=Object.entries(byCliente);
+  if(filtC)entries=entries.filter(([k])=>k.toLowerCase().includes(filtC));
+  if(filtE)entries=entries.map(([k,rows])=>([k,rows.filter(r=>r.estado_pago===filtE)])).filter(([,rows])=>rows.length);
+  if(!entries.length){document.getElementById('histClientesList').innerHTML='<div style="padding:24px;text-align:center;font-size:13px;color:var(--gris)">Sin registros.</div>';return;}
   let html='';
-  Object.entries(byCliente).forEach(function(entry){
-    const cliente=entry[0];const rows=entry[1];
-    const totalVal=rows.reduce(function(s,r){return s+(r.valor_facturado||0);},0);
-    const totalNC=rows.reduce(function(s,r){return s+(r.nc_monto||0);},0);
-    const pendVal=rows.filter(function(r){return r.estado_pago!=='Pagado';}).reduce(function(s,r){return s+(r.valor_facturado||0)-(r.nc_monto||0);},0);
-    const cupo=rows[0]?.cupo_asignado||0;
-    const enRiesgo=pendVal>cupo&&cupo>0;
-    const borderClr=enRiesgo?'var(--rd)':'var(--g)';html+='<div class="card" style="margin-bottom:12px;border-left:3px solid '+borderClr+'">';
-    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
-    html+='<div><div style="font-size:15px;font-weight:700">'+cliente+'</div>';
-    html+='<div style="font-size:12px;color:var(--gris)">'+rows.length+' entregas · Total facturado: $'+totalVal.toFixed(2)+'</div></div>';
-    if(enRiesgo)html+='<span class="badge br">⚠ Cupo excedido</span>';
-    else if(pendVal>0)html+='<span class="badge ba">$'+pendVal.toFixed(2)+' pendiente</span>';
-    else html+='<span class="badge bg">Al dia</span>';
-    html+='</div>';
-    if(cupo>0)html+='<div style="font-size:12px;color:var(--gris);margin-bottom:8px">Cupo: $'+cupo.toFixed(2)+' · Usado: $'+pendVal.toFixed(2)+' · Disponible: $'+Math.max(0,cupo-pendVal).toFixed(2)+'</div>';
-    html+='<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:6px">';
-    html+='<thead><tr style="background:var(--cr);font-weight:600"><th style="padding:5px 8px;text-align:left">Fecha</th><th style="padding:5px 8px">Cajas</th><th style="padding:5px 8px">Facturado</th><th style="padding:5px 8px">N/C</th><th style="padding:5px 8px">Causa N/C</th><th style="padding:5px 8px">Vencimiento</th><th style="padding:5px 8px">Estado</th><th style="padding:5px 8px">Reclamo</th></tr></thead><tbody>';
-    rows.forEach(function(r){
-      const ec={Pagado:'bg',Pendiente:'bb',Atrasado:'br'}[r.estado_pago]||'bk';
-      html+='<tr style="border-bottom:1px solid var(--bd)">';
-      html+='<td style="padding:5px 8px">'+(r.fecha_entrega||'—')+'</td>';
-      html+='<td style="padding:5px 8px;text-align:center">'+(r.cajas||0)+'</td>';
-      html+='<td style="padding:5px 8px;text-align:right">$'+(r.valor_facturado||0).toFixed(2)+'</td>';
-      html+='<td style="padding:5px 8px;text-align:right;color:'+(r.nc_monto?'var(--rd)':'var(--gris)')+'">'+((r.nc_monto||0)>0?'-$'+r.nc_monto.toFixed(2):'—')+'</td>';
-      html+='<td style="padding:5px 8px">'+(r.nc_causa||'—')+'</td>';
-      html+='<td style="padding:5px 8px">'+(r.fecha_vencimiento||'—')+'</td>';
-      html+='<td style="padding:5px 8px"><span class="badge '+ec+'">'+(r.estado_pago||'—')+'</span></td>';
-      html+='<td style="padding:5px 8px;max-width:150px;font-size:10px">'+(r.reclamo||'—')+'</td>';
-      html+='</tr>';
+  entries.forEach(([cliente,rows])=>{
+    const cliData=allClis.find(c=>c.nombre===cliente);
+    const cupoTotal=cliData?.cupo||0;
+    const saldoInicial=cliData?.saldo_inicial||0;
+    const diasCredito=cliData?.dias_credito||0;
+    const usadoSist=rows.filter(r=>r.estado_pago!=='Pagado').reduce((s,r)=>s+(r.valor_facturado_real||r.valor_cotizado||0),0);
+    const pendVal=usadoSist+saldoInicial;
+    const cupoDisp=Math.max(0,cupoTotal-pendVal);
+    const excedido=cupoTotal>0&&pendVal>cupoTotal;
+    const pctUsado=cupoTotal>0?Math.min(100,(pendVal/cupoTotal)*100):0;
+    const totalFact=rows.reduce((s,r)=>s+(r.valor_facturado_real||r.valor_cotizado||0),0);
+    html+=`<div class="card" style="margin-bottom:14px;border-left:3px solid ${excedido?'#EF4444':'#22C55E'}">`;
+    html+=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">`;
+    html+=`<div><div style="font-size:15px;font-weight:700">${cliente}</div>`;
+    html+=`<div style="font-size:11px;color:#6B7280;margin-top:2px">${rows.length} entregas · Total: $${totalFact.toLocaleString('en-US',{maximumFractionDigits:0})}${diasCredito>0?\` · Crédito ${diasCredito} días\`:''}</div></div>`;
+    html+=`<span style="background:${excedido?'#FEE2E2':pendVal>0?'#FEF3C7':'#D1FAE5'};color:${excedido?'#DC2626':pendVal>0?'#D97706':'#16A34A'};border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700">${excedido?'⚠ Cupo excedido':pendVal>0?'$'+pendVal.toLocaleString('en-US',{maximumFractionDigits:0})+' pendiente':'✓ Al día'}</span>`;
+    html+=`</div>`;
+    if(cupoTotal>0){
+      html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;font-size:11px">`;
+      html+=`<div><span style="color:#6B7280">Cupo total</span><br><b>$${cupoTotal.toLocaleString('en-US',{maximumFractionDigits:0})}</b></div>`;
+      html+=`<div><span style="color:#6B7280">Usado</span><br><b style="color:${excedido?'#DC2626':'#D97706'}">$${pendVal.toLocaleString('en-US',{maximumFractionDigits:0})}</b></div>`;
+      html+=`<div><span style="color:#6B7280">Disponible</span><br><b style="color:${cupoDisp>0?'#16A34A':'#DC2626'}">$${cupoDisp.toLocaleString('en-US',{maximumFractionDigits:0})}</b></div>`;
+      html+=`</div><div style="background:#E5E7EB;border-radius:4px;height:5px;margin-bottom:10px"><div style="background:${excedido?'#EF4444':'#22C55E'};height:5px;border-radius:4px;width:${pctUsado}%"></div></div>`;
+    }
+    html+=`<table style="width:100%;border-collapse:collapse;font-size:11px">`;
+    html+=`<thead><tr style="background:#F1F5F9;font-weight:600"><th style="padding:6px 8px;text-align:left">Cotización</th><th style="padding:6px 8px;text-align:left">Fecha despacho</th><th style="padding:6px 8px;text-align:right">Facturado</th><th style="padding:6px 8px;text-align:center">Calibres</th><th style="padding:6px 8px;text-align:left">Vencimiento</th><th style="padding:6px 8px;text-align:center">Pago</th><th style="padding:6px 8px;text-align:right">Días venc.</th></tr></thead><tbody>`;
+    rows.sort((a,b)=>(b.fecha||''). localeCompare(a.fecha||'')).forEach(r=>{
+      const pagoColor=r.estado_pago==='Pagado'?'#16A34A':r.dias_vencido>0?'#DC2626':'#D97706';
+      const pagoBg=r.estado_pago==='Pagado'?'#D1FAE5':r.dias_vencido>0?'#FEE2E2':'#FEF3C7';
+      let cals=[];try{cals=JSON.parse(r.calibres_despacho||'[]');}catch(e){}
+      html+=`<tr style="border-bottom:1px solid #F1F5F9">`;
+      html+=`<td style="padding:5px 8px;font-weight:600;color:#1A6B3C">${r.num_cot||'—'}</td>`;
+      html+=`<td style="padding:5px 8px;color:#6B7280">${r.fecha_despacho||r.fecha||'—'}</td>`;
+      html+=`<td style="padding:5px 8px;text-align:right;font-weight:700">$${(r.valor_facturado_real||r.valor_cotizado||0).toLocaleString('en-US',{maximumFractionDigits:0})}</td>`;
+      html+=`<td style="padding:5px 8px;text-align:center">${cals.length?cals.map(c=>`<span style="background:#DBEAFE;color:#1E40AF;border-radius:3px;padding:1px 4px;font-size:10px">Cal ${c}</span>`).join(' '):'—'}</td>`;
+      html+=`<td style="padding:5px 8px;color:${r.dias_vencido>0?'#DC2626':'#6B7280'}">${r.fecha_vencimiento||'—'}</td>`;
+      html+=`<td style="padding:5px 8px;text-align:center"><span style="background:${pagoBg};color:${pagoColor};border-radius:4px;padding:2px 6px;font-weight:600">${r.estado_pago||'Pendiente'}</span></td>`;
+      html+=`<td style="padding:5px 8px;text-align:right;font-weight:600;color:${r.dias_vencido>0?'#DC2626':'#6B7280'}">${r.dias_vencido>0?'+'+r.dias_vencido+' días':'—'}</td>`;
+      html+=`</tr>`;
     });
-    html+='</tbody></table></div>';
+    html+=`</tbody></table></div>`;
   });
   document.getElementById('histClientesList').innerHTML=html;
 }
