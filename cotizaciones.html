@@ -1897,8 +1897,8 @@ async function renderHistClientes(){
     html+=`<div class="card" style="margin-bottom:14px;border-left:3px solid ${excedido?'#EF4444':'#22C55E'}">`;
     html+=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">`;
     html+=`<div><div style="font-size:15px;font-weight:700">${cliente}</div>`;
-    html+=`<div style="font-size:11px;color:#6B7280;margin-top:2px">${rows.length} entregas · Total: $${totalFact.toLocaleString('en-US',{maximumFractionDigits:0})}${diasCredito>0?' · Crédito '+diasCredito+' días':''}</div></div>`;
-    html+=`<span style="background:${excedido?'#FEE2E2':pendVal>0?'#FEF3C7':'#D1FAE5'};color:${excedido?'#DC2626':pendVal>0?'#D97706':'#16A34A'};border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700">${excedido?'⚠ Cupo excedido':pendVal>0?'$'+pendVal.toLocaleString('en-US',{maximumFractionDigits:0})+' pendiente':'✓ Al día'}</span>`;
+    html+=`<div style="font-size:11px;color:#6B7280;margin-top:2px">${rows.length} entregas &middot; Total: $$${totalFact.toLocaleString('en-US',{maximumFractionDigits:0})}${diasCredito>0?' · Credito '+diasCredito+' dias':''}</div></div>`;
+    html+=`<span style="background:${excedido?'#FEE2E2':pendVal>0?'#FEF3C7':'#D1FAE5'};color:${excedido?'#DC2626':pendVal>0?'#D97706':'#16A34A'};border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700">${excedido?'!! Cupo excedido':pendVal>0?'$'+pendVal.toLocaleString('en-US',{maximumFractionDigits:0})+' pendiente':'OK Al dia'}</span>`;
     html+=`</div>`;
     if(cupoTotal>0){
       html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;font-size:11px">`;
