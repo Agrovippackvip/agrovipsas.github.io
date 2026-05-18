@@ -167,6 +167,7 @@ input,select,textarea,button{font-family:inherit}
     <button class="nav-btn" onclick="goTab('clientes')">👥 Clientes</button>
     <button class="nav-btn" onclick="goTab('disponibilidad')">🌿 Disponibilidad</button>
     <button class="nav-btn" onclick="goTab('histClientes')">📊 Hist. Clientes</button>
+    <button class="nav-btn" onclick="goTab('productores');renderProductores()">🚜 Productores</button>
     <button class="nav-btn" onclick="goTab('reportes')">📈 Reportes</button>
   </div>
 
@@ -224,8 +225,23 @@ input,select,textarea,button{font-family:inherit}
         </div>
         <div class="card">
           <div class="card-t">Precio de venta</div>
+          <!-- Calculadora margen ↔ precio -->
+          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span style="font-size:12px;font-weight:600;color:#166534">Calcular precio:</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <label style="font-size:11px;color:#6B7280">Margen %</label>
+              <input type="number" id="calcMargen" step="0.1" placeholder="14" style="width:70px;padding:5px 8px;font-size:13px;border:1.5px solid #22C55E;border-radius:6px;font-weight:700" oninput="calcPrecioDesdeMargen()">
+            </div>
+            <span style="color:#9CA3AF;font-size:13px">↔</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <label style="font-size:11px;color:#6B7280">Precio PB $/caja</label>
+              <input type="number" id="calcPrecio" step="0.01" placeholder="20.00" style="width:80px;padding:5px 8px;font-size:13px;border:1.5px solid #22C55E;border-radius:6px;font-weight:700" oninput="calcMargenDesdePrecio()">
+            </div>
+            <button onclick="aplicarPrecioCalculado()" style="background:#16A34A;color:white;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">→ Aplicar</button>
+            <span id="calcPreview" style="font-size:11px;color:#166534;font-weight:600"></span>
+          </div>
           <div class="fr2">
-            <div class="fld"><label>Precio PB — Pulpa Blanca ($/caja)</label><input type="number" id="pvPB" step="0.01" placeholder="0.00"></div>
+            <div class="fld"><label>Precio PB — Pulpa Blanca ($/caja)</label><input type="number" id="pvPB" step="0.01" placeholder="0.00" oninput="calcMargenDesdePVPB()"></div>
             <div class="fld"><label>Cajas PB</label><input type="number" id="cajasPB" step="1"></div>
           </div>
           <div class="fr2">
@@ -240,7 +256,15 @@ input,select,textarea,button{font-family:inherit}
             <div class="fld"><label>Precio AM — Amarilla ($/caja)</label><input type="number" id="pvAM" step="0.01" placeholder="0.00"></div>
             <div class="fld"><label>Cajas AM</label><input type="number" id="cajasAM" step="1"></div>
           </div>
-          <div class="fr2">
+          <!-- Costos adicionales -->
+          <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="font-size:12px;font-weight:600;color:#374151">Costos adicionales</span>
+              <button onclick="agregarCostoExtra()" style="background:none;border:1px dashed #9CA3AF;border-radius:5px;padding:3px 10px;font-size:11px;color:#6B7280;cursor:pointer">+ Agregar</button>
+            </div>
+            <div id="costosExtraList"></div>
+          </div>
+          <div class="fr2" style="margin-top:10px">
             <div class="fld"><label>Nota de crédito (USD)</label><input type="number" id="ncMonto" value="0"></div>
             <div class="fld"><label>Motivo N/C</label><input type="text" id="ncMotivo" placeholder="Ej: Moho..."></div>
           </div>
@@ -313,6 +337,7 @@ input,select,textarea,button{font-family:inherit}
             <div class="dr"><span class="lb">Caja cartón</span><span id="d_ct">—</span></div>
             <div class="dr"><span class="lb">Agrocaldad + otros</span><span id="d_ot">—</span></div>
             <div class="dr" id="d_admRow" style="display:none"><span class="lb">Gtos. adm.</span><span id="d_adm">—</span></div>
+            <div class="dr" id="d_extraRow" style="display:none"><span class="lb" id="d_extraLb">Costos adicionales</span><span id="d_extra">—</span></div>
             <div class="dr tot"><span class="lb">COSTO CIF/CAJA</span><span id="d_tot">—</span></div>
           </div>
           <div class="card">
@@ -396,6 +421,13 @@ input,select,textarea,button{font-family:inherit}
     </div>
 
     <!-- CLIENTES -->
+    <div class="tab" id="tab-productores">
+      <div class="sl">Productores registrados</div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn-p" onclick="abrirModalProductor()">+ Nuevo productor</button>
+      </div>
+      <div id="productoresList"></div>
+    </div>
     <div class="tab" id="tab-disponibilidad">
       <div class="sl">Disponibilidad semanal para cotizar</div>
       <div class="card">
@@ -570,6 +602,33 @@ input,select,textarea,button{font-family:inherit}
   </div>
 </div>
 
+<!-- MODAL PRODUCTOR -->
+<div class="modal-ov" id="modalProductor">
+  <div class="modal">
+    <div class="modal-title" id="modalProdTitle">Nuevo productor</div>
+    <div class="fr2">
+      <div class="fld"><label>Nombre</label><input type="text" id="mp_nombre" placeholder="Ej: Salvador Giler"></div>
+      <div class="fld"><label>Código</label><input type="text" id="mp_codigo" placeholder="Ej: SGI-01"></div>
+    </div>
+    <div class="fr2">
+      <div class="fld"><label>Zona / sector</label><input type="text" id="mp_zona" placeholder="Ej: Los Rios"></div>
+      <div class="fld"><label>Hectáreas</label><input type="number" id="mp_ha" placeholder="0" step="0.1" min="0"></div>
+    </div>
+    <div class="fr2">
+      <div class="fld"><label>WhatsApp (código país)</label><input type="text" id="mp_wapais" placeholder="+593" style="width:80px"></div>
+      <div class="fld"><label>Número</label><input type="tel" id="mp_wanum" placeholder="0991234567"></div>
+    </div>
+    <div class="fr2">
+      <div class="fld"><label>Precio promedio fruta ($/kg)</label><input type="number" id="mp_precio_fruta" step="0.01" placeholder="2.30"></div>
+      <div class="fld"><label>Anticipos (%)</label><input type="number" id="mp_anticipo_pct" placeholder="65" min="0" max="100"></div>
+    </div>
+    <div class="fld"><label>Notas</label><textarea id="mp_notas" placeholder="Observaciones, acuerdos, calidad..."></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn-p" style="margin-top:0" onclick="guardarProductor()">Guardar</button>
+      <button class="btn-sm" onclick="cerrarModal('modalProductor')">Cancelar</button>
+    </div>
+  </div>
+</div>
 <!-- MODAL CLIENTE -->
 <div class="modal-ov" id="modalCliente">
   <div class="modal">
@@ -892,7 +951,8 @@ async function calcular(){
   const empProm=cajasCon>0?(empPB*cajasPB+empPR*cajasPR+empPB*cajasGY+empPB*cajasAM)/cajasCon:empPB;
   const costoOtrosCaja=((fito+iica)+termos+sachets+otros+transp+comBancos)/cajasTotal;
   const costoAdmCaja=gastosAdm/cajasTotal;
-  const costoTotalCaja=costoFrutaCaja+costoFleteCaja+empProm+ctnCosto+costoOtrosCaja+costoAdmCaja;
+  const costoExtraCaja=cajasTotal>0?getCostosExtraTotal()/cajasTotal:0;
+  const costoTotalCaja=costoFrutaCaja+costoFleteCaja+empProm+ctnCosto+costoOtrosCaja+costoAdmCaja+costoExtraCaja;
   const costoTotal=costoTotalCaja*cajasTotal;
   const valorFacturado=pvPB*cajasPB+pvPR*cajasPR+pvGY*cajasGY+pvAM*cajasAM;
   const valorCobrado=valorFacturado-ncMonto;
@@ -914,6 +974,14 @@ async function calcular(){
   document.getElementById('d_em').textContent=f2(empProm);
   document.getElementById('d_ct').textContent=f2(ctnCosto);
   document.getElementById('d_ot').textContent=f2(costoOtrosCaja);
+  if(costoExtraCaja>0){
+    const desc=costosExtra.map(c=>c.desc||'Extra').join(', ');
+    document.getElementById('d_extraRow').style.display='';
+    document.getElementById('d_extraLb').textContent=desc.length>25?desc.substring(0,22)+'...':desc;
+    document.getElementById('d_extra').textContent=f2(costoExtraCaja);
+  } else {
+    document.getElementById('d_extraRow').style.display='none';
+  }
   document.getElementById('d_tot').textContent=f2(costoTotalCaja);
   if(gastosAdm>0){document.getElementById('d_admRow').style.display='';document.getElementById('d_adm').textContent=f2(costoAdmCaja);}
   else document.getElementById('d_admRow').style.display='none';
@@ -1614,6 +1682,123 @@ function cerrarModal(id){document.getElementById(id).classList.remove('show');}
 document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show');}));
 
 // Auto-calcular fecha vencimiento
+// ── PRODUCTORES ──────────────────────────────────────────────
+let _prods=null;
+let editProdId=null;
+const lcP={
+  prods:async()=>{if(_prods)return _prods;const r=await supaFetch('GET','productores?order=nombre.asc');_prods=r||[];return _prods;},
+  saveProd:async(d)=>{await supaFetch('POST','productores',d);_prods=null;},
+  updateProd:async(id,d)=>{await supaFetch('PATCH',`productores?id=eq.${id}`,d);_prods=null;},
+  delProd:async(id)=>{await supaFetch('DELETE',`productores?id=eq.${id}`);_prods=null;}
+};
+async function renderProductores(){
+  const list=await lcP.prods();
+  const cont=document.getElementById('productoresList');
+  if(!list.length){cont.innerHTML='<div style="padding:24px;text-align:center;color:var(--gris)">Sin productores registrados.</div>';return;}
+  cont.innerHTML=list.map(p=>`
+    <div class="card" style="margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start">
+      <div>
+        <div style="font-size:15px;font-weight:700">${p.nombre} <span style="font-size:11px;color:#6B7280;font-weight:400">${p.codigo||''}</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:4px">${[p.zona?'📍 '+p.zona:'',p.ha?p.ha+' ha':'',p.precio_fruta?'$'+p.precio_fruta+'/kg':'',p.anticipo_pct?'Anticipo '+p.anticipo_pct+'%':''].filter(Boolean).join(' · ')}</div>
+        ${p.notas?`<div style="font-size:11px;color:#9CA3AF;margin-top:4px">${p.notas}</div>`:''}
+        ${p.wanum?`<div style="font-size:12px;margin-top:4px">📱 ${p.wapais||''}${p.wanum}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm" onclick="abrirModalProductor('${p.id}')">✏</button>
+        <button class="btn-sm" style="background:#FEE2E2;color:#DC2626" onclick="eliminarProductor('${p.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+async function abrirModalProductor(id){
+  editProdId=id||null;
+  document.getElementById('modalProdTitle').textContent=id?'Editar productor':'Nuevo productor';
+  const p=id?(await lcP.prods()).find(x=>x.id===id):null;
+  document.getElementById('mp_nombre').value=p?.nombre||'';
+  document.getElementById('mp_codigo').value=p?.codigo||'';
+  document.getElementById('mp_zona').value=p?.zona||'';
+  document.getElementById('mp_ha').value=p?.ha||'';
+  document.getElementById('mp_wapais').value=p?.wapais||'+593';
+  document.getElementById('mp_wanum').value=p?.wanum||'';
+  document.getElementById('mp_precio_fruta').value=p?.precio_fruta||'';
+  document.getElementById('mp_anticipo_pct').value=p?.anticipo_pct||65;
+  document.getElementById('mp_notas').value=p?.notas||'';
+  document.getElementById('modalProductor').classList.add('show');
+}
+async function guardarProductor(){
+  const nombre=document.getElementById('mp_nombre').value.trim();
+  if(!nombre){alert('Ingresa el nombre');return;}
+  const datos={id:editProdId||'prod_'+Date.now(),nombre,codigo:document.getElementById('mp_codigo').value.trim(),zona:document.getElementById('mp_zona').value.trim(),ha:parseFloat(document.getElementById('mp_ha').value)||0,wapais:document.getElementById('mp_wapais').value.trim(),wanum:document.getElementById('mp_wanum').value.trim(),precio_fruta:parseFloat(document.getElementById('mp_precio_fruta').value)||0,anticipo_pct:parseInt(document.getElementById('mp_anticipo_pct').value)||65,notas:document.getElementById('mp_notas').value.trim()};
+  if(editProdId){await lcP.updateProd(editProdId,datos);}else{await lcP.saveProd(datos);}
+  cerrarModal('modalProductor');renderProductores();
+}
+async function eliminarProductor(id){
+  if(!confirm('Eliminar este productor?'))return;
+  await lcP.delProd(id);renderProductores();
+}
+// ── FIN PRODUCTORES ──────────────────────────────────────────
+function calcFechaVenc(){
+function getCostoCIFActual(){
+  // Intenta leer el costo CIF del último cálculo o del display
+  if(ultimoCalculo&&ultimoCalculo.costoTotalCaja)return ultimoCalculo.costoTotalCaja;
+  const txt=document.getElementById('d_cif')?.textContent||'';
+  return parseFloat(txt.replace(/[^0-9.]/g,''))||0;
+}
+function calcPrecioDesdeMargen(){
+  const margen=parseFloat(document.getElementById('calcMargen').value)||0;
+  const cif=getCostoCIFActual();
+  if(!cif){document.getElementById('calcPreview').textContent='Primero calcula el CIF';return;}
+  if(margen>=100){document.getElementById('calcPreview').textContent='Margen invalido';return;}
+  const precio=cif/(1-margen/100);
+  document.getElementById('calcPrecio').value=precio.toFixed(2);
+  document.getElementById('calcPreview').textContent=`CIF $${cif.toFixed(2)} → Precio $${precio.toFixed(2)}/caja`;
+}
+function calcMargenDesdePrecio(){
+  const precio=parseFloat(document.getElementById('calcPrecio').value)||0;
+  const cif=getCostoCIFActual();
+  if(!cif||!precio){document.getElementById('calcPreview').textContent='';return;}
+  const margen=((precio-cif)/precio)*100;
+  document.getElementById('calcMargen').value=margen.toFixed(1);
+  document.getElementById('calcPreview').textContent=`Margen resultante: ${margen.toFixed(1)}%${margen<14?' ⚠ bajo objetivo':''}`;
+}
+function calcMargenDesdePVPB(){
+  const precio=parseFloat(document.getElementById('pvPB').value)||0;
+  const cif=getCostoCIFActual();
+  if(!cif||!precio)return;
+  const margen=((precio-cif)/precio)*100;
+  document.getElementById('calcMargen').value=margen.toFixed(1);
+  document.getElementById('calcPrecio').value=precio.toFixed(2);
+  document.getElementById('calcPreview').textContent=`Margen resultante: ${margen.toFixed(1)}%${margen<14?' ⚠ bajo objetivo':''}`;
+}
+function aplicarPrecioCalculado(){
+  const precio=parseFloat(document.getElementById('calcPrecio').value)||0;
+  if(!precio){alert('Ingresa margen o precio primero');return;}
+  document.getElementById('pvPB').value=precio.toFixed(2);
+  document.getElementById('calcPreview').textContent='Aplicado a Precio PB';
+}
+// ── COSTOS ADICIONALES ──────────────────────────────────────
+let costosExtra=[];
+function agregarCostoExtra(){
+  const id='ce_'+Date.now();
+  costosExtra.push({id,desc:'',monto:0});
+  renderCostosExtra();
+}
+function eliminarCostoExtra(id){
+  costosExtra=costosExtra.filter(x=>x.id!==id);
+  renderCostosExtra();
+}
+function renderCostosExtra(){
+  const cont=document.getElementById('costosExtraList');
+  if(!costosExtra.length){cont.innerHTML='';return;}
+  cont.innerHTML=costosExtra.map(c=>`
+    <div style="display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;margin-bottom:6px">
+      <input type="text" value="${c.desc}" placeholder="Descripcion (ej: Fumigacion)" style="padding:5px 8px;font-size:12px;border:1px solid var(--bd);border-radius:6px" oninput="costosExtra.find(x=>x.id==='${c.id}').desc=this.value">
+      <input type="number" value="${c.monto||''}" placeholder="0.00" step="0.01" style="width:90px;padding:5px 8px;font-size:12px;border:1px solid var(--bd);border-radius:6px;text-align:right" oninput="costosExtra.find(x=>x.id==='${c.id}').monto=parseFloat(this.value)||0">
+      <button onclick="eliminarCostoExtra('${c.id}')" style="background:#FEE2E2;border:none;border-radius:5px;padding:4px 8px;color:#DC2626;cursor:pointer;font-size:12px">✕</button>
+    </div>`).join('');
+}
+function getCostosExtraTotal(){
+  return costosExtra.reduce((s,c)=>s+(c.monto||0),0);
+}
 function calcFechaVenc(){
   const fecha=document.getElementById('mf_fecha')?.value;
   const dias=parseInt(document.getElementById('mf_dias_credito')?.value)||0;
