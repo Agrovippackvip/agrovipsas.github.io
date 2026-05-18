@@ -202,6 +202,25 @@ input,select,textarea,button{font-family:inherit}
             <div class="fld"><label>Semana de despacho</label><input type="number" id="semanaDespacho" placeholder="Ej: 21"></div>
           </div>
           <div class="fld"><label>Notas</label><textarea id="cotNotas" placeholder="Condiciones especiales..."></textarea></div>
+          <div class="fld" style="margin-top:8px">
+            <label>Calibres aceptados en este despacho <span style="font-size:10px;color:var(--gris);font-weight:400">— Cal 6 al 12 disponibles</span></label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px" id="cot_calibres_wrap">
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="cot_cal" value="6" checked> Cal 6</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="cot_cal" value="7" checked> Cal 7</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="cot_cal" value="8" checked> Cal 8</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="cot_cal" value="9" checked> Cal 9</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="cot_cal" value="10"> Cal 10</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="cot_cal" value="11"> Cal 11</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="cot_cal" value="12"> Cal 12</label>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">
+              <span style="font-size:12px;color:var(--gris)">Calibres prioritarios:</span>
+              <input type="text" id="cot_cal_pref" placeholder="Ej: 6,7,8" style="width:110px;padding:5px 8px;font-size:12px;border:1px solid var(--bd);border-radius:6px">
+              <span style="font-size:12px;color:var(--gris)">deben ser ≥</span>
+              <input type="number" id="cot_cal_pct" placeholder="0" min="0" max="100" style="width:60px;padding:5px 8px;font-size:12px;border:1px solid var(--bd);border-radius:6px">
+              <span style="font-size:12px;color:var(--gris)">%</span>
+            </div>
+          </div>
         </div>
         <div class="card">
           <div class="card-t">Precio de venta</div>
@@ -584,29 +603,6 @@ input,select,textarea,button{font-family:inherit}
     <div class="fld"><label>Saldo inicial usado (USD) <span style="font-size:10px;color:var(--gris);font-weight:400">— deuda previa al sistema</span></label><input type="number" id="mc_saldo_inicial" placeholder="0" min="0" step="0.01"></div>
     <label class="check-row"><input type="checkbox" id="mc_notif_wa" checked> Enviar por WhatsApp</label>
     <label class="check-row"><input type="checkbox" id="mc_req_aprov"> Requiere aprobación del cliente</label>
-    <div class="fld" style="margin-top:8px">
-      <label>Preferencia de calibres <span style="font-size:10px;color:var(--gris);font-weight:400">— selecciona los calibres aceptados</span></label>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px" id="mc_calibres_wrap">
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="4"> Cal 4</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="5"> Cal 5</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="6"> Cal 6</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="7"> Cal 7</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="8"> Cal 8</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="9"> Cal 9</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="10"> Cal 10</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="11"> Cal 11</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="12"> Cal 12</label>
-      </div>
-    </div>
-    <div id="mc_calibres_pref_wrap" style="display:none;margin-top:6px">
-      <div class="fld"><label>Calibres prioritarios (% mínimo) <span style="font-size:10px;color:var(--gris);font-weight:400">Ej: 6,7,8 deben ser ≥70%</span></label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" id="mc_cal_pref" placeholder="Ej: 6,7,8" style="width:120px">
-          <span style="font-size:12px;color:var(--gris)">≥</span>
-          <input type="number" id="mc_cal_pct" placeholder="70" min="0" max="100" style="width:70px"> <span style="font-size:12px">%</span>
-        </div>
-      </div>
-    </div>
     <div class="fld" style="margin-top:8px"><label>Condiciones / notas</label><textarea id="mc_notas" placeholder="Factoring, plazos, requisitos..."></textarea></div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn-p" style="margin-top:0" onclick="guardarCliente()">Guardar cliente</button>
@@ -711,7 +707,8 @@ const lc={
       'costo_total_caja','pv_prom','pf_fruta_prom','kg_total','cajas_total','utilidad',
       'nc_monto','nc_motivo','notas','proveedores','margen_obj','valor_facturado_real',
       'num_factura','fecha_factura','cajas_facturadas','valor_por_caja_fact',
-      'nc_factura_tipo','nc_factura_monto','nc_factura_detalle','supa_id','semana','mes','creado_por'];
+      'nc_factura_tipo','nc_factura_monto','nc_factura_detalle','supa_id','semana','mes','creado_por',
+      'calibres_despacho','cal_pref_despacho','cal_pct_despacho'];
     const clean=Object.fromEntries(Object.entries(cot).filter(([k])=>allowed.includes(k)));
     await supaFetch('POST','cotizaciones',clean);_cots=null;
   },
@@ -850,6 +847,9 @@ async function calcular(){
   const ncMonto=parseFloat(document.getElementById('ncMonto').value)||0;
   const ncMotivo=document.getElementById('ncMotivo').value.trim();
   const notas=document.getElementById('cotNotas').value.trim();
+  const calibres_despacho=Array.from(document.querySelectorAll('.cot_cal')).filter(x=>x.checked).map(x=>parseInt(x.value));
+  const cal_pref_despacho=(document.getElementById('cot_cal_pref').value||'').split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x));
+  const cal_pct_despacho=parseInt(document.getElementById('cot_cal_pct').value)||0;
   const clienteNombre=document.getElementById('clienteNombre').value.trim()||'Sin cliente';
   const{tc:costFruta,tk:kgTotal,prom:pFrutaProm,proveedores}=calcFruta();
   const ea=tipoActual==='aereo',el=tipoActual==='local';
@@ -924,6 +924,7 @@ async function calcular(){
     <div class="cot-m"><div class="et">Precio mínimo</div><div class="nm">${f2(precioMin)}/caja</div></div>
     <div class="cot-m"><div class="et">Utilidad bruta</div><div class="nm hl">${f2(utilidad)}</div></div>
     <div class="cot-m"><div class="et">Fruta prom.</div><div class="nm">$${pFrutaProm.toFixed(3)}/kg</div></div>
+    ${calibres_despacho.length>0?`<div class="cot-m" style="grid-column:1/-1"><div class="et">Calibres aceptados</div><div class="nm" style="display:flex;flex-wrap:wrap;gap:4px">${calibres_despacho.map(c=>{const prio=cal_pref_despacho.includes(c);return `<span style="background:${prio?'#1D4ED8':'#DBEAFE'};color:${prio?'white':'#1E40AF'};border-radius:4px;padding:2px 7px;font-size:11px;font-weight:${prio?'700':'400'}">Cal ${c}${prio?'★':''}</span>`;}).join('')}${cal_pct_despacho>0&&cal_pref_despacho.length>0?`<span style="font-size:11px;color:#6B7280;align-self:center;margin-left:4px">Cal ${cal_pref_despacho.join(',')} ≥${cal_pct_despacho}%</span>`:''}</div></div>`:''}
   `;
   const gap=pvProm-precioMin;
   document.getElementById('cotResNota').textContent=gap>=0?`Margen de maniobra de ${f2(gap)}/caja sobre el precio mínimo.`:`Necesitas subir ${f2(Math.abs(gap))}/caja para alcanzar el ${margenObj}% objetivo.`;
@@ -955,6 +956,9 @@ async function calcular(){
     nc_monto:ncMonto,
     nc_motivo:ncMotivo,
     notas,
+    calibres_despacho:JSON.stringify(calibres_despacho),
+    cal_pref_despacho:JSON.stringify(cal_pref_despacho),
+    cal_pct_despacho,
     proveedores:JSON.stringify(proveedores),
     valor_facturado_real:null,
     num_factura:null,
