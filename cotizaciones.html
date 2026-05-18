@@ -1736,7 +1736,6 @@ async function eliminarProductor(id){
   await lcP.delProd(id);renderProductores();
 }
 // ── FIN PRODUCTORES ──────────────────────────────────────────
-function calcFechaVenc(){
 function getCostoCIFActual(){
   // Intenta leer el costo CIF del último cálculo o del display
   if(ultimoCalculo&&ultimoCalculo.costoTotalCaja)return ultimoCalculo.costoTotalCaja;
