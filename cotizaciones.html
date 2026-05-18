@@ -584,6 +584,29 @@ input,select,textarea,button{font-family:inherit}
     <div class="fld"><label>Saldo inicial usado (USD) <span style="font-size:10px;color:var(--gris);font-weight:400">— deuda previa al sistema</span></label><input type="number" id="mc_saldo_inicial" placeholder="0" min="0" step="0.01"></div>
     <label class="check-row"><input type="checkbox" id="mc_notif_wa" checked> Enviar por WhatsApp</label>
     <label class="check-row"><input type="checkbox" id="mc_req_aprov"> Requiere aprobación del cliente</label>
+    <div class="fld" style="margin-top:8px">
+      <label>Preferencia de calibres <span style="font-size:10px;color:var(--gris);font-weight:400">— selecciona los calibres aceptados</span></label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px" id="mc_calibres_wrap">
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="4"> Cal 4</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="5"> Cal 5</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="6"> Cal 6</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="7"> Cal 7</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="8"> Cal 8</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="9"> Cal 9</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="10"> Cal 10</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="11"> Cal 11</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:400"><input type="checkbox" class="mc_cal" value="12"> Cal 12</label>
+      </div>
+    </div>
+    <div id="mc_calibres_pref_wrap" style="display:none;margin-top:6px">
+      <div class="fld"><label>Calibres prioritarios (% mínimo) <span style="font-size:10px;color:var(--gris);font-weight:400">Ej: 6,7,8 deben ser ≥70%</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="mc_cal_pref" placeholder="Ej: 6,7,8" style="width:120px">
+          <span style="font-size:12px;color:var(--gris)">≥</span>
+          <input type="number" id="mc_cal_pct" placeholder="70" min="0" max="100" style="width:70px"> <span style="font-size:12px">%</span>
+        </div>
+      </div>
+    </div>
     <div class="fld" style="margin-top:8px"><label>Condiciones / notas</label><textarea id="mc_notas" placeholder="Factoring, plazos, requisitos..."></textarea></div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="btn-p" style="margin-top:0" onclick="guardarCliente()">Guardar cliente</button>
@@ -1473,6 +1496,21 @@ async function cargarCliente(id){
     if(saldoInicial>0)infoHtml+=`<div style="font-size:10px;color:#9CA3AF;margin-top:2px">Incluye $${saldoInicial.toFixed(0)} de saldo previo al sistema</div>`;
     infoHtml+='</div>';
   }
+  // Calibres del cliente
+  if(c.calibres_aceptados&&c.calibres_aceptados.length>0){
+    infoHtml+=`<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px">`;
+    infoHtml+=`<div style="font-weight:600;margin-bottom:6px;color:#1E40AF">📦 Preferencia de calibres</div>`;
+    infoHtml+=`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">`;
+    c.calibres_aceptados.forEach(cal=>{
+      const esPrio=c.cal_prioritarios&&c.cal_prioritarios.includes(cal);
+      infoHtml+=`<span style="background:${esPrio?'#1D4ED8':'#DBEAFE'};color:${esPrio?'white':'#1E40AF'};border-radius:4px;padding:2px 8px;font-size:11px;font-weight:${esPrio?'700':'400'}">Cal ${cal}${esPrio?'★':''}</span>`;
+    });
+    infoHtml+=`</div>`;
+    if(c.cal_prioritarios&&c.cal_prioritarios.length>0&&c.cal_pct_min>0){
+      infoHtml+=`<div style="font-size:11px;color:#1E40AF">Cal ${c.cal_prioritarios.join(', ')} deben ser <b>≥${c.cal_pct_min}%</b> del total</div>`;
+    }
+    infoHtml+='</div>';
+  }
   if(histCli.length){
     infoHtml+=`<div style="background:var(--cr);border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px">`;
     infoHtml+=`<div style="font-weight:600;margin-bottom:6px">Últimas entregas</div>`;
@@ -1505,6 +1543,17 @@ async function abrirModalCliente(id){
   document.getElementById('mc_saldo_inicial').value=c?.saldo_inicial||0;
   document.getElementById('mc_req_aprov').checked=c?.reqAprov||false;
   document.getElementById('mc_notas').value=c?.notas||'';
+  // Calibres
+  const calAcep=c?.calibres_aceptados||[];
+  document.querySelectorAll('.mc_cal').forEach(cb=>{cb.checked=calAcep.includes(parseInt(cb.value));});
+  document.getElementById('mc_cal_pref').value=(c?.cal_prioritarios||[]).join(',');
+  document.getElementById('mc_cal_pct').value=c?.cal_pct_min||'';
+  const hasCal=calAcep.length>0;
+  document.getElementById('mc_calibres_pref_wrap').style.display=hasCal?'block':'none';
+  document.querySelectorAll('.mc_cal').forEach(cb=>cb.addEventListener('change',()=>{
+    const any=Array.from(document.querySelectorAll('.mc_cal')).some(x=>x.checked);
+    document.getElementById('mc_calibres_pref_wrap').style.display=any?'block':'none';
+  }));
   document.getElementById('modalCliente').classList.add('show');
 }
 async function guardarCliente(){
@@ -1512,7 +1561,10 @@ async function guardarCliente(){
   const wapais=document.getElementById('mc_wapais').value.trim();
   const wanum=document.getElementById('mc_wanum').value.trim();
   const whatsapp=(wapais+wanum).replace(/[\s\-\(\)]/g,'');
-  const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,cupo:parseFloat(document.getElementById('mc_cupo').value)||0,dias_credito:parseInt(document.getElementById('mc_dias_credito').value)||0,saldo_inicial:parseFloat(document.getElementById('mc_saldo_inicial').value)||0,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notas:document.getElementById('mc_notas').value.trim()};
+  const calibres_aceptados=Array.from(document.querySelectorAll('.mc_cal')).filter(x=>x.checked).map(x=>parseInt(x.value));
+  const cal_prioritarios=(document.getElementById('mc_cal_pref').value||'').split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x));
+  const cal_pct_min=parseInt(document.getElementById('mc_cal_pct').value)||0;
+  const datos={id:editCliId||'cli_'+Date.now(),nombre,pais:document.getElementById('mc_pais').value.trim(),tipo:document.getElementById('mc_tipo').value,cajas:document.getElementById('mc_cajas').value,margen:document.getElementById('mc_margen').value,cupo:parseFloat(document.getElementById('mc_cupo').value)||0,dias_credito:parseInt(document.getElementById('mc_dias_credito').value)||0,saldo_inicial:parseFloat(document.getElementById('mc_saldo_inicial').value)||0,calibres_aceptados,cal_prioritarios,cal_pct_min,contacto:document.getElementById('mc_contacto').value.trim(),email:document.getElementById('mc_email').value.trim(),wapais,wanum,whatsapp,notas:document.getElementById('mc_notas').value.trim()};
   if(editCliId){await lc.updateCli(editCliId,datos);}else{await lc.saveClis(datos);}
   _clis=null;cerrarModal('modalCliente');renderClientes();poblClienteSel();
 }
