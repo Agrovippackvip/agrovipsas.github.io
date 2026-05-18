@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agrovip · Sistema Interno</title>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--g:#1A6B3C;--g2:#7A9A2E;--am:#D4A017;--rd:#C0392B;--cr:#F5F0E8;--cr2:#EAE3D2;--gris:#6B6B5A;--ink:#1C1C1C;--bd:#E0D8C8}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -423,9 +424,12 @@ input,select,textarea,button{font-family:inherit}
     <!-- CLIENTES -->
     <div class="tab" id="tab-productores">
       <div class="sl">Productores registrados</div>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
+        <button class="btn-sm" onclick="document.getElementById('importProdFile').click()">📥 Importar Excel/CSV</button>
+        <input type="file" id="importProdFile" accept=".csv,.xlsx,.xls" style="display:none" onchange="importarProductores(this)">
         <button class="btn-p" onclick="abrirModalProductor()">+ Nuevo productor</button>
       </div>
+      <div id="importProdPreview" style="display:none;margin-bottom:12px"></div>
       <div id="productoresList"></div>
     </div>
     <div class="tab" id="tab-disponibilidad">
@@ -1719,6 +1723,67 @@ const lcP={
   updateProd:async(id,d)=>{await supaFetch('PATCH',`productores?id=eq.${id}`,d);_prods=null;},
   delProd:async(id)=>{await supaFetch('DELETE',`productores?id=eq.${id}`);_prods=null;}
 };
+// ── IMPORTAR PRODUCTORES DESDE EXCEL/CSV ─────────────────────
+async function importarProductores(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    let rows=[];
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+    }catch(err){alert('Error leyendo el archivo: '+err.message);return;}
+    if(!rows.length){alert('El archivo está vacío o no tiene el formato correcto.');return;}
+    // Mapear columnas flexiblemente
+    const map=(r,keys)=>keys.map(k=>r[k]||r[k.toLowerCase()]||r[k.toUpperCase()]||'').find(v=>v)||'';
+    const preview=rows.slice(0,3).map(r=>JSON.stringify(r)).join('\n');
+    const cont=document.getElementById('importProdPreview');
+    cont.style.display='block';
+    cont.innerHTML=`<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px;font-size:12px">
+      <div style="font-weight:600;margin-bottom:8px;color:#1E40AF">📥 ${rows.length} filas detectadas — Vista previa:</div>
+      <div style="font-family:monospace;font-size:10px;color:#374151;white-space:pre-wrap;max-height:100px;overflow:auto">${preview}</div>
+      <div style="margin-top:8px;color:#6B7280;font-size:11px">Columnas esperadas: <b>nombre, codigo, zona, contacto, email, telefono, wanum, precio_fruta, anticipo_pct, categoria, notas</b></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn-p" style="font-size:12px" onclick="confirmarImportProd(${JSON.stringify(rows).split('"').join('&quot;')})">✅ Importar ${rows.length} productores</button>
+        <button class="btn-sm" style="font-size:12px" onclick="document.getElementById('importProdPreview').style.display='none'">Cancelar</button>
+      </div>
+    </div>`;
+    input.value='';
+  };
+  reader.readAsBinaryString(file);
+}
+async function confirmarImportProd(rows){
+  if(!rows||!rows.length)return;
+  const map=(r,keys)=>keys.find(k=>r[k]!==undefined)?r[keys.find(k=>r[k]!==undefined)]:'';
+  let ok=0,err=0;
+  for(const r of rows){
+    const nombre=(map(r,['nombre','Nombre','NOMBRE','name','Name'])||'').toString().trim();
+    if(!nombre){err++;continue;}
+    const datos={
+      id:'prod_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),
+      nombre,
+      codigo:(map(r,['codigo','Codigo','CODIGO','code','Code'])||'').toString().trim(),
+      zona:(map(r,['zona','Zona','ZONA','sector','Sector'])||'').toString().trim(),
+      contacto:(map(r,['contacto','Contacto','CONTACTO','contact'])||'').toString().trim(),
+      email:(map(r,['email','Email','EMAIL','correo','Correo'])||'').toString().trim(),
+      telefono:(map(r,['telefono','Telefono','TELEFONO','phone'])||'').toString().trim(),
+      wapais:'+593',
+      wanum:(map(r,['wanum','whatsapp','Whatsapp','WhatsApp','celular','Celular'])||'').toString().trim(),
+      precio_fruta:parseFloat(map(r,['precio_fruta','precio','Precio','price'])||0)||0,
+      anticipo_pct:parseInt(map(r,['anticipo_pct','anticipo','Anticipo'])||65)||65,
+      categoria:(map(r,['categoria','Categoria','CATEGORIA','category'])||'Activo').toString().trim(),
+      notas:(map(r,['notas','Notas','NOTAS','notes'])||'').toString().trim(),
+      ha:parseFloat(map(r,['ha','Ha','HA','hectareas'])||0)||0
+    };
+    try{await lcP.saveProd(datos);ok++;}catch(e){err++;}
+  }
+  document.getElementById('importProdPreview').style.display='none';
+  alert(`Importación completada: ${ok} productores importados${err>0?`, ${err} errores`:''}.`);
+  _prods=null;
+  renderProductores();
+}
 async function renderProductores(){
   const list=await lcP.prods();
   const cont=document.getElementById('productoresList');
