@@ -615,8 +615,24 @@ input,select,textarea,button{font-family:inherit}
       <div class="fld"><label>Hectáreas</label><input type="number" id="mp_ha" placeholder="0" step="0.1" min="0"></div>
     </div>
     <div class="fr2">
+      <div class="fld"><label>Contacto principal</label><input type="text" id="mp_contacto" placeholder="Nombre del contacto"></div>
+      <div class="fld"><label>Email</label><input type="email" id="mp_email" placeholder="contacto@empresa.com"></div>
+    </div>
+    <div class="fr2">
       <div class="fld"><label>WhatsApp (código país)</label><input type="text" id="mp_wapais" placeholder="+593" style="width:80px"></div>
       <div class="fld"><label>Número</label><input type="tel" id="mp_wanum" placeholder="0991234567"></div>
+    </div>
+    <div class="fr2">
+      <div class="fld"><label>Teléfono fijo</label><input type="tel" id="mp_telefono" placeholder="042345678"></div>
+      <div class="fld"><label>Categoría</label>
+        <select id="mp_categoria">
+          <option value="Aliado">⭐ Aliado estratégico</option>
+          <option value="Vulnerable">🟡 Vulnerable</option>
+          <option value="Presion">🔴 Presión</option>
+          <option value="Activo">✅ Activo</option>
+          <option value="Inactivo">⏸ Inactivo</option>
+        </select>
+      </div>
     </div>
     <div class="fr2">
       <div class="fld"><label>Precio promedio fruta ($/kg)</label><input type="number" id="mp_precio_fruta" step="0.01" placeholder="2.30"></div>
@@ -983,6 +999,18 @@ async function calcular(){
     document.getElementById('d_extraRow').style.display='none';
   }
   document.getElementById('d_tot').textContent=f2(costoTotalCaja);
+  // Auto-actualizar calculadora precio ↔ margen con el CIF nuevo
+  const margenCalc=parseFloat(document.getElementById('calcMargen').value)||0;
+  if(margenCalc>0&&margenCalc<100){
+    const precioSug=costoTotalCaja/(1-margenCalc/100);
+    document.getElementById('calcPrecio').value=precioSug.toFixed(2);
+    document.getElementById('calcPreview').textContent=`CIF $${costoTotalCaja.toFixed(2)} → Precio sugerido $${precioSug.toFixed(2)}/caja`;
+  } else if(parseFloat(document.getElementById('calcPrecio').value)>0){
+    const precio=parseFloat(document.getElementById('calcPrecio').value);
+    const margenCalc2=((precio-costoTotalCaja)/precio)*100;
+    document.getElementById('calcMargen').value=margenCalc2.toFixed(1);
+    document.getElementById('calcPreview').textContent=`Margen resultante: ${margenCalc2.toFixed(1)}%${margenCalc2<14?' ⚠ bajo objetivo':''}`;
+  }
   if(gastosAdm>0){document.getElementById('d_admRow').style.display='';document.getElementById('d_adm').textContent=f2(costoAdmCaja);}
   else document.getElementById('d_admRow').style.display='none';
   document.getElementById('r_fa').textContent=f2(valorFacturado);
@@ -1695,19 +1723,28 @@ async function renderProductores(){
   const list=await lcP.prods();
   const cont=document.getElementById('productoresList');
   if(!list.length){cont.innerHTML='<div style="padding:24px;text-align:center;color:var(--gris)">Sin productores registrados.</div>';return;}
-  cont.innerHTML=list.map(p=>`
-    <div class="card" style="margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start">
+  const catColor={'Aliado':'#16A34A','Vulnerable':'#D97706','Presion':'#DC2626','Activo':'#2563EB','Inactivo':'#6B7280'};
+  cont.innerHTML=list.map(p=>{
+    const cat=p.categoria||'Activo';
+    const color=catColor[cat]||'#6B7280';
+    return `<div class="card" style="margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;border-left:3px solid ${color}">
       <div>
-        <div style="font-size:15px;font-weight:700">${p.nombre} <span style="font-size:11px;color:#6B7280;font-weight:400">${p.codigo||''}</span></div>
-        <div style="font-size:12px;color:#6B7280;margin-top:4px">${[p.zona?'📍 '+p.zona:'',p.ha?p.ha+' ha':'',p.precio_fruta?'$'+p.precio_fruta+'/kg':'',p.anticipo_pct?'Anticipo '+p.anticipo_pct+'%':''].filter(Boolean).join(' · ')}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+          <span style="font-size:15px;font-weight:700">${p.nombre}</span>
+          <span style="background:${color}20;color:${color};border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600">${p.codigo||''}</span>
+          <span style="background:${color}15;color:${color};border-radius:4px;padding:2px 6px;font-size:10px">${cat}</span>
+        </div>
+        ${p.contacto||p.wanum||p.telefono?`<div style="font-size:13px;font-weight:600;color:#1A6B3C;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">👤 ${p.contacto||'Sin contacto asignado'}${p.wanum?' · 📱 '+(p.wapais||'')+p.wanum:''}${p.telefono?' · ☎ '+p.telefono:''}</div>`:''}
+        <div style="font-size:12px;color:#6B7280">${[p.zona?'📍 '+p.zona:'',p.ha?p.ha+' ha':'',p.precio_fruta?'$'+p.precio_fruta+'/kg':'',p.anticipo_pct?'Anticipo '+p.anticipo_pct+'%':''].filter(Boolean).join(' · ')}</div>
+        ${p.email?`<div style="font-size:11px;color:#6B7280;margin-top:2px">📧 ${p.email}</div>`:''}
         ${p.notas?`<div style="font-size:11px;color:#9CA3AF;margin-top:4px">${p.notas}</div>`:''}
-        ${p.wanum?`<div style="font-size:12px;margin-top:4px">📱 ${p.wapais||''}${p.wanum}</div>`:''}
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn-sm" onclick="abrirModalProductor('${p.id}')">✏</button>
         <button class="btn-sm" style="background:#FEE2E2;color:#DC2626" onclick="eliminarProductor('${p.id}')">🗑</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 async function abrirModalProductor(id){
   editProdId=id||null;
@@ -1719,6 +1756,10 @@ async function abrirModalProductor(id){
   document.getElementById('mp_ha').value=p?.ha||'';
   document.getElementById('mp_wapais').value=p?.wapais||'+593';
   document.getElementById('mp_wanum').value=p?.wanum||'';
+  document.getElementById('mp_contacto').value=p?.contacto||'';
+  document.getElementById('mp_email').value=p?.email||'';
+  document.getElementById('mp_telefono').value=p?.telefono||'';
+  document.getElementById('mp_categoria').value=p?.categoria||'Activo';
   document.getElementById('mp_precio_fruta').value=p?.precio_fruta||'';
   document.getElementById('mp_anticipo_pct').value=p?.anticipo_pct||65;
   document.getElementById('mp_notas').value=p?.notas||'';
@@ -1727,7 +1768,7 @@ async function abrirModalProductor(id){
 async function guardarProductor(){
   const nombre=document.getElementById('mp_nombre').value.trim();
   if(!nombre){alert('Ingresa el nombre');return;}
-  const datos={id:editProdId||'prod_'+Date.now(),nombre,codigo:document.getElementById('mp_codigo').value.trim(),zona:document.getElementById('mp_zona').value.trim(),ha:parseFloat(document.getElementById('mp_ha').value)||0,wapais:document.getElementById('mp_wapais').value.trim(),wanum:document.getElementById('mp_wanum').value.trim(),precio_fruta:parseFloat(document.getElementById('mp_precio_fruta').value)||0,anticipo_pct:parseInt(document.getElementById('mp_anticipo_pct').value)||65,notas:document.getElementById('mp_notas').value.trim()};
+  const datos={id:editProdId||'prod_'+Date.now(),nombre,codigo:document.getElementById('mp_codigo').value.trim(),zona:document.getElementById('mp_zona').value.trim(),ha:parseFloat(document.getElementById('mp_ha').value)||0,wapais:document.getElementById('mp_wapais').value.trim(),wanum:document.getElementById('mp_wanum').value.trim(),contacto:document.getElementById('mp_contacto').value.trim(),email:document.getElementById('mp_email').value.trim(),telefono:document.getElementById('mp_telefono').value.trim(),categoria:document.getElementById('mp_categoria').value,precio_fruta:parseFloat(document.getElementById('mp_precio_fruta').value)||0,anticipo_pct:parseInt(document.getElementById('mp_anticipo_pct').value)||65,notas:document.getElementById('mp_notas').value.trim()};
   if(editProdId){await lcP.updateProd(editProdId,datos);}else{await lcP.saveProd(datos);}
   cerrarModal('modalProductor');renderProductores();
 }
