@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agrovip · Sistema Interno</title>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--g:#1A6B3C;--g2:#7A9A2E;--am:#D4A017;--rd:#C0392B;--cr:#F5F0E8;--cr2:#EAE3D2;--gris:#6B6B5A;--ink:#1C1C1C;--bd:#E0D8C8}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -367,10 +366,6 @@ input,select,textarea,button{font-family:inherit}
           <div class="aprov-panel" id="aprovPanel" style="display:none">
             <div class="aprov-panel-title">✅ Estado de aprobaciones</div>
             <div class="aprov-row">
-              <div><div class="aprov-name">Pablo Moysam</div><div style="font-size:11px;color:var(--gris)">Gerente General</div></div>
-              <span class="aprov-status aprov-pend" id="ap_pablo">⏳ Pendiente</span>
-            </div>
-            <div class="aprov-row">
               <div><div class="aprov-name">Daniel Polit</div><div style="font-size:11px;color:var(--gris)">Ventas</div></div>
               <span class="aprov-status aprov-pend" id="ap_daniel">⏳ Pendiente</span>
             </div>
@@ -424,12 +419,9 @@ input,select,textarea,button{font-family:inherit}
     <!-- CLIENTES -->
     <div class="tab" id="tab-productores">
       <div class="sl">Productores registrados</div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
-        <button class="btn-sm" onclick="document.getElementById('importProdFile').click()">📥 Importar Excel/CSV</button>
-        <input type="file" id="importProdFile" accept=".csv,.xlsx,.xls" style="display:none" onchange="importarProductores(this)">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
         <button class="btn-p" onclick="abrirModalProductor()">+ Nuevo productor</button>
       </div>
-      <div id="importProdPreview" style="display:none;margin-bottom:12px"></div>
       <div id="productoresList"></div>
     </div>
     <div class="tab" id="tab-disponibilidad">
@@ -1126,14 +1118,14 @@ async function calcular(){
 async function enviarAprobacion(){
   if(!ultimoCalculo){alert('Primero calcula una cotización.');return;}
   const c=ultimoCalculo;
-  const tokenDaniel=genToken(),tokenPablo=genToken(),tokenCliente=genToken();
+  const tokenDaniel=genToken(),tokenCliente=genToken();
 
   // Guardar en Supabase
   const data=await supaFetch('POST','aprobaciones',{
     cot_id:c.id,num_cot:c.num_cot||c.numCot,cliente:c.cliente,
     valor:c.valor_cotizado||c.valorCotizado,margen:c.margen_real||c.margenReal,
     tipo_pitahaya:c.tipo_pitahaya,cajas_total:c.cajas_total||c.cajasTotal,pv_prom:c.pv_prom||c.pvProm,
-    token_daniel:tokenDaniel,token_pablo:tokenPablo,token_cliente:tokenCliente
+    token_daniel:tokenDaniel,token_cliente:tokenCliente
   });
   if(!data){alert('Error al guardar en Supabase. Verifica la conexión.');return;}
 
@@ -1144,11 +1136,9 @@ async function enviarAprobacion(){
   ultimoCalculo.supaId=supaId;
 
   const linkDaniel=`${BASE_URL}?aprobar=${supaId}&rol=daniel&token=${tokenDaniel}`;
-  const linkPablo=`${BASE_URL}?aprobar=${supaId}&rol=pablo&token=${tokenPablo}`;
   const linkCliente=`${BASE_URL}?aprobar=${supaId}&rol=cliente&token=${tokenCliente}`;
 
   const msgInterno=`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n📊 Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%\n\n*Aprobar aquí:*\n${linkDaniel}`;
-  const msgPablo=`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n📊 Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%\n\n*Aprobar aquí:*\n${linkPablo}`;
   const msgCliente=`Estimado cliente,\n\nAdjuntamos cotización *${c.numCot}* de Agrovip S.A.\n\n📦 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n\nPor favor confirme su aprobación en el siguiente enlace:\n${linkCliente}\n\nAgrovip S.A. · agrovipsas.com`;
 
   // Mostrar panel de aprobaciones
@@ -1156,15 +1146,9 @@ async function enviarAprobacion(){
   document.getElementById('ap_cli_nombre').textContent=c.cliente;
 
   const waNumDaniel='593998945387';
-  const waNumPablo='593996404584';
 
-  // Links para copiar
-  const todosLosLinks=`*LINKS DE APROBACIÓN — ${c.numCot}*\n\n👤 Daniel Polit:\n${linkDaniel}\n\n👤 Pablo Moysam:\n${linkPablo}\n\n🏢 Cliente ${c.cliente}:\n${linkCliente}`;
-  navigator.clipboard.writeText(todosLosLinks).catch(()=>{});
 
-  // Mensajes WhatsApp
   const waDaniel=`https://wa.me/${waNumDaniel}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n📊 Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkDaniel}`)}`;
-  const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Aprobación requerida*\n\n📋 ${c.numCot}\n👤 Cliente: ${c.cliente}\n💰 Valor: ${f2(c.valor_cotizado||c.valorCotizado)}\n📊 Margen: ${(c.margen_real||c.margenReal||0).toFixed(1)}%\n\n✅ Aprobar aquí:\n${linkPablo}`)}`;
 
   // Mostrar botones de envío manual
   document.getElementById('aprovPanel').style.display='block';
@@ -1178,10 +1162,6 @@ async function enviarAprobacion(){
       <a href="${waDaniel}" target="_blank" style="display:flex;align-items:center;gap:8px;background:#25D366;color:white;padding:10px 14px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         Enviar a Daniel Polit
-      </a>
-      <a href="${waPablo}" target="_blank" style="display:flex;align-items:center;gap:8px;background:#25D366;color:white;padding:10px 14px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Enviar a Pablo Moysam
       </a>
       <button onclick="navigator.clipboard.writeText('${linkCliente}').then(()=>alert('✓ Link del cliente copiado'))" style="display:flex;align-items:center;gap:8px;background:#1A6B3C;color:white;padding:10px 14px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;width:100%">
         📋 Copiar link para ${c.cliente}
@@ -1199,15 +1179,12 @@ function iniciarPolling(supaId){
     if(!data||!data[0])return;
     const r=data[0];
     const elDaniel=document.getElementById('ap_daniel');
-    const elPablo=document.getElementById('ap_pablo');
     const elCliente=document.getElementById('ap_cliente');
     if(elDaniel)elDaniel.textContent=r.aprobado_daniel?'✅ Aprobado '+r.fecha_daniel?.split('T')[0]:'⏳ Pendiente';
     if(elDaniel)elDaniel.className='aprov-status '+(r.aprobado_daniel?'aprov-ok':'aprov-pend');
-    if(elPablo)elPablo.textContent=r.aprobado_pablo?'✅ Aprobado '+r.fecha_pablo?.split('T')[0]:'⏳ Pendiente';
-    if(elPablo)elPablo.className='aprov-status '+(r.aprobado_pablo?'aprov-ok':'aprov-pend');
     if(elCliente)elCliente.textContent=r.aprobado_cliente?'✅ Aprobado '+r.fecha_cliente?.split('T')[0]:'⏳ Pendiente';
     if(elCliente)elCliente.className='aprov-status '+(r.aprobado_cliente?'aprov-ok':'aprov-pend');
-    if(r.aprobado_daniel&&r.aprobado_pablo&&r.aprobado_cliente){
+    if(r.aprobado_daniel&&r.aprobado_cliente){
       clearInterval(interval);
       await supaFetch('PATCH',`cotizaciones?supa_id=eq.${supaId}`,{estado:'Aprobada'});_cots=null;
       document.getElementById('ap_refresh_hint').textContent='✅ ¡Cotización completamente aprobada!';
@@ -1232,10 +1209,10 @@ async function procesarAprobacion(supaId,rol,token){
   const data=await supaFetch('GET',`aprobaciones?id=eq.${supaId}&select=*`);
   if(!data||!data[0]){document.getElementById('aprovMsg').textContent='Link inválido o expirado.';return;}
   const r=data[0];
-  const tokenField={'daniel':'token_daniel','pablo':'token_pablo','cliente':'token_cliente'}[rol];
+  const tokenField={'daniel':'token_daniel','cliente':'token_cliente'}[rol];
   if(r[tokenField]!==token){document.getElementById('aprovMsg').textContent='Token inválido.';return;}
-  const yaAprobado={'daniel':r.aprobado_daniel,'pablo':r.aprobado_pablo,'cliente':r.aprobado_cliente}[rol];
-  const nombre={'daniel':'Daniel Polit','pablo':'Pablo Moysam','cliente':r.cliente}[rol];
+  const yaAprobado={'daniel':r.aprobado_daniel,'cliente':r.aprobado_cliente}[rol];
+  const nombre={'daniel':'Daniel Polit','cliente':r.cliente}[rol];
 
   // Detalle cotización
   document.getElementById('aprovMsg').innerHTML=`
@@ -1343,32 +1320,25 @@ async function confirmarAprobacion(supaId,rol){
   const fecha=new Date().toLocaleDateString('es-EC');
   const linkPablo=`${BASE_URL}?aprobar=${supaId}&rol=pablo&token=${r?.token_pablo}`;
   const linkCliente=`${BASE_URL}?aprobar=${supaId}&rol=cliente&token=${r?.token_cliente}`;
-  const waNumPablo='593996404584';
 
   // CADENA SECUENCIAL
   if(rol==='daniel'){
-    // Email a Lili, Pablo y Daniel: Daniel aprobó
+    // Email a Lili: Daniel aprobó, enviar link al cliente
     const asunto=`✅ Daniel aprobó cotización ${r?.num_cot} — ${r?.cliente}`;
     const utilidad=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
-    const msg=`Hola,\n\nDaniel Polit (Ventas) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||r?.valor_cotizado||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad.toFixed(2)}\n📅 Fecha: ${fecha}\n\nPablo — por favor revisa y aprueba aquí:\n${linkPablo}\n\nAgrovip S.A.`;
+    const msg=`Hola,\n\nDaniel Polit (Ventas) aprobó la cotización:\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||r?.valor_cotizado||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad aprox: $${utilidad.toFixed(2)}\n📅 Fecha: ${fecha}\n\nLili — envía el link al cliente:\n${linkCliente}\n\nAgrovip S.A.`;
     await enviarEmail(MAIL_LILI, asunto, msg);
-    await enviarEmail(MAIL_PABLO, asunto, msg);
     await enviarEmail(MAIL_GERENCIA, asunto, msg);
-    // WhatsApp a Pablo
-    const utilidadWa=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
-    const waPablo=`https://wa.me/${waNumPablo}?text=${encodeURIComponent(`*AGROVIP · Tu aprobación es requerida*\n\n📋 ${r?.num_cot}\n👤 Cliente: ${r?.cliente}\n💰 Valor: $${parseFloat(r?.valor||r?.valor_cotizado||0).toFixed(2)}\n📊 Margen: ${parseFloat(r?.margen||0).toFixed(1)}%\n✅ Utilidad: $${utilidadWa.toFixed(2)}\n\n✅ Daniel Polit ya aprobó.\n\n👉 Aprobar aquí:\n${linkPablo}`)}`;
+    const utilidadWa=0;
     document.getElementById('aprovBtn').innerHTML=`
       <div style="background:#D1FAE5;border:1px solid #A7D7B8;padding:20px;border-radius:10px;text-align:center;margin-bottom:12px">
         <div style="font-size:28px;margin-bottom:6px">✅</div>
         <div style="font-size:15px;font-weight:700;color:#065F46">¡Aprobado! Gracias Daniel.</div>
-        <div style="font-size:12px;color:#065F46;margin-top:4px">Se notificó a Lili y Pablo por email.</div>
+        <div style="font-size:12px;color:#065F46;margin-top:4px">Se notificó a Lili por email con link para el cliente.</div>
       </div>
-      <a href="${waPablo}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:white;padding:12px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Enviar WhatsApp a Pablo Moysam
-      </a>`;
+`;
 
-  } else if(rol==='pablo'){
+  } else if(rol==='pablo_disabled'){  // Pablo removed
     // Email a Lili y Daniel: Pablo aprobó — listo para cliente
     const asunto=`✅ Pablo aprobó ${r?.num_cot} — Listo para enviar al cliente`;
     const utilidad2=parseFloat(r?.valor||0)*(parseFloat(r?.margen||0)/100);
@@ -1723,67 +1693,6 @@ const lcP={
   updateProd:async(id,d)=>{await supaFetch('PATCH',`productores?id=eq.${id}`,d);_prods=null;},
   delProd:async(id)=>{await supaFetch('DELETE',`productores?id=eq.${id}`);_prods=null;}
 };
-// ── IMPORTAR PRODUCTORES DESDE EXCEL/CSV ─────────────────────
-async function importarProductores(input){
-  const file=input.files[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=async(e)=>{
-    let rows=[];
-    try{
-      const wb=XLSX.read(e.target.result,{type:'binary'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-    }catch(err){alert('Error leyendo el archivo: '+err.message);return;}
-    if(!rows.length){alert('El archivo está vacío o no tiene el formato correcto.');return;}
-    // Mapear columnas flexiblemente
-    const map=(r,keys)=>keys.map(k=>r[k]||r[k.toLowerCase()]||r[k.toUpperCase()]||'').find(v=>v)||'';
-    const preview=rows.slice(0,3).map(r=>JSON.stringify(r)).join('\n');
-    const cont=document.getElementById('importProdPreview');
-    cont.style.display='block';
-    cont.innerHTML=`<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px;font-size:12px">
-      <div style="font-weight:600;margin-bottom:8px;color:#1E40AF">📥 ${rows.length} filas detectadas — Vista previa:</div>
-      <div style="font-family:monospace;font-size:10px;color:#374151;white-space:pre-wrap;max-height:100px;overflow:auto">${preview}</div>
-      <div style="margin-top:8px;color:#6B7280;font-size:11px">Columnas esperadas: <b>nombre, codigo, zona, contacto, email, telefono, wanum, precio_fruta, anticipo_pct, categoria, notas</b></div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="btn-p" style="font-size:12px" onclick="confirmarImportProd(${JSON.stringify(rows).split('"').join('&quot;')})">✅ Importar ${rows.length} productores</button>
-        <button class="btn-sm" style="font-size:12px" onclick="document.getElementById('importProdPreview').style.display='none'">Cancelar</button>
-      </div>
-    </div>`;
-    input.value='';
-  };
-  reader.readAsBinaryString(file);
-}
-async function confirmarImportProd(rows){
-  if(!rows||!rows.length)return;
-  const map=(r,keys)=>keys.find(k=>r[k]!==undefined)?r[keys.find(k=>r[k]!==undefined)]:'';
-  let ok=0,err=0;
-  for(const r of rows){
-    const nombre=(map(r,['nombre','Nombre','NOMBRE','name','Name'])||'').toString().trim();
-    if(!nombre){err++;continue;}
-    const datos={
-      id:'prod_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),
-      nombre,
-      codigo:(map(r,['codigo','Codigo','CODIGO','code','Code'])||'').toString().trim(),
-      zona:(map(r,['zona','Zona','ZONA','sector','Sector'])||'').toString().trim(),
-      contacto:(map(r,['contacto','Contacto','CONTACTO','contact'])||'').toString().trim(),
-      email:(map(r,['email','Email','EMAIL','correo','Correo'])||'').toString().trim(),
-      telefono:(map(r,['telefono','Telefono','TELEFONO','phone'])||'').toString().trim(),
-      wapais:'+593',
-      wanum:(map(r,['wanum','whatsapp','Whatsapp','WhatsApp','celular','Celular'])||'').toString().trim(),
-      precio_fruta:parseFloat(map(r,['precio_fruta','precio','Precio','price'])||0)||0,
-      anticipo_pct:parseInt(map(r,['anticipo_pct','anticipo','Anticipo'])||65)||65,
-      categoria:(map(r,['categoria','Categoria','CATEGORIA','category'])||'Activo').toString().trim(),
-      notas:(map(r,['notas','Notas','NOTAS','notes'])||'').toString().trim(),
-      ha:parseFloat(map(r,['ha','Ha','HA','hectareas'])||0)||0
-    };
-    try{await lcP.saveProd(datos);ok++;}catch(e){err++;}
-  }
-  document.getElementById('importProdPreview').style.display='none';
-  alert(`Importación completada: ${ok} productores importados${err>0?`, ${err} errores`:''}.`);
-  _prods=null;
-  renderProductores();
-}
 async function renderProductores(){
   const list=await lcP.prods();
   const cont=document.getElementById('productoresList');
