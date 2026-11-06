@@ -41,6 +41,8 @@ table.grid th.n{background:var(--cr2);z-index:3}
 table.grid tr.tot td{background:var(--cr2);font-weight:700}
 table.grid tr.tot td.n{background:var(--cr2)}
 table.grid tr.ro td{background:#F3F8F4;color:var(--g)}
+table.grid tr.prc td{background:#FAF7EE}
+table.grid tr.prc td.n{background:#FAF7EE}
 table.grid tr.ro td.n{background:#F3F8F4}
 input.cell{width:52px;padding:4px 3px;border:1px solid transparent;border-radius:4px;text-align:right;font-size:12px;background:#FFFFF0}
 input.cell:focus{border-color:var(--g);outline:none;background:#fff}
@@ -151,7 +153,7 @@ async function cargar(){
     supa('GET','plan_ventas?anio=eq.'+anio+'&select=*'),
     supa('GET','despachos?select=semana,fecha,cliente,total_cajas,estado,tipo'),
     supa('GET','cotizaciones?select=semana_despacho,fecha_despacho,cliente,cajas_total,estado'),
-    supa('GET','clientes?select=nombre')
+    supa('GET','clientes?select=*')
   ]);
   tablaOk=(p!==null);
   despachos=d||[];cotizaciones=c||[];clientesDB=cl||[];
@@ -162,7 +164,7 @@ async function cargar(){
     nombres[nk]=nombres[nk]||r.cliente;
     if(!clientesPlan[emp].includes(nk))clientesPlan[emp].push(nk);
     plan[emp+SEP+nk+SEP+r.semana]=parseFloat(r.cajas)||0;
-    if(r.precio_caja!=null&&r.precio_caja!=='')precio[emp+SEP+nk]=parseFloat(r.precio_caja);
+    if(r.precio_caja!=null&&r.precio_caja!=='')precio[emp+SEP+nk+SEP+r.semana]=parseFloat(r.precio_caja);
   });
   const hoy=new Date(),y=hoy.getFullYear();
   corte=(anio===y)?Math.min(isoWeek(hoy),nSem):nSem;
@@ -191,8 +193,17 @@ function renderTodo(){
 const getC=(emp,nk,s)=>plan[emp+SEP+nk+SEP+s]||0;
 function totSem(emp,s){return clientesPlan[emp].reduce((a,nk)=>a+getC(emp,nk,s),0);}
 function totCli(emp,nk){let a=0;for(let s=1;s<=nSem;s++)a+=getC(emp,nk,s);return a;}
-const px=(emp,nk)=>precio[emp+SEP+nk]||0;
-function ingresoCli(emp,nk){return totCli(emp,nk)*px(emp,nk);}
+const px=(emp,nk,s)=>precio[emp+SEP+nk+SEP+s]||0;
+function ingresoCli(emp,nk){let a=0;for(let s=1;s<=nSem;s++)a+=getC(emp,nk,s)*px(emp,nk,s);return a;}
+function ingresoSem(emp,s){return clientesPlan[emp].reduce((a,nk)=>a+getC(emp,nk,s)*px(emp,nk,s),0);}
+function ingresoAgrovipInterno(){let a=0;for(let s=1;s<=nSem;s++)a+=totSem('agrovip',s);return a*tarifaInterna();}
+const cliInfo=nk=>clientesDB.find(x=>norm(x.nombre)===nk)||null;
+function acordadoTxt(emp,nk){
+  const ci=cliInfo(nk);if(!ci||!(parseFloat(ci.cajas_anio)>0))return '<span style="color:var(--gris)" title="Sin acuerdo de cajas en Clientes">—</span>';
+  const ac=parseFloat(ci.cajas_anio),t=totCli(emp,nk),sobre=t>ac;
+  return '<span title="Cajas acordadas en el año con este cliente" style="color:'+(sobre?'var(--rd)':'var(--g)')+'">'+nf(ac)+(sobre?' ⚠':'')+'</span>';
+}
+function pxProm(emp,nk){const c=totCli(emp,nk);return c?ingresoCli(emp,nk)/c:0;}
 
 // ---------- grilla del plan ----------
 function tarifaInterna(){return parseFloat(localStorage.getItem('tarifaInterna')||'')||0;}
@@ -202,8 +213,8 @@ function renderPlan(emp){
   const cont=document.getElementById('tab-'+emp);
   const interno=(emp==='packvip');
   let h='<div class="barra">'
-    +'<input type="text" id="newCli_'+emp+'" list="dl_cli" placeholder="Agregar cliente…" style="min-width:200px">'
-    +'<button class="btn-s" onclick="addCliente(\''+emp+'\')">+ Agregar</button>'
+    +'<input type="text" id="newCli_'+emp+'" list="dl_cli" placeholder="Nombre del cliente (existente o nuevo)" style="min-width:260px" onkeydown="if(event.key===\'Enter\')addCliente(\''+emp+'\')">'
+    +'<button class="btn-s" onclick="addCliente(\''+emp+'\')">+ Agregar / crear cliente nuevo</button>'
     +'<button class="btn-p" id="btnSave" onclick="guardarPlan()" '+(tablaOk?'':'disabled')+'>💾 Guardar plan</button>'
     +'<span class="nota" id="saveHint" style="margin:0">'+(dirty.size?'Cambios sin guardar':'')+'</span>';
   if(interno){
@@ -212,10 +223,11 @@ function renderPlan(emp){
       +'<label class="nota" style="margin:0">Capacidad cajas/mes <input type="number" id="capMes" class="cell px" style="border-color:var(--bd);width:80px" value="'+capMensual()+'" onchange="localStorage.setItem(\'capMensual\',this.value);renderPlan(\'packvip\')"></label>';
   }
   h+='</div>';
+  h+='<div id="nuevoCli_'+emp+'" class="aviso" style="display:none;background:#EEF6F0;border-color:#BFD9C6;color:var(--ink)"></div>';
   h+='<div class="nota">'+(interno
     ?'La primera fila (verde) se llena sola con las cajas del plan de Agrovip, que PackVip empaca como cliente interno. Debajo registras los clientes propios de PackVip.'
-    :'Escribe las cajas planificadas por semana y cliente. Un cliente nuevo aparece al guardar sus cajas.')+'</div>';
-  h+='<div class="tw"><table class="grid"><thead><tr><th class="n">Cliente</th><th>$/caja</th>';
+    :'Cada cliente tiene dos filas: las cajas y el precio por caja de esa semana. El precio base solo copia ese valor a las semanas que no tienen precio; después cambias las semanas que necesites.')+'</div>';
+  h+='<div class="tw"><table class="grid"><thead><tr><th class="n">Cliente</th><th>Cajas acordadas / Base $</th>';
   for(let s=1;s<=nSem;s++)h+='<th>S'+s+'</th>';
   h+='<th>Total</th><th>Ingreso</th></tr></thead><tbody>';
 
@@ -226,13 +238,19 @@ function renderPlan(emp){
     h+='<td><b>'+nf(tt)+'</b></td><td>'+(tf?money(tt*tf):'—')+'</td></tr>';
   }
   clientesPlan[emp].forEach((nk,i)=>{
-    h+='<tr><td class="n">'+esc(nombres[nk]||nk)+'</td>'
-      +'<td><input type="number" step="0.01" min="0" class="cell px" value="'+(px(emp,nk)||'')+'" data-e="'+emp+'" data-c="'+esc(nk)+'" onchange="priceChange(this)"></td>';
+    h+='<tr><td class="n">'+esc(nombres[nk]||nk)+' <span style="font-weight:400;color:var(--gris)">· cajas</span></td><td id="ac_'+emp+'_'+i+'" style="font-size:10px">'+acordadoTxt(emp,nk)+'</td>';
     for(let s=1;s<=nSem;s++){
       const v=getC(emp,nk,s);
       h+='<td><input type="number" min="0" step="1" class="cell" value="'+(v||'')+'" data-e="'+emp+'" data-c="'+esc(nk)+'" data-s="'+s+'" onchange="cellChange(this)"></td>';
     }
-    h+='<td id="rt_'+emp+'_'+i+'"><b>'+nf(totCli(emp,nk))+'</b></td><td id="ri_'+emp+'_'+i+'">'+money(ingresoCli(emp,nk))+'</td></tr>';
+    h+='<td id="rt_'+emp+'_'+i+'"><b>'+nf(totCli(emp,nk))+'</b></td><td id="ri_'+emp+'_'+i+'" rowspan="2"><b>'+money(ingresoCli(emp,nk))+'</b></td></tr>';
+    h+='<tr class="prc"><td class="n" style="font-weight:400;color:var(--gris)">$/caja de la semana</td>'
+      +'<td><input type="number" step="0.01" min="0" class="cell px" title="Escribe un precio base y se copia a las semanas sin precio" data-e="'+emp+'" data-c="'+esc(nk)+'" onchange="baseChange(this)"></td>';
+    for(let s=1;s<=nSem;s++){
+      const v=px(emp,nk,s);
+      h+='<td><input type="number" step="0.01" min="0" class="cell px" value="'+(v||'')+'" data-e="'+emp+'" data-c="'+esc(nk)+'" data-s="'+s+'" onchange="priceChange(this)"></td>';
+    }
+    h+='<td id="rp_'+emp+'_'+i+'" style="color:var(--gris)">prom. $'+pxProm(emp,nk).toFixed(2)+'</td></tr>';
   });
   // totales
   let tTot=0;
@@ -241,8 +259,11 @@ function renderPlan(emp){
     const v=totSem(emp,s)+(interno?totSem('agrovip',s):0);tTot+=v;
     h+='<td id="t_'+emp+'_'+s+'">'+(v?nf(v):'')+'</td>';
   }
-  const ing=clientesPlan[emp].reduce((a,nk)=>a+ingresoCli(emp,nk),0)+(interno?tarifaInterna()*Object.keys(plan).filter(k=>k.startsWith('agrovip'+SEP)).reduce((a,k)=>a+plan[k],0):0);
+  const ing=clientesPlan[emp].reduce((a,nk)=>a+ingresoCli(emp,nk),0)+(interno?ingresoAgrovipInterno():0);
   h+='<td id="tt_'+emp+'">'+nf(tTot)+'</td><td id="ti_'+emp+'">'+money(ing)+'</td></tr>';
+  h+='<tr class="tot"><td class="n">Ingreso semanal $</td><td></td>';
+  for(let s=1;s<=nSem;s++){const v=ingresoSem(emp,s)+(interno?totSem('agrovip',s)*tarifaInterna():0);h+='<td id="is_'+emp+'_'+s+'">'+(v?nf(v):'')+'</td>';}
+  h+='<td></td><td></td></tr>';
   if(interno){
     const capSem=capMensual()*12/52;
     h+='<tr class="tot"><td class="n">% de capacidad semanal</td><td></td>';
@@ -267,9 +288,12 @@ function refreshTotals(emp){
   }
   clientesPlan[emp].forEach((nk,i)=>{
     const a=document.getElementById('rt_'+emp+'_'+i);if(a)a.innerHTML='<b>'+nf(totCli(emp,nk))+'</b>';
-    const b=document.getElementById('ri_'+emp+'_'+i);if(b)b.textContent=money(ingresoCli(emp,nk));
+    const b=document.getElementById('ri_'+emp+'_'+i);if(b)b.innerHTML='<b>'+money(ingresoCli(emp,nk))+'</b>';
+    const ac=document.getElementById('ac_'+emp+'_'+i);if(ac)ac.innerHTML=acordadoTxt(emp,nk);
+    const c2=document.getElementById('rp_'+emp+'_'+i);if(c2)c2.textContent='prom. $'+pxProm(emp,nk).toFixed(2);
   });
-  const ing=clientesPlan[emp].reduce((a,nk)=>a+ingresoCli(emp,nk),0)+(interno?tarifaInterna()*Object.keys(plan).filter(k=>k.startsWith('agrovip'+SEP)).reduce((a,k)=>a+plan[k],0):0);
+  for(let s=1;s<=nSem;s++){const e=document.getElementById('is_'+emp+'_'+s);if(e){const v=ingresoSem(emp,s)+(interno?totSem('agrovip',s)*tarifaInterna():0);e.textContent=v?nf(v):'';}}
+  const ing=clientesPlan[emp].reduce((a,nk)=>a+ingresoCli(emp,nk),0)+(interno?ingresoAgrovipInterno():0);
   const t1=document.getElementById('tt_'+emp);if(t1)t1.textContent=nf(tTot);
   const t2=document.getElementById('ti_'+emp);if(t2)t2.textContent=money(ing);
   const hint=document.getElementById('saveHint');if(hint)hint.textContent=dirty.size?'Cambios sin guardar':'';
@@ -283,26 +307,64 @@ function cellChange(el){
   refreshTotals(emp);
 }
 function priceChange(el){
-  const emp=el.dataset.e,nk=el.dataset.c;
-  precio[emp+SEP+nk]=Math.max(0,parseFloat(el.value)||0);
-  for(let s=1;s<=nSem;s++){if(getC(emp,nk,s)>0)dirty.add(emp+SEP+nk+SEP+s);}
+  const emp=el.dataset.e,nk=el.dataset.c,s=parseInt(el.dataset.s);
+  const k=emp+SEP+nk+SEP+s;
+  precio[k]=Math.max(0,parseFloat(el.value)||0);
+  dirty.add(k);
   refreshTotals(emp);
+}
+function baseChange(el){
+  const emp=el.dataset.e,nk=el.dataset.c,v=Math.max(0,parseFloat(el.value)||0);
+  if(!v)return;
+  for(let s=1;s<=nSem;s++){const k=emp+SEP+nk+SEP+s;if(!precio[k]){precio[k]=v;dirty.add(k);}}
+  renderPlan(emp);
 }
 function addCliente(emp){
   const inp=document.getElementById('newCli_'+emp);
   const name=inp.value.trim();if(!name)return;
   const nk=norm(name);
   if(clientesPlan[emp].includes(nk)){toast('Ese cliente ya está en la lista');return;}
+  if(cliInfo(nk)){ponerCliente(emp,cliInfo(nk).nombre);return;}
+  // cliente nuevo: pedir cupo y cajas del año
+  const box=document.getElementById('nuevoCli_'+emp);
+  box.style.display='block';pendiente[emp]=name;
+  box.innerHTML='<b>Cliente nuevo: '+esc(name)+'</b> — se crea también en la lista de Clientes de Cotizaciones.'
+   +'<div class="barra" style="margin:8px 0 0">'
+   +'<label class="nota" style="margin:0">Cajas a despachar en el año <input type="number" min="0" id="nc_cajas_'+emp+'" class="cell px" style="border-color:var(--bd);width:90px"></label>'
+   +'<label class="nota" style="margin:0">Cupo USD <input type="number" min="0" id="nc_cupo_'+emp+'" class="cell px" style="border-color:var(--bd);width:90px"></label>'
+   +'<label class="nota" style="margin:0">Días de crédito <input type="number" min="0" id="nc_dias_'+emp+'" class="cell px" style="border-color:var(--bd);width:70px"></label>'
+   +'<label class="nota" style="margin:0">País <input type="text" id="nc_pais_'+emp+'" class="cell px" style="border-color:var(--bd);width:90px;text-align:left"></label>'
+   +'<button class="btn-p" onclick="crearClienteNuevo(\''+emp+'\')">Crear cliente</button>'
+   +'<button class="btn-s" onclick="document.getElementById(\'nuevoCli_'+emp+'\').style.display=\'none\'">Cancelar</button></div>';
+}
+const pendiente={};
+function ponerCliente(emp,name){
+  const nk=norm(name);
   nombres[nk]=nombres[nk]||name;
   clientesPlan[emp].push(nk);
+  dirty.add(emp+SEP+nk+SEP+1);
   renderPlan(emp);
+  toast('Cliente agregado. Llena sus cajas y precios y pulsa Guardar plan');
+}
+async function crearClienteNuevo(emp){
+  const name=pendiente[emp];if(!name)return;
+  const g=id=>document.getElementById(id+'_'+emp).value;
+  const reg={id:'cli_'+Date.now(),nombre:name,pais:g('nc_pais').trim(),tipo:'maritimo_sea',cupo:parseFloat(g('nc_cupo'))||0,dias_credito:parseInt(g('nc_dias'))||0,cajas_anio:parseFloat(g('nc_cajas'))||0,creado_por:USUARIO&&USUARIO.nombre||null};
+  const ok=await supa('POST','clientes',reg,'return=minimal');
+  if(!ok){
+    if(!confirm('No pude crear el cliente en la lista de Clientes (¿ya ejecutaste clientes_ampliar.sql en Supabase?). ¿Agregarlo solo al plan por ahora?'))return;
+  }else{
+    clientesDB.push(reg);
+    document.getElementById('dl_cli').innerHTML+= '<option value="'+esc(name)+'">';
+  }
+  ponerCliente(emp,name);
 }
 
 async function guardarPlan(){
   if(!dirty.size){toast('No hay cambios por guardar');return;}
   const rows=[...dirty].map(k=>{
     const [emp,nk,s]=k.split(SEP);
-    const p=precio[emp+SEP+nk];
+    const p=precio[k];
     return{anio,semana:parseInt(s),empresa:emp,cliente:nombres[nk]||nk,cajas:plan[k]||0,precio_caja:p?p:null,creado_por:USUARIO&&USUARIO.nombre||null};
   });
   const btn=document.getElementById('btnSave');if(btn){btn.disabled=true;btn.textContent='Guardando…';}
@@ -346,6 +408,7 @@ function pill(pct){
   const c=pct>=95?'pv':(pct>=80?'pa':'pr');
   return '<span class="pill '+c+'">'+Math.round(pct)+'%</span>';
 }
+function acA(n){const c=cliInfo(norm(n));return c?(parseFloat(c.cajas_anio)||0):0;}
 function renderComp(){
   const cont=document.getElementById('tab-comp');
   const {real,cot,realCli}=agregarReal();
@@ -399,11 +462,11 @@ function renderComp(){
     for(let s=1;s<=corte;s++)mapa[nk].r+=realCli[nk].w[s]||0;
   });
   const lista=Object.values(mapa).filter(x=>x.p||x.r).sort((a,b)=>(b.p+b.r)-(a.p+a.r));
-  h+='<div class="tw"><table class="grid"><thead><tr><th class="n">Cliente</th><th>Plan</th><th>Despachado</th><th>Dif.</th><th>Cumpl.</th></tr></thead><tbody>';
-  if(!lista.length)h+='<tr><td class="n" colspan="5" style="text-align:left;font-weight:400;color:var(--gris)">Sin datos todavía.</td></tr>';
+  h+='<div class="tw"><table class="grid"><thead><tr><th class="n">Cliente</th><th>Plan</th><th>Despachado</th><th>Dif.</th><th>Cumpl.</th><th>Acordado año</th><th>Plan año</th></tr></thead><tbody>';
+  if(!lista.length)h+='<tr><td class="n" colspan="7" style="text-align:left;font-weight:400;color:var(--gris)">Sin datos todavía.</td></tr>';
   lista.forEach(x=>{
     const pc=(x.p>0&&!futuro)?x.r/x.p*100:null;
-    h+='<tr><td class="n">'+esc(x.n)+(x.sinPlan?' <span class="pill pa">sin plan</span>':'')+'</td><td>'+nf(x.p)+'</td><td>'+nf(x.r)+'</td><td>'+nf(x.r-x.p)+'</td><td>'+pill(pc)+'</td></tr>';
+    h+='<tr><td class="n">'+esc(x.n)+(x.sinPlan?' <span class="pill pa">sin plan</span>':'')+'</td><td>'+nf(x.p)+'</td><td>'+nf(x.r)+'</td><td>'+nf(x.r-x.p)+'</td><td>'+pill(pc)+'</td><td>'+(acA(x.n)?nf(acA(x.n)):'—')+'</td><td>'+nf(totCli('agrovip',norm(x.n)))+'</td></tr>';
   });
   h+='</tbody></table></div>';
   if(!esAg)h+='<div class="nota">Esta tabla por cliente corresponde a Agrovip.</div>';
