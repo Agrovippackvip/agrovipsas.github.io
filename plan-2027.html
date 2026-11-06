@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agrovip · Plan de ventas</title>
+<style>
+:root{--g:#1A6B3C;--g2:#7A9A2E;--am:#D4A017;--rd:#C0392B;--cr:#F5F0E8;--cr2:#EAE3D2;--gris:#6B6B5A;--ink:#1C1C1C;--bd:#E0D8C8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--cr);color:var(--ink);font-size:13px}
+#loginWrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--g);padding:20px}
+.login-box{background:#fff;border-radius:14px;padding:34px 30px;width:340px;text-align:center}
+.login-logo{width:56px;height:56px;background:var(--g2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:#fff;margin:0 auto 14px}
+.login-box h2{color:var(--g);font-size:19px;margin-bottom:4px}
+.login-box p{color:var(--gris);font-size:12px;margin-bottom:18px}
+.login-box input{width:100%;padding:11px;border:1px solid var(--bd);border-radius:8px;font-size:14px;margin-bottom:10px}
+#loginErr{display:none;color:var(--rd);font-size:12px;margin-bottom:8px}
+.btn-p{padding:10px 18px;background:var(--g);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-p:disabled{opacity:.5;cursor:default}
+.btn-s{padding:8px 14px;background:none;border:1px solid var(--g);color:var(--g);border-radius:7px;font-size:12px;cursor:pointer}
+header{background:var(--g);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header a{color:#fff;text-decoration:none;font-size:12px;opacity:.8}
+header h1{font-size:16px;flex:1}
+header select,header .who{font-size:12px}
+header select{padding:5px 8px;border-radius:6px;border:none}
+nav{display:flex;gap:4px;background:#fff;border-bottom:1px solid var(--bd);padding:0 14px;overflow-x:auto}
+nav button{padding:12px 16px;background:none;border:none;border-bottom:3px solid transparent;font-size:13px;font-weight:600;color:var(--gris);cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--g);border-bottom-color:var(--g)}
+main{padding:16px 18px;max-width:100%}
+.aviso{background:#FEF3C7;border:1px solid #F5D77A;color:#7A5200;border-radius:8px;padding:11px 14px;margin-bottom:12px;font-size:12px;line-height:1.5}
+.aviso.err{background:#FDECEA;border-color:#F3B9B2;color:#8E2A20}
+.barra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.barra input[type=text],.barra input[type=number]{padding:8px 10px;border:1px solid var(--bd);border-radius:7px;font-size:12px}
+.nota{font-size:11px;color:var(--gris);margin:6px 0 10px;line-height:1.5}
+.tw{overflow-x:auto;background:#fff;border:1px solid var(--bd);border-radius:10px}
+table.grid{border-collapse:collapse;font-size:12px;min-width:100%}
+table.grid th,table.grid td{padding:4px 5px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}
+table.grid th{background:var(--cr2);font-size:11px;color:var(--gris);position:sticky;top:0}
+table.grid td.n,table.grid th.n{text-align:left;position:sticky;left:0;background:#fff;z-index:2;min-width:150px;font-weight:600}
+table.grid th.n{background:var(--cr2);z-index:3}
+table.grid tr.tot td{background:var(--cr2);font-weight:700}
+table.grid tr.tot td.n{background:var(--cr2)}
+table.grid tr.ro td{background:#F3F8F4;color:var(--g)}
+table.grid tr.ro td.n{background:#F3F8F4}
+input.cell{width:52px;padding:4px 3px;border:1px solid transparent;border-radius:4px;text-align:right;font-size:12px;background:#FFFFF0}
+input.cell:focus{border-color:var(--g);outline:none;background:#fff}
+input.px{width:62px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 14px}
+.kpi .l{font-size:10px;letter-spacing:.5px;color:var(--gris);text-transform:uppercase}
+.kpi .v{font-size:20px;font-weight:700;color:var(--g);margin-top:4px}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.pv{background:#D1FAE5;color:#065F46}.pa{background:#FEF3C7;color:#92400E}.pr{background:#FDE2E0;color:#8E2A20}.pn{background:#EEE;color:#777}
+tr.hoy td{background:#FFF8DC !important}
+tr.fuera td{color:#aaa}
+h3.sec{font-size:13px;color:var(--g);margin:18px 0 8px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;display:none;z-index:50}
+</style>
+</head>
+<body>
+
+<div id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">AV</div>
+    <h2>Plan de ventas</h2>
+    <p>Agrovip · PackVip</p>
+    <input type="password" id="loginPass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
+    <div id="loginErr">Contraseña incorrecta</div>
+    <button class="btn-p" style="width:100%" onclick="login()">Entrar</button>
+  </div>
+</div>
+
+<div id="appWrap" style="display:none">
+  <header>
+    <a href="./index.html">← Inicio</a>
+    <h1>Plan de ventas</h1>
+    <label style="font-size:12px">Año <select id="selAnio" onchange="cambiarAnio()"><option>2026</option><option selected>2027</option><option>2028</option></select></label>
+    <span class="who" id="who"></span>
+    <button class="btn-s" style="color:#fff;border-color:rgba(255,255,255,.5)" onclick="logout()">Salir</button>
+  </header>
+  <nav>
+    <button id="nb-agrovip" class="on" onclick="goTab('agrovip')">Plan Agrovip</button>
+    <button id="nb-packvip" onclick="goTab('packvip')">Plan PackVip</button>
+    <button id="nb-comp" onclick="goTab('comp')">Comparativo semanal</button>
+  </nav>
+  <main>
+    <div id="avisos"></div>
+    <section id="tab-agrovip"></section>
+    <section id="tab-packvip" style="display:none"></section>
+    <section id="tab-comp" style="display:none"></section>
+  </main>
+</div>
+<datalist id="dl_cli"></datalist>
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0';
+const SEP='::';
+
+let USUARIO=null,anio=2027,nSem=52,tablaOk=true;
+let plan={},precio={},nombres={},clientesPlan={agrovip:[],packvip:[]};
+let dirty=new Set(),dirtyPrecio=new Set();
+let despachos=[],cotizaciones=[],clientesDB=[];
+let tabActual='agrovip',empComp='agrovip',corte=52;
+let avisoSinSemana=0;
+
+// ---------- utilidades ----------
+const norm=s=>String(s==null?'':s).trim().toLowerCase();
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=n=>Math.round(n).toLocaleString('en-US');
+const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y0=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y0)/86400000+1)/7);}
+function isoWeeksInYear(y){return isoWeek(new Date(y,11,28));}
+function anioDe(f){const y=parseInt(String(f||'').slice(0,4));return isNaN(y)?null:y;}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2600);}
+
+async function supa(method,path,body,prefer){
+  const h={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
+  if(body!==undefined)h['Content-Type']='application/json';
+  if(prefer)h['Prefer']=prefer;
+  try{
+    const r=await fetch(SUPA_URL+'/rest/v1/'+path,{method,headers:h,body:body!==undefined?JSON.stringify(body):undefined});
+    if(!r.ok){console.error('Supabase',r.status,await r.text());return null;}
+    if(r.status===204)return true;
+    const t=await r.text();
+    return t?JSON.parse(t):true;
+  }catch(e){console.error(e);return null;}
+}
+
+// ---------- acceso ----------
+async function login(){
+  const pw=document.getElementById('loginPass').value.trim();
+  const err=document.getElementById('loginErr');
+  if(!pw){err.style.display='block';return;}
+  const data=await supa('GET','usuarios?clave=eq.'+encodeURIComponent(pw)+'&select=*');
+  if(!data||!data.length){err.style.display='block';return;}
+  USUARIO=data[0];
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('appWrap').style.display='block';
+  document.getElementById('who').textContent=USUARIO.nombre||'';
+  await cargar();
+}
+function logout(){location.reload();}
+
+// ---------- carga de datos ----------
+async function cargar(){
+  anio=parseInt(document.getElementById('selAnio').value)||2027;
+  nSem=isoWeeksInYear(anio);
+  const [p,d,c,cl]=await Promise.all([
+    supa('GET','plan_ventas?anio=eq.'+anio+'&select=*'),
+    supa('GET','despachos?select=semana,fecha,cliente,total_cajas,estado,tipo'),
+    supa('GET','cotizaciones?select=semana_despacho,fecha_despacho,cliente,cajas_total,estado'),
+    supa('GET','clientes?select=nombre')
+  ]);
+  tablaOk=(p!==null);
+  despachos=d||[];cotizaciones=c||[];clientesDB=cl||[];
+  plan={};precio={};nombres={};clientesPlan={agrovip:[],packvip:[]};dirty=new Set();dirtyPrecio=new Set();
+  (p||[]).forEach(r=>{
+    const emp=r.empresa,nk=norm(r.cliente);
+    if(!clientesPlan[emp])return;
+    nombres[nk]=nombres[nk]||r.cliente;
+    if(!clientesPlan[emp].includes(nk))clientesPlan[emp].push(nk);
+    plan[emp+SEP+nk+SEP+r.semana]=parseFloat(r.cajas)||0;
+    if(r.precio_caja!=null&&r.precio_caja!=='')precio[emp+SEP+nk]=parseFloat(r.precio_caja);
+  });
+  const hoy=new Date(),y=hoy.getFullYear();
+  corte=(anio===y)?Math.min(isoWeek(hoy),nSem):nSem;
+  document.getElementById('dl_cli').innerHTML=clientesDB.map(x=>'<option value="'+esc(x.nombre)+'">').join('');
+  const av=document.getElementById('avisos');
+  av.innerHTML=tablaOk?'':'<div class="aviso err"><b>Falta crear la tabla del plan en Supabase.</b> Abre Supabase, entra a SQL Editor y ejecuta el script <code>plan_ventas.sql</code>. Después recarga esta página.</div>';
+  renderTodo();
+}
+function cambiarAnio(){if(dirty.size&&!confirm('Tienes cambios sin guardar. ¿Cambiar de año y perderlos?')){document.getElementById('selAnio').value=anio;return;}cargar();}
+
+function goTab(t){
+  tabActual=t;
+  ['agrovip','packvip','comp'].forEach(x=>{
+    document.getElementById('tab-'+x).style.display=(x===t)?'':'none';
+    document.getElementById('nb-'+x).classList.toggle('on',x===t);
+  });
+  renderTodo();
+}
+function renderTodo(){
+  if(tabActual==='agrovip')renderPlan('agrovip');
+  else if(tabActual==='packvip')renderPlan('packvip');
+  else renderComp();
+}
+
+// ---------- totales del plan ----------
+const getC=(emp,nk,s)=>plan[emp+SEP+nk+SEP+s]||0;
+function totSem(emp,s){return clientesPlan[emp].reduce((a,nk)=>a+getC(emp,nk,s),0);}
+function totCli(emp,nk){let a=0;for(let s=1;s<=nSem;s++)a+=getC(emp,nk,s);return a;}
+const px=(emp,nk)=>precio[emp+SEP+nk]||0;
+function ingresoCli(emp,nk){return totCli(emp,nk)*px(emp,nk);}
+
+// ---------- grilla del plan ----------
+function tarifaInterna(){return parseFloat(localStorage.getItem('tarifaInterna')||'')||0;}
+function capMensual(){return parseFloat(localStorage.getItem('capMensual')||'')||120000;}
+
+function renderPlan(emp){
+  const cont=document.getElementById('tab-'+emp);
+  const interno=(emp==='packvip');
+  let h='<div class="barra">'
+    +'<input type="text" id="newCli_'+emp+'" list="dl_cli" placeholder="Agregar cliente…" style="min-width:200px">'
+    +'<button class="btn-s" onclick="addCliente(\''+emp+'\')">+ Agregar</button>'
+    +'<button class="btn-p" id="btnSave" onclick="guardarPlan()" '+(tablaOk?'':'disabled')+'>💾 Guardar plan</button>'
+    +'<span class="nota" id="saveHint" style="margin:0">'+(dirty.size?'Cambios sin guardar':'')+'</span>';
+  if(interno){
+    h+='<span style="flex:1"></span>'
+      +'<label class="nota" style="margin:0">Tarifa empaque a Agrovip $/caja <input type="number" step="0.01" id="tarifaInt" class="cell px" style="border-color:var(--bd)" value="'+(tarifaInterna()||'')+'" onchange="localStorage.setItem(\'tarifaInterna\',this.value);renderPlan(\'packvip\')"></label>'
+      +'<label class="nota" style="margin:0">Capacidad cajas/mes <input type="number" id="capMes" class="cell px" style="border-color:var(--bd);width:80px" value="'+capMensual()+'" onchange="localStorage.setItem(\'capMensual\',this.value);renderPlan(\'packvip\')"></label>';
+  }
+  h+='</div>';
+  h+='<div class="nota">'+(interno
+    ?'La primera fila (verde) se llena sola con las cajas del plan de Agrovip, que PackVip empaca como cliente interno. Debajo registras los clientes propios de PackVip.'
+    :'Escribe las cajas planificadas por semana y cliente. Un cliente nuevo aparece al guardar sus cajas.')+'</div>';
+  h+='<div class="tw"><table class="grid"><thead><tr><th class="n">Cliente</th><th>$/caja</th>';
+  for(let s=1;s<=nSem;s++)h+='<th>S'+s+'</th>';
+  h+='<th>Total</th><th>Ingreso</th></tr></thead><tbody>';
+
+  if(interno){
+    const tf=tarifaInterna();let tt=0;
+    h+='<tr class="ro"><td class="n">Agrovip (cliente interno)</td><td>'+(tf?('$'+tf.toFixed(2)):'—')+'</td>';
+    for(let s=1;s<=nSem;s++){const v=totSem('agrovip',s);tt+=v;h+='<td>'+(v?nf(v):'')+'</td>';}
+    h+='<td><b>'+nf(tt)+'</b></td><td>'+(tf?money(tt*tf):'—')+'</td></tr>';
+  }
+  clientesPlan[emp].forEach((nk,i)=>{
+    h+='<tr><td class="n">'+esc(nombres[nk]||nk)+'</td>'
+      +'<td><input type="number" step="0.01" min="0" class="cell px" value="'+(px(emp,nk)||'')+'" data-e="'+emp+'" data-c="'+esc(nk)+'" onchange="priceChange(this)"></td>';
+    for(let s=1;s<=nSem;s++){
+      const v=getC(emp,nk,s);
+      h+='<td><input type="number" min="0" step="1" class="cell" value="'+(v||'')+'" data-e="'+emp+'" data-c="'+esc(nk)+'" data-s="'+s+'" onchange="cellChange(this)"></td>';
+    }
+    h+='<td id="rt_'+emp+'_'+i+'"><b>'+nf(totCli(emp,nk))+'</b></td><td id="ri_'+emp+'_'+i+'">'+money(ingresoCli(emp,nk))+'</td></tr>';
+  });
+  // totales
+  let tTot=0;
+  h+='<tr class="tot"><td class="n">TOTAL '+(interno?'PackVip':'Agrovip')+'</td><td></td>';
+  for(let s=1;s<=nSem;s++){
+    const v=totSem(emp,s)+(interno?totSem('agrovip',s):0);tTot+=v;
+    h+='<td id="t_'+emp+'_'+s+'">'+(v?nf(v):'')+'</td>';
+  }
+  const ing=clientesPlan[emp].reduce((a,nk)=>a+ingresoCli(emp,nk),0)+(interno?tarifaInterna()*Object.keys(plan).filter(k=>k.startsWith('agrovip'+SEP)).reduce((a,k)=>a+plan[k],0):0);
+  h+='<td id="tt_'+emp+'">'+nf(tTot)+'</td><td id="ti_'+emp+'">'+money(ing)+'</td></tr>';
+  if(interno){
+    const capSem=capMensual()*12/52;
+    h+='<tr class="tot"><td class="n">% de capacidad semanal</td><td></td>';
+    for(let s=1;s<=nSem;s++){
+      const v=totSem('packvip',s)+totSem('agrovip',s);
+      const pct=capSem?Math.round(v/capSem*100):0;
+      h+='<td id="cap_'+s+'" style="color:'+(pct>100?'var(--rd)':(pct>=85?'var(--am)':'inherit'))+'">'+(v?pct+'%':'')+'</td>';
+    }
+    h+='<td></td><td></td></tr>';
+  }
+  h+='</tbody></table></div>';
+  cont.innerHTML=h;
+}
+
+function refreshTotals(emp){
+  const interno=(emp==='packvip');
+  let tTot=0;
+  for(let s=1;s<=nSem;s++){
+    const v=totSem(emp,s)+(interno?totSem('agrovip',s):0);tTot+=v;
+    const el=document.getElementById('t_'+emp+'_'+s);if(el)el.textContent=v?nf(v):'';
+    if(interno){const capSem=capMensual()*12/52;const c=document.getElementById('cap_'+s);if(c){const pct=capSem?Math.round(v/capSem*100):0;c.textContent=v?pct+'%':'';c.style.color=pct>100?'var(--rd)':(pct>=85?'var(--am)':'inherit');}}
+  }
+  clientesPlan[emp].forEach((nk,i)=>{
+    const a=document.getElementById('rt_'+emp+'_'+i);if(a)a.innerHTML='<b>'+nf(totCli(emp,nk))+'</b>';
+    const b=document.getElementById('ri_'+emp+'_'+i);if(b)b.textContent=money(ingresoCli(emp,nk));
+  });
+  const ing=clientesPlan[emp].reduce((a,nk)=>a+ingresoCli(emp,nk),0)+(interno?tarifaInterna()*Object.keys(plan).filter(k=>k.startsWith('agrovip'+SEP)).reduce((a,k)=>a+plan[k],0):0);
+  const t1=document.getElementById('tt_'+emp);if(t1)t1.textContent=nf(tTot);
+  const t2=document.getElementById('ti_'+emp);if(t2)t2.textContent=money(ing);
+  const hint=document.getElementById('saveHint');if(hint)hint.textContent=dirty.size?'Cambios sin guardar':'';
+}
+
+function cellChange(el){
+  const emp=el.dataset.e,nk=el.dataset.c,s=parseInt(el.dataset.s);
+  const v=Math.max(0,parseFloat(el.value)||0);
+  const k=emp+SEP+nk+SEP+s;
+  plan[k]=v;dirty.add(k);
+  refreshTotals(emp);
+}
+function priceChange(el){
+  const emp=el.dataset.e,nk=el.dataset.c;
+  precio[emp+SEP+nk]=Math.max(0,parseFloat(el.value)||0);
+  for(let s=1;s<=nSem;s++){if(getC(emp,nk,s)>0)dirty.add(emp+SEP+nk+SEP+s);}
+  refreshTotals(emp);
+}
+function addCliente(emp){
+  const inp=document.getElementById('newCli_'+emp);
+  const name=inp.value.trim();if(!name)return;
+  const nk=norm(name);
+  if(clientesPlan[emp].includes(nk)){toast('Ese cliente ya está en la lista');return;}
+  nombres[nk]=nombres[nk]||name;
+  clientesPlan[emp].push(nk);
+  renderPlan(emp);
+}
+
+async function guardarPlan(){
+  if(!dirty.size){toast('No hay cambios por guardar');return;}
+  const rows=[...dirty].map(k=>{
+    const [emp,nk,s]=k.split(SEP);
+    const p=precio[emp+SEP+nk];
+    return{anio,semana:parseInt(s),empresa:emp,cliente:nombres[nk]||nk,cajas:plan[k]||0,precio_caja:p?p:null,creado_por:USUARIO&&USUARIO.nombre||null};
+  });
+  const btn=document.getElementById('btnSave');if(btn){btn.disabled=true;btn.textContent='Guardando…';}
+  for(let i=0;i<rows.length;i+=400){
+    const ok=await supa('POST','plan_ventas?on_conflict=anio,semana,empresa,cliente',rows.slice(i,i+400),'resolution=merge-duplicates,return=minimal');
+    if(!ok){
+      alert('No se pudo guardar el plan. Revisa tu conexión (o que la tabla plan_ventas exista) e inténtalo de nuevo.');
+      if(btn){btn.disabled=false;btn.textContent='💾 Guardar plan';}
+      return;
+    }
+  }
+  dirty=new Set();
+  if(btn){btn.disabled=false;btn.textContent='💾 Guardar plan';}
+  refreshTotals(tabActual==='packvip'?'packvip':'agrovip');
+  toast('✓ Plan guardado ('+rows.length+' celdas)');
+}
+
+// ---------- comparativo ----------
+function agregarReal(){
+  const real=Array(nSem+2).fill(0),cot=Array(nSem+2).fill(0),realCli={};
+  avisoSinSemana=0;
+  despachos.forEach(d=>{
+    if(d.estado==='Borrador')return;
+    if(anioDe(d.fecha)!==anio)return;
+    const s=parseInt(d.semana);
+    if(!(s>=1&&s<=nSem)){avisoSinSemana++;return;}
+    const c=parseFloat(d.total_cajas)||0;real[s]+=c;
+    const nk=norm(d.cliente);realCli[nk]=realCli[nk]||{n:d.cliente,w:{}};
+    realCli[nk].w[s]=(realCli[nk].w[s]||0)+c;
+  });
+  cotizaciones.forEach(c=>{
+    if(!['Enviada','Aprobada','Facturada'].includes(c.estado))return;
+    if(anioDe(c.fecha_despacho)!==anio)return;
+    const s=parseInt(c.semana_despacho);
+    if(s>=1&&s<=nSem)cot[s]+=parseFloat(c.cajas_total)||0;
+  });
+  return{real,cot,realCli};
+}
+function pill(pct){
+  if(pct==null)return '<span class="pill pn">—</span>';
+  const c=pct>=95?'pv':(pct>=80?'pa':'pr');
+  return '<span class="pill '+c+'">'+Math.round(pct)+'%</span>';
+}
+function renderComp(){
+  const cont=document.getElementById('tab-comp');
+  const {real,cot,realCli}=agregarReal();
+  const hoy=new Date(),semHoy=(anio===hoy.getFullYear())?isoWeek(hoy):-1;
+  const futuro=anio>hoy.getFullYear();
+  const esAg=(empComp==='agrovip');
+  let h='<div class="barra">'
+    +'<label>Empresa <select id="selEmp" onchange="empComp=this.value;renderComp()" style="padding:7px;border-radius:6px;border:1px solid var(--bd)"><option value="agrovip"'+(esAg?' selected':'')+'>Agrovip</option><option value="packvip"'+(esAg?'':' selected')+'>PackVip</option></select></label>'
+    +'<label>Corte: semana <input type="number" min="1" max="'+nSem+'" value="'+corte+'" style="width:64px;padding:7px;border:1px solid var(--bd);border-radius:6px" onchange="corte=Math.min(nSem,Math.max(1,parseInt(this.value)||1));renderComp()"></label></div>';
+  if(!tablaOk)h+='<div class="aviso err">Aún no existe la tabla del plan: el plan se ve en cero. Ejecuta <code>plan_ventas.sql</code> en Supabase.</div>';
+  if(avisoSinSemana)h+='<div class="aviso">Hay '+avisoSinSemana+' despacho(s) de '+anio+' sin una semana válida; no se cuentan en esta tabla. Revisa el campo Semana en Despachos.</div>';
+  if(!esAg)h+='<div class="aviso">Para PackVip solo se compara la parte de Agrovip (despachos). Las cajas realmente empacadas para clientes propios de PackVip todavía no se registran en esta app; se verán aquí cuando exista el registro de producción diaria.</div>';
+
+  const planA=s=>totSem('agrovip',s),planP=s=>totSem('packvip',s);
+  let accPlan=0,accReal=0,bajo=0;
+  const filas=[];
+  for(let s=1;s<=nSem;s++){
+    const pl=planA(s),re=real[s],dentro=(s<=corte);
+    if(dentro){accPlan+=pl;accReal+=re;if(pl>0&&re/pl<0.8)bajo++;}
+    filas.push({s,pl,re,co:cot[s],pp:planP(s),dentro,accP:accPlan,accR:accReal});
+  }
+  const cump=accPlan>0&&!futuro?accReal/accPlan*100:null;
+  h+='<div class="kpis">'
+    +'<div class="kpi"><div class="l">Plan acumulado (S1–S'+corte+')</div><div class="v">'+nf(accPlan)+'</div></div>'
+    +'<div class="kpi"><div class="l">Despachado acumulado</div><div class="v">'+nf(accReal)+'</div></div>'
+    +'<div class="kpi"><div class="l">Cumplimiento</div><div class="v">'+(cump==null?'—':Math.round(cump)+'%')+'</div></div>'
+    +'<div class="kpi"><div class="l">Brecha (cajas)</div><div class="v">'+(futuro?'—':nf(accReal-accPlan))+'</div></div>'
+    +'<div class="kpi"><div class="l">Semanas bajo 80%</div><div class="v">'+(futuro?'—':bajo)+'</div></div></div>';
+  h+='<div class="nota">Despachado = despachos en estado Programado o posterior. Cotizado = cotizaciones Enviadas, Aprobadas o Facturadas con fecha de despacho en el año. Las semanas después del corte se muestran en gris.</div>';
+
+  h+='<div class="tw"><table class="grid"><thead><tr><th class="n">Semana</th>';
+  if(esAg)h+='<th>Plan</th><th>Cotizado</th><th>Despachado</th><th>Dif.</th><th>Cumpl.</th><th>Plan acum.</th><th>Desp. acum.</th>';
+  else h+='<th>Plan total PackVip</th><th>De Agrovip</th><th>Clientes PackVip</th><th>Despachado Agrovip</th><th>Dif. vs plan Agrovip</th><th>Cumpl.</th>';
+  h+='</tr></thead><tbody>';
+  filas.forEach(f=>{
+    const cls=(f.s===semHoy?'hoy':'')+(f.dentro?'':' fuera');
+    const pct=(f.pl>0&&f.dentro&&!futuro)?f.re/f.pl*100:null;
+    h+='<tr class="'+cls+'"><td class="n">S'+f.s+(f.s===semHoy?' · hoy':'')+'</td>';
+    if(esAg)h+='<td>'+(f.pl?nf(f.pl):'')+'</td><td>'+(f.co?nf(f.co):'')+'</td><td>'+(f.re?nf(f.re):'')+'</td><td>'+((f.pl||f.re)?nf(f.re-f.pl):'')+'</td><td>'+pill(pct)+'</td><td>'+(f.dentro&&f.accP?nf(f.accP):'')+'</td><td>'+(f.dentro&&f.accR?nf(f.accR):'')+'</td>';
+    else h+='<td>'+((f.pl+f.pp)?nf(f.pl+f.pp):'')+'</td><td>'+(f.pl?nf(f.pl):'')+'</td><td>'+(f.pp?nf(f.pp):'')+'</td><td>'+(f.re?nf(f.re):'')+'</td><td>'+((f.pl||f.re)?nf(f.re-f.pl):'')+'</td><td>'+pill(pct)+'</td>';
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+
+  // por cliente
+  h+='<h3 class="sec">Por cliente (acumulado hasta S'+corte+')</h3>';
+  const mapa={};
+  clientesPlan.agrovip.forEach(nk=>{mapa[nk]={n:nombres[nk]||nk,p:0,r:0,sinPlan:false};for(let s=1;s<=corte;s++)mapa[nk].p+=getC('agrovip',nk,s);});
+  Object.keys(realCli).forEach(nk=>{
+    if(!mapa[nk])mapa[nk]={n:realCli[nk].n,p:0,r:0,sinPlan:true};
+    for(let s=1;s<=corte;s++)mapa[nk].r+=realCli[nk].w[s]||0;
+  });
+  const lista=Object.values(mapa).filter(x=>x.p||x.r).sort((a,b)=>(b.p+b.r)-(a.p+a.r));
+  h+='<div class="tw"><table class="grid"><thead><tr><th class="n">Cliente</th><th>Plan</th><th>Despachado</th><th>Dif.</th><th>Cumpl.</th></tr></thead><tbody>';
+  if(!lista.length)h+='<tr><td class="n" colspan="5" style="text-align:left;font-weight:400;color:var(--gris)">Sin datos todavía.</td></tr>';
+  lista.forEach(x=>{
+    const pc=(x.p>0&&!futuro)?x.r/x.p*100:null;
+    h+='<tr><td class="n">'+esc(x.n)+(x.sinPlan?' <span class="pill pa">sin plan</span>':'')+'</td><td>'+nf(x.p)+'</td><td>'+nf(x.r)+'</td><td>'+nf(x.r-x.p)+'</td><td>'+pill(pc)+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  if(!esAg)h+='<div class="nota">Esta tabla por cliente corresponde a Agrovip.</div>';
+  cont.innerHTML=h;
+}
+</script>
+</body>
+</html>
