@@ -100,7 +100,7 @@ const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0';
 const SEP='::';
 
-let USUARIO=null,anio=2027,nSem=52,tablaOk=true;
+let lastErr='',USUARIO=null,anio=2027,nSem=52,tablaOk=true;
 let plan={},precio={},nombres={},clientesPlan={agrovip:[],packvip:[]};
 let dirty=new Set(),dirtyPrecio=new Set();
 let despachos=[],cotizaciones=[],clientesDB=[];
@@ -123,7 +123,7 @@ async function supa(method,path,body,prefer){
   if(prefer)h['Prefer']=prefer;
   try{
     const r=await fetch(SUPA_URL+'/rest/v1/'+path,{method,headers:h,body:body!==undefined?JSON.stringify(body):undefined});
-    if(!r.ok){console.error('Supabase',r.status,await r.text());return null;}
+    if(!r.ok){const tx=await r.text();lastErr=r.status+' '+tx.slice(0,220);console.error('Supabase',lastErr);return null;}
     if(r.status===204)return true;
     const t=await r.text();
     return t?JSON.parse(t):true;
@@ -352,7 +352,7 @@ async function crearClienteNuevo(emp){
   const reg={id:'cli_'+Date.now(),nombre:name,pais:g('nc_pais').trim(),tipo:'maritimo_sea',cupo:parseFloat(g('nc_cupo'))||0,dias_credito:parseInt(g('nc_dias'))||0,cajas_anio:parseFloat(g('nc_cajas'))||0,creado_por:USUARIO&&USUARIO.nombre||null};
   const ok=await supa('POST','clientes',reg,'return=minimal');
   if(!ok){
-    if(!confirm('No pude crear el cliente en la lista de Clientes (¿ya ejecutaste clientes_ampliar.sql en Supabase?). ¿Agregarlo solo al plan por ahora?'))return;
+    if(!confirm('No pude crear el cliente en la lista de Clientes (¿ya ejecutaste clientes_ampliar.sql en Supabase?).\n\nDetalle técnico: '+lastErr+'\n\n¿Agregarlo solo al plan por ahora?'))return;
   }else{
     clientesDB.push(reg);
     document.getElementById('dl_cli').innerHTML+= '<option value="'+esc(name)+'">';
