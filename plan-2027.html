@@ -206,7 +206,7 @@ function acordadoTxt(emp,nk){
 function pxProm(emp,nk){const c=totCli(emp,nk);return c?ingresoCli(emp,nk)/c:0;}
 
 // ---------- grilla del plan ----------
-function tarifaInterna(){return parseFloat(localStorage.getItem('tarifaInterna')||'')||0;}
+function tarifaInterna(){return parseFloat(localStorage.getItem('tarifaInterna')||'')||1.8;}
 function capMensual(){return parseFloat(localStorage.getItem('capMensual')||'')||120000;}
 
 function renderPlan(emp){

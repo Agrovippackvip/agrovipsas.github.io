@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agrovip · Dashboard de ventas</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--g:#1A6B3C;--g2:#7A9A2E;--am:#D4A017;--rd:#C0392B;--cr:#F5F0E8;--cr2:#EAE3D2;--gris:#6B6B5A;--ink:#1C1C1C;--bd:#E0D8C8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--cr);color:var(--ink);font-size:13px}
+#loginWrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--g);padding:20px}
+.login-box{background:#fff;border-radius:14px;padding:34px 30px;width:340px;text-align:center}
+.login-logo{width:56px;height:56px;background:var(--g2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:#fff;margin:0 auto 14px}
+.login-box h2{color:var(--g);font-size:19px;margin-bottom:4px}
+.login-box p{color:var(--gris);font-size:12px;margin-bottom:18px}
+.login-box input{width:100%;padding:11px;border:1px solid var(--bd);border-radius:8px;font-size:14px;margin-bottom:10px}
+#loginErr{display:none;color:var(--rd);font-size:12px;margin-bottom:8px}
+.btn-p{padding:10px 18px;background:var(--g);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-p:disabled{opacity:.5;cursor:default}
+.btn-s{padding:8px 14px;background:none;border:1px solid var(--g);color:var(--g);border-radius:7px;font-size:12px;cursor:pointer}
+header{background:var(--g);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header a{color:#fff;text-decoration:none;font-size:12px;opacity:.8}
+header h1{font-size:16px;flex:1}
+header select,header .who{font-size:12px}
+header select{padding:5px 8px;border-radius:6px;border:none}
+nav{display:flex;gap:4px;background:#fff;border-bottom:1px solid var(--bd);padding:0 14px;overflow-x:auto}
+nav button{padding:12px 16px;background:none;border:none;border-bottom:3px solid transparent;font-size:13px;font-weight:600;color:var(--gris);cursor:pointer;white-space:nowrap}
+nav button.on{color:var(--g);border-bottom-color:var(--g)}
+main{padding:16px 18px;max-width:100%}
+.aviso{background:#FEF3C7;border:1px solid #F5D77A;color:#7A5200;border-radius:8px;padding:11px 14px;margin-bottom:12px;font-size:12px;line-height:1.5}
+.aviso.err{background:#FDECEA;border-color:#F3B9B2;color:#8E2A20}
+.barra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.barra input[type=text],.barra input[type=number]{padding:8px 10px;border:1px solid var(--bd);border-radius:7px;font-size:12px}
+.nota{font-size:11px;color:var(--gris);margin:6px 0 10px;line-height:1.5}
+.tw{overflow-x:auto;background:#fff;border:1px solid var(--bd);border-radius:10px}
+table.grid{border-collapse:collapse;font-size:12px;min-width:100%}
+table.grid th,table.grid td{padding:4px 5px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}
+table.grid th{background:var(--cr2);font-size:11px;color:var(--gris);position:sticky;top:0}
+table.grid td.n,table.grid th.n{text-align:left;position:sticky;left:0;background:#fff;z-index:2;min-width:150px;font-weight:600}
+table.grid th.n{background:var(--cr2);z-index:3}
+table.grid tr.tot td{background:var(--cr2);font-weight:700}
+table.grid tr.tot td.n{background:var(--cr2)}
+table.grid tr.ro td{background:#F3F8F4;color:var(--g)}
+table.grid tr.prc td{background:#FAF7EE}
+table.grid tr.prc td.n{background:#FAF7EE}
+table.grid tr.ro td.n{background:#F3F8F4}
+input.cell{width:52px;padding:4px 3px;border:1px solid transparent;border-radius:4px;text-align:right;font-size:12px;background:#FFFFF0}
+input.cell:focus{border-color:var(--g);outline:none;background:#fff}
+input.px{width:62px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:12px 14px}
+.kpi .l{font-size:10px;letter-spacing:.5px;color:var(--gris);text-transform:uppercase}
+.kpi .v{font-size:20px;font-weight:700;color:var(--g);margin-top:4px}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.pv{background:#D1FAE5;color:#065F46}.pa{background:#FEF3C7;color:#92400E}.pr{background:#FDE2E0;color:#8E2A20}.pn{background:#EEE;color:#777}
+tr.hoy td{background:#FFF8DC !important}
+tr.fuera td{color:#aaa}
+h3.sec{font-size:13px;color:var(--g);margin:18px 0 8px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;display:none;z-index:50}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px}
+.card h3{font-size:13px;color:var(--g);margin-bottom:8px}
+.kpi .s{font-size:10px;color:var(--gris);margin-top:3px}
+.kpi.rojo .v{color:var(--rd)}.kpi.am .v{color:var(--am)}
+svg text{font-size:9px;fill:#6B6B5A}
+table.grid td.l,table.grid th.l{text-align:left}
+</style>
+</head>
+<body>
+<div id="loginWrap"><div class="login-box"><div class="login-logo">AV</div><h2>Dashboard de ventas</h2><p>Agrovip · PackVip</p>
+<input type="password" id="loginPass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()"><div id="loginErr">Contraseña incorrecta</div>
+<button class="btn-p" style="width:100%" onclick="login()">Entrar</button></div></div>
+<div id="appWrap" style="display:none">
+<header><a href="./index.html">← Inicio</a><h1>Dashboard de ventas</h1>
+<label style="font-size:12px">Año <select id="selAnio" onchange="cargar()"><option>2026</option><option selected>2027</option><option>2028</option></select></label>
+<label style="font-size:12px">Corte: semana <input type="number" id="corteIn" min="1" max="53" style="width:60px;padding:5px;border-radius:6px;border:none" onchange="setCorte(this.value)"></label>
+<span class="who" id="who"></span><button class="btn-s" style="color:#fff;border-color:rgba(255,255,255,.5)" onclick="location.reload()">Salir</button></header>
+<nav><button id="nb-agrovip" class="on" onclick="goEmp('agrovip')">Agrovip</button><button id="nb-packvip" onclick="goEmp('packvip')">PackVip</button></nav>
+<main><div id="avisos"></div><div id="out"></div></main></div>
+<script>
+const SUPA_URL='https://asexyvzorhdddsgjqczh.supabase.co';
+const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZXh5dnpvcmhkZGRzZ2pxY3poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzUzNjUsImV4cCI6MjA5NDM1MTM2NX0.QTw9LfbpbKFelpsqeZrVhiEdz3hzYBDreouO8Mi1Xx0";
+let USUARIO=null,anio=2027,nSem=52,corte=52,emp='agrovip',tablaOk=true;
+let planRows=[],desps=[],cots=[],realRows=[],realOk=true,staged=null,acuerdos=[],avances=[],acOk=true,editAc=null,formAc=false;
+const norm=s=>String(s==null?'':s).trim().toLowerCase();
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=n=>Math.round(n).toLocaleString('en-US');
+const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+const pc=(a,b)=>b>0?a/b*100:null;
+const num=x=>parseFloat(x)||0;
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y0=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y0)/86400000+1)/7);}
+function weeksIn(y){return isoWeek(new Date(y,11,28));}
+function anioDe(f){const y=parseInt(String(f||'').slice(0,4));return isNaN(y)?null:y;}
+function mesDeSemana(y,w){const j4=new Date(Date.UTC(y,0,4));const dow=j4.getUTCDay()||7;const lunes=new Date(j4.getTime()-(dow-1)*864e5);const jue=new Date(lunes.getTime()+((w-1)*7+3)*864e5);return jue.getUTCMonth();}
+const qDeMes=m=>Math.floor(m/3);
+async function supa(path){try{const r=await fetch(SUPA_URL+'/rest/v1/'+path,{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}});if(!r.ok){console.error(r.status,await r.text());return null;}return await r.json();}catch(e){console.error(e);return null;}}
+async function login(){
+  const pw=document.getElementById('loginPass').value.trim();const err=document.getElementById('loginErr');
+  const data=pw?await supa('usuarios?clave=eq.'+encodeURIComponent(pw)+'&select=*'):null;
+  if(!data||!data.length){err.style.display='block';return;}
+  USUARIO=data[0];document.getElementById('loginWrap').style.display='none';document.getElementById('appWrap').style.display='block';
+  document.getElementById('who').textContent=USUARIO.nombre||'';await cargar();
+}
+async function cargar(){
+  anio=parseInt(document.getElementById('selAnio').value);nSem=weeksIn(anio);
+  const [p,d,c,rs,ac,av]=await Promise.all([supa('plan_ventas?anio=eq.'+anio+'&select=*'),supa('despachos?select=*'),supa('cotizaciones?select=*'),supa('real_semanal?anio=eq.'+anio+'&select=*'),supa('acuerdos_packvip?select=*&order=fecha_inicio.desc'),supa('avance_acuerdo?select=*&order=fecha.asc')]);
+  tablaOk=(p!==null);planRows=p||[];desps=d||[];cots=c||[];realOk=(rs!==null);realRows=rs||[];acOk=(ac!==null);acuerdos=ac||[];avances=av||[];
+  const hoy=new Date();corte=(anio===hoy.getFullYear())?Math.min(isoWeek(hoy),nSem):nSem;
+  document.getElementById('corteIn').value=corte;
+  document.getElementById('avisos').innerHTML=tablaOk?'':'<div class="aviso err">Falta la tabla del plan (<code>plan_ventas.sql</code>). El plan se ve en cero.</div>';
+  render();
+}
+function setCorte(v){corte=Math.max(1,Math.min(nSem,parseInt(v)||1));render();}
+function goEmp(e){emp=e;document.getElementById('nb-agrovip').classList.toggle('on',e==='agrovip');document.getElementById('nb-packvip').classList.toggle('on',e==='packvip');render();}
+
+// ---------- modelo de datos ----------
+function modelo(){
+  const W=nSem+1;
+  const planA=Array(W).fill(0),planP=Array(W).fill(0),real=Array(W).fill(0);
+  const cli={}; const get=(n)=>{const k=norm(n);return cli[k]=cli[k]||{n,planA:0,planP:0,real:0,ing:0,util:0,cotIng:0,fact:0,factCosto:0,costo:0,cajasCot:0,otifOk:0,otifN:0,ifOk:0,ifN:0,otOk:0,otN:0};};
+  planRows.forEach(r=>{const s=r.semana;if(s<1||s>nSem)return;const c=num(r.cajas);const k=get(r.cliente);
+    if(r.empresa==='agrovip'){planA[s]+=c;if(s<=corte)k.planA+=c;}else{planP[s]+=c;if(s<=corte)k.planP+=c;}});
+  const cotById={};cots.forEach(c=>{cotById[c.id]=c;if(c.supa_id)cotById[c.supa_id]=c;});
+  let sinSem=0;
+  desps.forEach(d=>{
+    if(d.estado==='Borrador'||anioDe(d.fecha)!==anio)return;
+    const s=parseInt(d.semana);if(!(s>=1&&s<=nSem)){sinSem++;return;}
+    const c=num(d.total_cajas);real[s]+=c;const k=get(d.cliente||'—');if(s<=corte)k.real+=c;
+    if(s>corte)return;
+    // OTIF: en cantidad (>=95% del objetivo) y a tiempo (semana de salida <= semana prometida en la cotización)
+    const obj=num(d.cajas_obj);const ct=cotById[d.cotizacion_id];
+    const inFull=obj>0?c>=0.95*obj:null;
+    const prom=ct?parseInt(ct.semana_despacho):NaN;
+    const onTime=(ct&&prom>0)?s<=prom:null;
+    if(inFull!==null){k.ifN++;if(inFull)k.ifOk++;}
+    if(onTime!==null){k.otN++;if(onTime)k.otOk++;}
+    if(inFull!==null&&onTime!==null){k.otifN++;if(inFull&&onTime)k.otifOk++;}
+  });
+  // cotizaciones comprometidas (Aprobada/Facturada) con despacho en el año
+  const mesIng=Array(12).fill(0),mesUtil=Array(12).fill(0),mesPlan=Array(12).fill(0),mesReal=Array(12).fill(0);
+  const costoSem={};let tot={ing:0,util:0,cajas:0,costo:0,factIng:0,factCosto:0};
+  cots.forEach(c=>{
+    if(!['Aprobada','Facturada'].includes(c.estado))return;
+    if(anioDe(c.fecha_despacho)!==anio)return;
+    const s=parseInt(c.semana_despacho);if(!(s>=1&&s<=nSem)||s>corte)return;
+    const k=get(c.cliente||'—');const ing=num(c.valor_cotizado),ut=num(c.utilidad),co=num(c.costo_total),ca=num(c.cajas_total);
+    k.ing+=ing;k.util+=ut;k.costo+=co;k.cajasCot+=ca;tot.ing+=ing;tot.util+=ut;tot.cajas+=ca;tot.costo+=co;
+    const m=mesDeSemana(anio,s);mesIng[m]+=ing;mesUtil[m]+=ut;
+    if(c.estado==='Facturada'&&num(c.valor_facturado_real)>0){k.fact+=num(c.valor_facturado_real);k.factCosto+=co;tot.factIng+=num(c.valor_facturado_real);tot.factCosto+=co;}
+  });
+  const mk=()=>({cajas:Array(W).fill(0),ing:Array(W).fill(0),cos:Array(W).fill(0),n:0});
+  const R={agrovip:mk(),packvip:mk()};
+  realRows.forEach(r=>{const s=parseInt(r.semana);if(!R[r.empresa]||!(s>=1&&s<=nSem))return;const o=R[r.empresa];o.cajas[s]=num(r.cajas);o.ing[s]=num(r.ingreso);o.cos[s]=num(r.costo);o.n++;});
+  const planTot=planA.map((v,i)=>v+planP[i]);
+  return {planA,planP,planTot,real,cli,tot,mesIng,mesUtil,sinSem,R};
+}
+function suma(a,d,h){let t=0;for(let s=d;s<=h;s++)t+=a[s]||0;return t;}
+function rangoMes(m){let d=0,h=0;for(let s=1;s<=nSem;s++){if(mesDeSemana(anio,s)===m){if(!d)d=s;h=s;}}return[d,h];}
+function rangoQ(q){const [d]=rangoMes(q*3);const [,h]=rangoMes(q*3+2);return[d,h];}
+function pill(p){if(p==null)return '<span class="pill pn">—</span>';return '<span class="pill '+(p>=95?'pv':p>=80?'pa':'pr')+'">'+Math.round(p)+'%</span>';}
+const pctTxt=p=>p==null?'—':p.toFixed(1)+'%';
+
+// ---------- render ----------
+function render(){
+  const M=modelo(),esAg=(emp==='agrovip');
+  // plan de referencia del cumplimiento: Agrovip = su plan; PackVip = plan interno (Agrovip) que sí tiene real registrado
+  const R=M.R[emp],hasR=R.n>0;
+  const tarifa=parseFloat(localStorage.getItem('tarifaInterna'))||1.8,mLo=parseFloat(localStorage.getItem('mgLo'))||30,mHi=parseFloat(localStorage.getItem('mgHi'))||40;
+  const plan=esAg?M.planA:(hasR?M.planTot:M.planA),real=esAg?M.real:(hasR?R.cajas:M.real);
+  const cmesIdx=mesDeSemana(anio,Math.min(corte,nSem)),[md,mh]=rangoMes(cmesIdx),[qd,qh]=rangoQ(qDeMes(cmesIdx));
+  const cumplSem=pc(real[corte],plan[corte]),cumplMes=pc(suma(real,md,Math.min(mh,corte)),suma(plan,md,Math.min(mh,corte)));
+  const cumplQ=pc(suma(real,qd,Math.min(qh,corte)),suma(plan,qd,Math.min(qh,corte)));
+  const planAc=suma(plan,1,corte),realAc=suma(real,1,corte),cumplAc=pc(realAc,planAc);
+  const futuro=anio>new Date().getFullYear();
+  let tIF=0,tIFn=0,tOT=0,tOTn=0,tO=0,tOn=0;Object.values(M.cli).forEach(k=>{tIF+=k.ifOk;tIFn+=k.ifN;tOT+=k.otOk;tOTn+=k.otN;tO+=k.otifOk;tOn+=k.otifN;});
+  const mEst=pc(M.tot.util,M.tot.ing),mFact=M.tot.factIng>0?pc(M.tot.factIng-M.tot.factCosto,M.tot.factIng):null;
+  const costoProm=M.tot.cajas>0?M.tot.costo/M.tot.cajas:null;
+  const sumR=a=>suma(a,1,corte);
+  let expIng=0;for(let s=1;s<=corte;s++)expIng+=plan[s]*tarifa;
+  const mReal=hasR?pc(sumR(R.ing)-sumR(R.cos),sumR(R.ing)):null,realCostoCaja=hasR&&sumR(R.cajas)>0?sumR(R.cos)/sumR(R.cajas):null;
+  const showFin=esAg||hasR;
+  const mesIng=Array(12).fill(0),mesUtil=Array(12).fill(0);
+  if(esAg){for(let m=0;m<12;m++){mesIng[m]=M.mesIng[m];mesUtil[m]=M.mesUtil[m];}}
+  else{for(let s=1;s<=corte;s++){const m=mesDeSemana(anio,s);mesIng[m]+=R.ing[s];mesUtil[m]+=R.ing[s]-R.cos[s];}}
+  const kp=(l,v,s,cls)=>'<div class="kpi '+(cls||'')+'"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+(s||'')+'</div></div>';
+  const cl=p=>p==null?'':(p>=95?'':p>=80?'am':'rojo');
+  let h='';
+  if(!esAg&&!hasR)h+='<div class="aviso">Aún no hay datos reales de PackVip para '+anio+'. Mientras tanto el cumplimiento mide solo lo que empaca para Agrovip. Carga el Excel semanal en el panel de abajo («Cargar datos reales») y aparecen ingreso, margen y costo contra lo esperado.</div>';
+  if(!realOk)h+='<div class="aviso err">Falta crear la tabla de datos reales: ejecuta <code>real_semanal.sql</code> en Supabase.</div>';
+  if(M.sinSem)h+='<div class="aviso">'+M.sinSem+' despacho(s) de '+anio+' no tienen una semana válida y no se cuentan.</div>';
+  h+='<div class="kpis">'
+   +kp('Cumplimiento semana '+corte,futuro?'—':pctTxt(cumplSem),nf(real[corte])+' de '+nf(plan[corte])+' cajas',futuro?'':cl(cumplSem))
+   +kp('Cumplimiento mes',futuro?'—':pctTxt(cumplMes),['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][cmesIdx],futuro?'':cl(cumplMes))
+   +kp('Cumplimiento Q'+(qDeMes(cmesIdx)+1),futuro?'—':pctTxt(cumplQ),'',futuro?'':cl(cumplQ))
+   +kp('Acumulado año',futuro?'—':pctTxt(cumplAc),nf(realAc)+' de '+nf(planAc)+' cajas',futuro?'':cl(cumplAc))
+   +(esAg?kp('Margen estimado',pctTxt(mEst),'cotizaciones aprobadas y facturadas · '+money(M.tot.ing)+' ingreso')
+     +kp('Margen facturado',pctTxt(mFact),mFact==null?'sin facturas registradas':'facturado real vs costo cotizado')
+     +kp('Costo promedio / caja',costoProm==null?'—':'$'+costoProm.toFixed(2),'costo cotizado ponderado')
+     +(hasR?kp('Margen real (carga semanal)',pctTxt(pc(sumR(R.ing)-sumR(R.cos),sumR(R.ing))),money(sumR(R.ing))+' ingreso · '+money(sumR(R.cos))+' costo'):'')
+     :(hasR?kp('Ingreso real vs esperado',money(sumR(R.ing)),'esperado '+money(expIng)+' ('+nf(planAc)+' cajas × $'+tarifa.toFixed(2)+')',expIng>0&&sumR(R.ing)<0.8*expIng?'rojo':'')
+       +kp('Margen real acumulado',pctTxt(mReal),'meta '+mLo+'% a '+mHi+'%',mReal==null?'':(mReal<mLo?'rojo':mReal<mHi?'am':''))
+       +kp('Costo real / caja',realCostoCaja==null?'—':'$'+realCostoCaja.toFixed(2),'esperado $'+(tarifa*(1-mHi/100)).toFixed(2)+' a $'+(tarifa*(1-mLo/100)).toFixed(2),realCostoCaja!=null&&realCostoCaja>tarifa*(1-mLo/100)?'rojo':'')
+       +kp('Utilidad real vs esperada',money(sumR(R.ing)-sumR(R.cos)),'esperada '+money(expIng*mLo/100)+' a '+money(expIng*mHi/100))
+       :kp('Ingreso esperado',money(expIng),nf(planAc)+' cajas × $'+tarifa.toFixed(2)+' · utilidad esperada '+money(expIng*mLo/100)+' a '+money(expIng*mHi/100))))
+   +(esAg?kp('OTIF',tOn?pctTxt(pc(tO,tOn)):'—',tOn?tO+' de '+tOn+' despachos':'sin despachos evaluables',tOn?cl(pc(tO,tOn)):'')
+   +kp('En cantidad (IF)',tIFn?pctTxt(pc(tIF,tIFn)):'—','≥95% de cajas objetivo')
+   +kp('A tiempo (OT)',tOTn?pctTxt(pc(tOT,tOTn)):'—','semana de salida ≤ prometida'):'')
+   +'</div>';
+  // gráfico semanal
+  h+='<div class="card" style="margin-bottom:14px"><h3>Cajas por semana — plan vs despachado</h3>'+chart(plan,real,esAg?null:M.planP)+'</div>';
+  // mensual y Q
+  const nm=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  let fm='';for(let m=0;m<12;m++){const [d,hh]=rangoMes(m);if(!d)continue;const p=suma(plan,d,hh),r=suma(real,d,Math.min(hh,corte)),pp=suma(plan,d,Math.min(hh,corte));
+    fm+='<tr><td class="n l">'+nm[m]+'</td><td>'+nf(p)+'</td><td>'+nf(r)+'</td><td>'+(d>corte||futuro?pill(null):pill(pc(r,pp)))+'</td>'+(showFin?'<td>'+money(mesIng[m])+'</td><td>'+pctTxt(pc(mesUtil[m],mesIng[m]))+'</td>':'')+'</tr>';}
+  let fq='';for(let q=0;q<4;q++){const [d,hh]=rangoQ(q);const p=suma(plan,d,hh),r=suma(real,d,Math.min(hh,corte)),pp=suma(plan,d,Math.min(hh,corte));
+    const ing=[0,1,2].reduce((a,i)=>a+mesIng[q*3+i],0),ut=[0,1,2].reduce((a,i)=>a+mesUtil[q*3+i],0);
+    fq+='<tr><td class="n l">Q'+(q+1)+'</td><td>'+nf(p)+'</td><td>'+nf(r)+'</td><td>'+(d>corte||futuro?pill(null):pill(pc(r,pp)))+'</td>'+(showFin?'<td>'+money(ing)+'</td><td>'+pctTxt(pc(ut,ing))+'</td>':'')+'</tr>';}
+  const th='<th class="n l">Periodo</th><th>Plan</th><th>Despachado</th><th>Cumpl.</th>'+(showFin?(esAg?'<th>Ingreso cotiz.</th><th>Margen est.</th>':'<th>Ingreso real</th><th>Margen real</th>'):'');
+  h+='<div class="cols"><div class="card"><h3>Por mes</h3><div class="tw"><table class="grid"><thead><tr>'+th+'</tr></thead><tbody>'+fm+'</tbody></table></div></div>'
+   +'<div class="card"><h3>Por trimestre (Q)</h3><div class="tw"><table class="grid"><thead><tr>'+th+'</tr></thead><tbody>'+fq+'</tbody></table></div></div></div>';
+  // detalle por cliente
+  let rows=Object.values(M.cli).filter(k=>esAg?(k.planA||k.real||k.ing):(k.planP||k.planA||k.real)).sort((a,b)=>(b.real+b.planA+b.planP)-(a.real+a.planA+a.planP));
+  h+='<h3 class="sec">Detalle por cliente (acumulado hasta S'+corte+')</h3><div class="tw"><table class="grid"><thead><tr><th class="n l">Cliente</th><th>Plan</th><th>Despachado</th><th>Cumpl.</th>'
+    +(esAg?'<th>Ingreso cotiz.</th><th>Margen est.</th><th>Margen fact.</th><th>Costo prom./caja</th>':'')+'<th>OTIF</th></tr></thead><tbody>';
+  if(!rows.length)h+='<tr><td class="n l" colspan="9" style="font-weight:400;color:var(--gris)">Sin datos todavía.</td></tr>';
+  rows.forEach(k=>{
+    const planK=esAg?k.planA:(k.planP+0);
+    if(esAg){
+      h+='<tr><td class="n l">'+esc(k.n)+(k.planA===0&&k.real>0?' <span class="pill pa">sin plan</span>':'')+'</td><td>'+nf(k.planA)+'</td><td>'+nf(k.real)+'</td><td>'+(futuro?pill(null):pill(pc(k.real,k.planA)))+'</td>'
+       +'<td>'+money(k.ing)+'</td><td>'+pctTxt(pc(k.util,k.ing))+'</td><td>'+(k.fact>0?pctTxt(pc(k.fact-k.factCosto,k.fact)):'—')+'</td><td>'+(k.cajasCot>0?'$'+(k.costo/k.cajasCot).toFixed(2):'—')+'</td><td>'+(k.otifN?pill(pc(k.otifOk,k.otifN)):pill(null))+'</td></tr>';
+    }else{
+      h+='<tr><td class="n l">'+esc(k.n)+'</td><td>'+nf(k.planP)+'</td><td><span style="color:var(--gris)">sin registro</span></td><td>—</td><td>—</td></tr>';
+    }
+  });
+  h+='</tbody></table></div>';
+  if(!esAg)h+='<div class="nota">Tabla de clientes propios de PackVip (solo plan). El plan interno de Agrovip está en los indicadores de arriba.</div>';
+  else h+='<div class="nota"><b>Cómo se calcula.</b> Despachado: despachos Programados o posteriores. Margen estimado: utilidad ÷ ingreso de cotizaciones Aprobadas y Facturadas. Margen facturado: (facturado real − costo cotizado) ÷ facturado real, solo cotizaciones Facturadas; es el margen real de ventas contra el costo que se cotizó, no contra el costo realmente pagado. OTIF: un despacho cumple si salió con ≥95% de las cajas objetivo y en la semana prometida o antes; mide la salida de planta, no la llegada al cliente.</div>';
+  h=(esAg?'':panelPack(M,R,hasR,tarifa,mLo,mHi,futuro)+acuerdosCard(tarifa))+alertas(M,esAg,plan,real,R,hasR,mReal,mLo,mHi,realCostoCaja,tarifa,futuro)+h+panelCarga();
+  document.getElementById('out').innerHTML=h;
+}
+function panelPack(M,R,hasR,tarifa,mLo,mHi,futuro){
+  let h='<div class="card" style="margin-bottom:14px"><h3>Supuestos de PackVip (esperado)</h3><div class="barra" style="margin:0">'
+   +'<label class="nota" style="margin:0">Tarifa de empaque $/caja <input type="number" step="0.01" class="cell px" style="border-color:var(--bd)" value="'+tarifa+'" onchange="localStorage.setItem(\'tarifaInterna\',this.value);render()"></label>'
+   +'<label class="nota" style="margin:0">Margen esperado desde % <input type="number" class="cell px" style="border-color:var(--bd)" value="'+mLo+'" onchange="localStorage.setItem(\'mgLo\',this.value);render()"></label>'
+   +'<label class="nota" style="margin:0">hasta % <input type="number" class="cell px" style="border-color:var(--bd)" value="'+mHi+'" onchange="localStorage.setItem(\'mgHi\',this.value);render()"></label>'
+   +'<span class="nota" style="margin:0">Se aplica al plan de cajas de Agrovip + clientes de PackVip. Se guarda en este navegador.</span></div></div>';
+  if(!hasR)return h;
+  let rows='',ai=0,ac=0,ap=0,ar=0;
+  for(let s=1;s<=corte;s++){
+    const pl=M.planTot[s],rc=R.cajas[s],ing=R.ing[s],co=R.cos[s];
+    if(!pl&&!rc&&!ing&&!co)continue;
+    ai+=ing;ac+=co;ap+=pl;ar+=rc;
+    const m=ing>0?(ing-co)/ing*100:null,ma=ai>0?(ai-ac)/ai*100:null;
+    const cls=m==null?'pn':(m<mLo?'pr':m<mHi?'pa':'pv');
+    rows+='<tr><td class="n l">S'+s+'</td><td>'+nf(pl)+'</td><td>'+nf(rc)+'</td><td>'+(futuro?pill(null):pill(pc(rc,pl)))+'</td><td>'+money(pl*tarifa)+'</td><td>'+money(ing)+'</td><td>'+money(co)+'</td><td>'+(rc>0?'$'+(co/rc).toFixed(2):'—')+'</td><td><span class="pill '+cls+'">'+(m==null?'—':m.toFixed(1)+'%')+'</span></td><td>'+(ma==null?'—':ma.toFixed(1)+'%')+'</td></tr>';
+  }
+  return h+'<h3 class="sec">PackVip por semana: esperado contra real</h3><div class="tw" style="margin-bottom:14px"><table class="grid"><thead><tr><th class="n l">Semana</th><th>Plan cajas</th><th>Real cajas</th><th>Cumpl.</th><th>Ingreso esperado</th><th>Ingreso real</th><th>Costo real</th><th>Costo/caja</th><th>Margen sem.</th><th>Margen acum.</th></tr></thead><tbody>'+(rows||'<tr><td class="n l" colspan="10">Sin semanas hasta el corte.</td></tr>')+'</tbody></table></div>';
+}
+function alertas(M,esAg,plan,real,R,hasR,mReal,mLo,mHi,cc,tarifa,futuro){
+  const a=[];
+  if(!futuro){
+    const bajas=[];for(let s=1;s<=corte;s++){if(plan[s]>0&&real[s]/plan[s]<0.8)bajas.push('S'+s);}
+    if(bajas.length)a.push('<b>Volumen bajo el plan (menos de 80%) en '+bajas.length+' semana(s):</b> '+bajas.slice(-8).join(', ')+'. Revisar qué clientes no despacharon y si falta fruta o confirmación del cliente.');
+    const pl=suma(plan,1,corte),re=suma(real,1,corte);
+    if(pl>0&&re/pl<0.9)a.push('<b>Acumulado del año en '+Math.round(re/pl*100)+'% del plan:</b> faltan '+nf(pl-re)+' cajas. Definir qué clientes se reactivan o se suman para cerrar la brecha.');
+  }
+  if(!esAg&&hasR&&mReal!=null){
+    if(mReal<mLo)a.push('<b>Margen real de PackVip ('+mReal.toFixed(1)+'%) por debajo de la meta ('+mLo+'%):</b> el costo por caja real es $'+(cc||0).toFixed(2)+' contra un máximo de $'+(tarifa*(1-mLo/100)).toFixed(2)+'. Revisar horas extra y personal por caja, cartón y desperdicio.');
+    else if(mReal<mHi)a.push('Margen real de PackVip ('+mReal.toFixed(1)+'%) dentro de la banda esperada pero bajo el tope de '+mHi+'%.');
+    else a.push('Margen real de PackVip ('+mReal.toFixed(1)+'%) sobre el tope esperado.');
+  }
+  if(esAg&&!futuro){
+    const tOn=Object.values(M.cli).reduce((x,k)=>x+k.otifN,0),tO=Object.values(M.cli).reduce((x,k)=>x+k.otifOk,0);
+    if(tOn&&tO/tOn<0.9)a.push('<b>OTIF en '+Math.round(tO/tOn*100)+'%:</b> hay despachos que salieron incompletos o tarde. Mirar el detalle por cliente y confirmar fruta y camiones con anticipación.');
+  }
+  if(!a.length)return '';
+  return '<div class="card" style="margin-bottom:14px;border-color:#F5D77A;background:#FFFBEA"><h3>Alertas y acciones sugeridas</h3><ul style="margin-left:18px;line-height:1.7;font-size:12px">'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>';
+}
+// ---------- acuerdos de precio por volumen ----------
+async function supaW(method,path,body,prefer){
+  try{const h={apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json'};if(prefer)h.Prefer=prefer;
+    const r=await fetch(SUPA_URL+'/rest/v1/'+path,{method,headers:h,body:body?JSON.stringify(body):undefined});
+    if(!r.ok){console.error(await r.text());return false;}return true;}catch(e){console.error(e);return false;}
+}
+const dia=s=>new Date(s+'T00:00:00');
+function hoyStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+const esGerencia=()=>!!(USUARIO&&USUARIO.rol==='daniel');
+function evalAcuerdo(a,tarifa,hoy){
+  const ini=dia(a.fecha_inicio),fin=dia(a.fecha_fin),h0=hoy||new Date(new Date().toDateString());
+  const total=Math.round((fin-ini)/864e5)+1,trans=Math.max(0,Math.min(total,Math.round((h0-ini)/864e5)+1)),rest=Math.max(0,total-trans);
+  const av=avances.filter(x=>String(x.acuerdo_id)===String(a.id)),avance=av.reduce((s,x)=>s+num(x.cajas),0),comp=num(a.cajas_compromiso);
+  const ritmo=trans>0?avance/trans:0,proy=ritmo*total,reqDia=rest>0?Math.max(0,comp-avance)/rest:0;
+  let estado;if(avance>=comp)estado='Cumplido';else if(h0>fin)estado='Incumplido';else if(trans===0)estado='Por iniciar';else estado=proy>=comp?'En camino':'En riesgo';
+  const m=num(a.margen_obj)/100,costoBase=tarifa*(1-m),costo=costoBase-(a.aporta_insumos?num(a.ahorro_insumos_caja):0);
+  const esp=num(a.precio_especial),nor=num(a.precio_normal);
+  const sugerido=tarifa-(a.aporta_insumos?num(a.ahorro_insumos_caja)/(1-m):0);
+  const conPrecio=esp>0&&nor>0;
+  const aplica=!conPrecio?null:(estado==='Cumplido'?esp:(estado==='Incumplido'?nor:null));
+  return{conPrecio,total,trans,rest,avance,comp,ritmo,proy,reqDia,estado,costo,esp,nor,sugerido,aplica,
+    margEsp:esp>0?(esp-costo)/esp*100:null,margNor:nor>0?(nor-costo)/nor*100:null,enJuego:avance*(nor-esp),porcentaje:comp>0?avance/comp*100:0};
+}
+function acuerdosCard(tarifa){
+  let h='<div class="card" style="margin-bottom:14px"><h3>Acuerdos de precio por volumen</h3>';
+  if(!acOk)return h+'<div class="aviso err">Falta crear las tablas: ejecuta <code>acuerdos_packvip.sql</code> en Supabase.</div></div>';
+  h+='<div class="nota" style="margin-top:0">Cada acuerdo tiene un precio especial si el cliente cumple el volumen en el plazo, y un precio normal si no cumple. Si el cliente aporta insumos, baja tu costo por caja; el precio debe bajar solo lo necesario para que el margen en % se mantenga.</div>';
+  if(!acuerdos.length)h+='<div class="nota">Aún no hay acuerdos.</div>';
+  const col={Cumplido:'pv','En camino':'pv','En riesgo':'pr',Incumplido:'pr','Por iniciar':'pn'};
+  acuerdos.forEach(a=>{
+    const e=evalAcuerdo(a,tarifa);
+    h+='<div style="border:1px solid var(--bd);border-radius:9px;padding:12px;margin-bottom:10px;background:#FFFEFA">'
+     +'<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b style="font-size:14px">'+esc(a.cliente)+'</b><span class="pill '+col[e.estado]+'">'+e.estado+'</span>'
+     +'<span class="nota" style="margin:0">'+a.fecha_inicio+' → '+a.fecha_fin+' · día '+e.trans+' de '+e.total+'</span><span style="flex:1"></span>'
+     +'<button class="btn-s" onclick="abrirForm('+a.id+')">Editar</button><button class="btn-s" style="color:var(--rd);border-color:var(--rd)" onclick="borrarAcuerdo('+a.id+')">Eliminar</button></div>'
+     +'<div style="background:#EEE;border-radius:5px;height:10px;margin:10px 0 6px"><div style="background:'+(e.estado==='En riesgo'||e.estado==='Incumplido'?'var(--rd)':'var(--g)')+';height:10px;border-radius:5px;width:'+Math.min(100,e.porcentaje)+'%"></div></div>'
+     +'<div class="nota" style="margin:0 0 8px"><b>'+nf(e.avance)+'</b> de '+nf(e.comp)+' cajas ('+e.porcentaje.toFixed(0)+'%)'
+     +(e.estado==='Cumplido'?' · volumen logrado':e.rest>0?' · faltan '+nf(Math.max(0,e.comp-e.avance))+' en '+e.rest+' día(s): <b>'+nf(e.reqDia)+' cajas/día</b> (ritmo actual '+nf(e.ritmo)+'/día, proyección '+nf(e.proy)+')':e.estado==='Incumplido'?' · plazo vencido sin cumplir':'')+'</div>'
+     +(!e.conPrecio?'<div class="nota" style="margin:0 0 8px">'+(esGerencia()?'<b>Faltan los precios del acuerdo.</b> Pulsa Editar y complétalos.':'Gerencia define los precios del acuerdo.')+'</div>':'')
+     +(esGerencia()&&e.conPrecio?'<div class="kpis" style="margin:0 0 8px">'
+     +'<div class="kpi"><div class="l">Precio especial</div><div class="v" style="font-size:16px">$'+e.esp.toFixed(2)+'</div><div class="s">margen '+(e.margEsp==null?'—':e.margEsp.toFixed(1)+'%')+(e.margEsp!=null&&e.margEsp<num(a.margen_obj)-0.05?' · bajo la meta':'')+'</div></div>'
+     +'<div class="kpi"><div class="l">Precio normal (si no cumple)</div><div class="v" style="font-size:16px">$'+e.nor.toFixed(2)+'</div><div class="s">margen '+(e.margNor==null?'—':e.margNor.toFixed(1)+'%')+'</div></div>'
+     +'<div class="kpi"><div class="l">Se factura a</div><div class="v" style="font-size:16px">'+(e.aplica!=null?'$'+e.aplica.toFixed(2):'por definir')+'</div><div class="s">'+(e.aplica!=null?nf(e.avance)+' cajas = '+money(e.avance*e.aplica):'especial si cumple, normal si no')+'</div></div>'
+     +'<div class="kpi '+(e.estado==='En riesgo'||e.estado==='Incumplido'?'rojo':'')+'"><div class="l">Diferencia en juego</div><div class="v" style="font-size:16px">'+money(e.enJuego)+'</div><div class="s">cajas hechas × (normal − especial)</div></div></div>':'')
+     +(esGerencia()&&a.aporta_insumos?'<div class="nota" style="margin:0 0 8px">El cliente pone los insumos (ahorro $'+num(a.ahorro_insumos_caja).toFixed(2)+'/caja). Costo por caja $'+e.costo.toFixed(2)+'. <b>Precio que mantiene el margen de '+num(a.margen_obj)+'%: $'+e.sugerido.toFixed(2)+'</b>.</div>':'')
+     +(a.notas?'<div class="nota" style="margin:0 0 8px">'+esc(a.notas)+'</div>':'')
+     +'<div class="barra" style="margin:0"><input type="date" id="avF_'+a.id+'" value="'+hoyStr()+'" style="padding:6px;border:1px solid var(--bd);border-radius:6px"><input type="number" min="0" id="avC_'+a.id+'" placeholder="cajas" style="width:100px;padding:6px;border:1px solid var(--bd);border-radius:6px"><button class="btn-s" onclick="registrarAvance('+a.id+')">+ Registrar cajas</button>'
+     +'<span class="nota" style="margin:0">'+(avances.filter(x=>String(x.acuerdo_id)===String(a.id)).slice(-4).map(x=>x.fecha.slice(5)+': '+nf(num(x.cajas))).join(' · '))+'</span></div></div>';
+  });
+  if(formAc){
+    const a=acuerdos.find(x=>x.id===editAc)||{};
+    const v=(k,d)=>esc(a[k]!=null?a[k]:(d==null?'':d));
+    h+='<div style="border:2px solid var(--g);border-radius:9px;padding:12px;margin-top:6px"><b>'+(editAc?'Editar acuerdo':'Nuevo acuerdo')+'</b><div class="barra" style="margin:8px 0 0">'
+     +'<label class="nota" style="margin:0">Cliente<br><input type="text" id="ac_cli" value="'+v('cliente')+'" style="padding:6px;width:170px;border:1px solid var(--bd);border-radius:6px"></label>'
+     +'<label class="nota" style="margin:0">Desde<br><input type="date" id="ac_ini" value="'+v('fecha_inicio')+'" style="padding:6px;border:1px solid var(--bd);border-radius:6px"></label>'
+     +'<label class="nota" style="margin:0">Hasta<br><input type="date" id="ac_fin" value="'+v('fecha_fin')+'" style="padding:6px;border:1px solid var(--bd);border-radius:6px"></label>'
+     +'<label class="nota" style="margin:0">Cajas comprometidas<br><input type="number" id="ac_cajas" value="'+v('cajas_compromiso')+'" style="padding:6px;width:110px;border:1px solid var(--bd);border-radius:6px"></label>'
+     +(esGerencia()?'<label class="nota" style="margin:0">Precio especial $/caja<br><input type="number" step="0.01" id="ac_esp" value="'+v('precio_especial')+'" style="padding:6px;width:100px;border:1px solid var(--bd);border-radius:6px"></label>'
+     +'<label class="nota" style="margin:0">Precio normal $/caja<br><input type="number" step="0.01" id="ac_nor" value="'+v('precio_normal',tarifa)+'" style="padding:6px;width:100px;border:1px solid var(--bd);border-radius:6px"></label>'
+     +'<label class="nota" style="margin:0">Margen meta %<br><input type="number" id="ac_mg" value="'+v('margen_obj',35)+'" style="padding:6px;width:80px;border:1px solid var(--bd);border-radius:6px"></label>'
+     +'<label class="nota" style="margin:0"><input type="checkbox" id="ac_ins" '+(a.aporta_insumos?'checked':'')+'> El cliente aporta los insumos</label>'
+     +'<label class="nota" style="margin:0">Ahorro de insumos $/caja<br><input type="number" step="0.01" id="ac_aho" value="'+v('ahorro_insumos_caja',0)+'" style="padding:6px;width:100px;border:1px solid var(--bd);border-radius:6px"></label>':'')+'</div>'
+     +(esGerencia()?'':'<div class="nota">Los precios y el margen los completa Gerencia después.</div>')
+     +'<div class="barra" style="margin:8px 0 0"><input type="text" id="ac_not" placeholder="Notas (condiciones del acuerdo)" value="'+v('notas')+'" style="flex:1;min-width:220px;padding:6px;border:1px solid var(--bd);border-radius:6px"><button class="btn-p" onclick="guardarAcuerdo()">Guardar acuerdo</button><button class="btn-s" onclick="formAc=false;render()">Cancelar</button></div></div>';
+  }else h+='<button class="btn-s" onclick="abrirForm(null)">+ Nuevo acuerdo</button>';
+  return h+'</div>';
+}
+function abrirForm(id){editAc=id;formAc=true;render();}
+async function guardarAcuerdo(){
+  const g=i=>document.getElementById(i).value;
+  const body={cliente:g('ac_cli').trim(),fecha_inicio:g('ac_ini'),fecha_fin:g('ac_fin'),cajas_compromiso:num(g('ac_cajas')),notas:g('ac_not').trim()};
+  if(!editAc)body.creado_por=USUARIO&&USUARIO.nombre||null;
+  if(esGerencia()){Object.assign(body,{precio_especial:num(g('ac_esp'))||null,precio_normal:num(g('ac_nor'))||null,margen_obj:num(g('ac_mg'))||35,aporta_insumos:document.getElementById('ac_ins').checked,ahorro_insumos_caja:num(g('ac_aho'))});}
+  if(!body.cliente||!body.fecha_inicio||!body.fecha_fin||!(body.cajas_compromiso>0)){alert('Completa cliente, fechas y la meta de cajas.');return;}
+  if(body.fecha_fin<body.fecha_inicio){alert('La fecha final no puede ser anterior a la inicial.');return;}
+  const ok=editAc?await supaW('PATCH','acuerdos_packvip?id=eq.'+editAc,body):await supaW('POST','acuerdos_packvip',body,'return=minimal');
+  if(!ok){alert('No se pudo guardar. ¿Ya ejecutaste acuerdos_packvip.sql en Supabase?');return;}
+  formAc=false;editAc=null;await cargar();
+}
+async function registrarAvance(id){
+  const f=document.getElementById('avF_'+id).value,c=num(document.getElementById('avC_'+id).value);
+  if(!f||!(c>0)){alert('Escribe la fecha y las cajas.');return;}
+  if(!await supaW('POST','avance_acuerdo',{acuerdo_id:id,fecha:f,cajas:c,creado_por:USUARIO&&USUARIO.nombre||null},'return=minimal')){alert('No se pudo registrar.');return;}
+  await cargar();
+}
+async function borrarAcuerdo(id){
+  if(!confirm('¿Eliminar este acuerdo y todas las cajas registradas?'))return;
+  if(!await supaW('DELETE','acuerdos_packvip?id=eq.'+id)){alert('No se pudo eliminar.');return;}
+  await cargar();
+}
+// ---------- carga de datos reales ----------
+function panelCarga(){
+  return '<details class="card" style="margin-top:16px" id="detCarga"><summary style="cursor:pointer;font-weight:700;color:var(--g)">Cargar datos reales de la semana (desde Excel)</summary>'
+   +'<div class="nota" style="margin-top:8px">Una fila por semana con 4 columnas: <b>semana, cajas, ingreso, costo</b> (en dólares). Puedes subir un .xlsx o .csv, o copiar las celdas desde Excel y pegarlas. Si repites una semana, se actualiza; no se duplica.</div>'
+   +'<div class="barra"><label class="nota" style="margin:0">Empresa <select id="cargaEmp" style="padding:6px;border-radius:6px;border:1px solid var(--bd)"><option value="agrovip"'+(emp==='agrovip'?' selected':'')+'>Agrovip</option><option value="packvip"'+(emp==='packvip'?' selected':'')+'>PackVip</option></select></label>'
+   +'<input type="file" id="cargaFile" accept=".xlsx,.xls,.csv" onchange="leerArchivo(this)">'
+   +'<button class="btn-s" onclick="descargarPlantilla()">Descargar plantilla</button></div>'
+   +'<textarea id="cargaTxt" rows="5" placeholder="o pega aquí: semana [tab] cajas [tab] ingreso [tab] costo" style="width:100%;padding:8px;border:1px solid var(--bd);border-radius:7px;font-size:12px" oninput="previsualizar(parsePegado(this.value))"></textarea>'
+   +'<div id="cargaPrev" class="nota"></div><button class="btn-p" id="btnCarga" onclick="guardarCarga()" disabled>Guardar datos</button></details>';
+}
+function num2(x){if(typeof x==='number')return x;const t=String(x==null?'':x).replace(/[$\s]/g,'').replace(/,(?=\d{3}\b)/g,'');return parseFloat(t.replace(',','.'));}
+function filasValidas(arr){
+  const out=[];arr.forEach(r=>{if(!r||r.length<4)return;const s=num2(r[0]);if(!(s>=1&&s<=nSem)||s!==Math.floor(s))return;
+    const c=num2(r[1]),i=num2(r[2]),k=num2(r[3]);if([c,i,k].some(isNaN))return;out.push({semana:s,cajas:c,ingreso:i,costo:k});});
+  return out;
+}
+function parsePegado(t){return filasValidas(t.split(/\r?\n/).map(l=>l.includes('\t')?l.split('\t'):l.includes(';')?l.split(';'):l.split(',')));}
+function leerArchivo(inp){
+  const f=inp.files[0];if(!f)return;
+  const rd=new FileReader();rd.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];previsualizar(filasValidas(XLSX.utils.sheet_to_json(ws,{header:1,raw:true})));}catch(err){console.error(err);previsualizar([],'No pude leer el archivo.');}};
+  rd.readAsArrayBuffer(f);
+}
+function previsualizar(rows,msg){
+  staged=rows;const el=document.getElementById('cargaPrev');
+  el.innerHTML=msg?msg:(rows.length?'<b>'+rows.length+' semana(s) listas</b>: de S'+Math.min(...rows.map(r=>r.semana))+' a S'+Math.max(...rows.map(r=>r.semana))+' · '+nf(rows.reduce((a,r)=>a+r.cajas,0))+' cajas · '+money(rows.reduce((a,r)=>a+r.ingreso,0))+' ingreso · '+money(rows.reduce((a,r)=>a+r.costo,0))+' costo. Año '+anio+'.':'No encontré filas válidas. Revisa que la primera columna sea la semana (1 a '+nSem+').');
+  document.getElementById('btnCarga').disabled=!rows.length;
+}
+async function guardarCarga(){
+  if(!staged||!staged.length)return;
+  const e=document.getElementById('cargaEmp').value;
+  const body=staged.map(r=>({anio,semana:r.semana,empresa:e,cajas:r.cajas,ingreso:r.ingreso,costo:r.costo,creado_por:USUARIO&&USUARIO.nombre||null,updated_at:new Date().toISOString()}));
+  try{
+    const r=await fetch(SUPA_URL+'/rest/v1/real_semanal?on_conflict=anio,semana,empresa',{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(body)});
+    if(!r.ok){alert('No se pudo guardar. ¿Ya ejecutaste real_semanal.sql en Supabase?');console.error(await r.text());return;}
+  }catch(err){alert('No se pudo guardar. Revisa tu conexión.');return;}
+  staged=null;emp=e;document.getElementById('nb-agrovip').classList.toggle('on',e==='agrovip');document.getElementById('nb-packvip').classList.toggle('on',e==='packvip');
+  await cargar();alert('Datos guardados. El dashboard ya está actualizado.');
+}
+function descargarPlantilla(){
+  const csv='semana,cajas,ingreso,costo\n1,10000,18000,12000\n2,10500,18900,12400\n';
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='plantilla_datos_reales.csv';a.click();
+}
+function chart(plan,real,extra){
+  const W=1000,H=190,pad=24,n=nSem;const max=Math.max(1,...plan.slice(1),...real.slice(1),...(extra?extra.slice(1):[0]));
+  const bw=(W-pad*2)/n;let s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto">';
+  s+='<line x1="'+pad+'" y1="'+(H-20)+'" x2="'+(W-pad)+'" y2="'+(H-20)+'" stroke="#E0D8C8"/>';
+  for(let i=1;i<=n;i++){
+    const x=pad+(i-1)*bw,hp=plan[i]/max*(H-50),hr=real[i]/max*(H-50);
+    s+='<rect x="'+(x+1)+'" y="'+(H-20-hp)+'" width="'+(bw/2-1)+'" height="'+hp+'" fill="#CBBF9F"><title>S'+i+' plan '+nf(plan[i])+'</title></rect>';
+    s+='<rect x="'+(x+bw/2)+'" y="'+(H-20-hr)+'" width="'+(bw/2-1)+'" height="'+hr+'" fill="'+(i>corte?"#ddd":"#1A6B3C")+'"><title>S'+i+' despachado '+nf(real[i])+'</title></rect>';
+    if(i%4===1)s+='<text x="'+x+'" y="'+(H-6)+'">S'+i+'</text>';
+  }
+  s+='<rect x="'+pad+'" y="2" width="9" height="9" fill="#CBBF9F"/><text x="'+(pad+13)+'" y="10">Plan</text><rect x="'+(pad+55)+'" y="2" width="9" height="9" fill="#1A6B3C"/><text x="'+(pad+68)+'" y="10">Despachado</text></svg>';
+  return s;
+}
+</script>
+</body>
+</html>
